@@ -21,7 +21,19 @@
 결제시 부족한 포인트는 충전과정을 거쳐야 합니다.
 사용자는 결제를 진행하여 좌석을 확정짓습니다.
 결제가 완료되면 대기열 토큰이 만료되고, 좌석 소유권이 사용자에게 이전됩니다.
-## API 설명
+## API Spec
+
+| API | Method | URI | Request | Response
+|----------|----------|----------|----------|----------|
+| 유저 토큰 발급 API | Get | http://localhost/user |  | 'token' |
+| 예약 가능 날짜 API | Get | http://localhost/reservation/{concertId}/date |  | [ConcertDate{id,date,availableSeats,concert}] |
+| 예약 가능 좌석 API | Get | http://localhost/reservation/{concertDateId}/seat |  | [Seat{id,seatNumber,concertDate,status,reservations}] |
+| 좌석 예약 요청 API | Post | http://localhost/seat/{seatId} |  | Seat{id,seatNumber,concertDate,status,reservations} |
+| 잔액 충전 API | Patch | http://localhost/user | 0 | 0 |
+| 잔액 조회 API | Get | http://localhost/user |  | 0 |
+| 결제 API | Post | http://localhost/reservation/{reservationId}/payment |  | PointLog{id,amount,reason,user,reservation,paymentDate} |
+
+
 1. 유저 토큰 발급 API
 JWT와 UserInspector를 활용하여 유저의 UUID와 대기열 정보를 기반으로 토큰을 발급합니다.
 2. 예약 가능 날짜 / 좌석 조회 API
