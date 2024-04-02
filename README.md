@@ -43,3 +43,7 @@ Redis의 pub/sub을 이용한 대기열 기능을 통해 예약 가능한 좌석
    
 ![image](https://github.com/goodmirow-1/ticketing/assets/57578975/30c5317b-811b-4135-8595-2466ab30101a)
 
+
+## 엔티티 릴래이션 다이어그램 ( ERD )
+
+![image](https://github.com/goodmirow-1/ticketing/assets/57578975/25bb72cd-d33a-437e-92ab-88e6fb71f9fa)
