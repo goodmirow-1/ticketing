@@ -6,11 +6,7 @@
 - 좌석 예약 요청시에, 결제가 이루어지지 않더라도 일정 시간동안 다른 유저가 해당 좌석에 접근할 수 없도록 합니다.
 
 ## 타임 라인
-[1주차 - 시나리오 선택 및 요구사항 분석](https://github.com/goodmirow-1/ticketing/milestone/1)
-
-[2주차 - 테스트 케이스, 대기열, 예약 구현](https://github.com/users/goodmirow-1/ticketing/milestone/2)
-
-[3주차 - 피드백 적용 및 포인트, 결제 구현](https://github.com/users/goodmirow-1/ticketing/milestone/3)
+[마일스톤](https://github.com/goodmirow-1/ticketing/milestones)
 
 [로드맵](https://github.com/users/goodmirow-1/projects/2/views/1)
 
