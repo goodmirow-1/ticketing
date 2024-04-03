@@ -22,15 +22,15 @@
 결제가 완료되면 대기열 토큰이 만료되고, 좌석 소유권이 사용자에게 이전됩니다.
 ## API Spec
 
-| API | Method | URI | Request | Response
+| API | Method | URI | Req | Res
 |----------|----------|----------|----------|----------|
-| 유저 토큰 발급 API | Get | http://localhost/user |  | 'token' |
-| 예약 가능 날짜 API | Get | http://localhost/reservation/{concertId}/date |  | [{id,date,availableSeats,concert}] |
-| 예약 가능 좌석 API | Get | http://localhost/reservation/{concertDateId}/seat |  | [{id,seatNumber,concertDate,status,reservations}] |
-| 좌석 예약 요청 API | Post | http://localhost/seat/{seatId} |  | {id,seatNumber,concertDate,status,reservations} |
-| 잔액 충전 API | Patch | http://localhost/user | 0 | 0 |
-| 잔액 조회 API | Get | http://localhost/user |  | 0 |
-| 결제 API | Post | http://localhost/reservation/{reservationId}/payment |  | {id,amount,reason,user,reservation,paymentDate} |
+| 유저 토큰 발급 | Get | /user |  | 'token' |
+| 예약 가능 날짜 | Get | /reservation/{concertId}/date |  | [{id,date,availableSeats,concert}] |
+| 예약 가능 좌석 | Get | /reservation/{concertDateId}/seat |  | [{id,seatNumber,concertDate,status,reservations}] |
+| 좌석 예약 요청 | Post | /seat/{seatId} |  | {id,seatNumber,concertDate,status,reservations} |
+| 잔액 충전 | Patch | /user | 0 | 0 |
+| 잔액 조회 | Get |/user |  | 0 |
+| 결제 | Post |/{reservationId}/payment |  | {id,amount,reason,user,reservation,paymentDate} |
 
 
 1. 유저 토큰 발급 API
