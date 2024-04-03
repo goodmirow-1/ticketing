@@ -33,26 +33,27 @@
 | 결제 | Post |/{reservationId}/payment |  | {id,amount,reason,user,reservation,paymentDate} |
 
 
-1. 유저 토큰 발급 API
-JWT와 UserInspector를 활용하여 유저의 UUID와 대기열 정보를 기반으로 토큰을 발급합니다.
-2. 예약 가능 날짜 / 좌석 조회 API
-Redis의 pub/sub을 이용(SSE)한 대기열 기능을 통해 예약 가능한 좌석 정보를 제공합니다.
-3. 좌석 예약 요청 API
-사용자는 날짜와 좌석 정보를 입력하여 예약을 요청할 수 있습니다.
-예약 시 비관적or낙관적 락을 적용하여 동시성을 제어합니다.
-4. 잔액 충전 / 조회 API
-사용자는 자신의 잔액을 충전하거나 조회할 수 있습니다.
-5. 결제 API
-사용자는 충분한 잔액을 가지고 있어야 결제를 진행할 수 있습니다.
-
 ## 시퀀스 다이어그램
-### 예약 가능 날짜 및 해당 날짜 조회
+### 유저 토큰 발급
    
-![image](https://github.com/goodmirow-1/ticketing/assets/57578975/fbe0210a-5c0d-4a87-bea6-7410d0807b84)
+![image](https://github.com/goodmirow-1/ticketing/assets/57578975/cd1e01f7-aae4-4d33-88da-bd3ff83dea9e)
 
-### 좌석 예약 및 결제
+
+### 예약 가능 날짜 / 좌석 조회
    
-![image](https://github.com/goodmirow-1/ticketing/assets/57578975/30c5317b-811b-4135-8595-2466ab30101a)
+![image](https://github.com/goodmirow-1/ticketing/assets/57578975/1341b2e0-da85-4af9-8fe8-c0c1752c8105)
+
+### 좌석 예약
+
+![image](https://github.com/goodmirow-1/ticketing/assets/57578975/17d6dfd2-1db8-4f72-8aa5-203dec3fb594)
+
+### 잔액 조회 / 충전
+
+![image](https://github.com/goodmirow-1/ticketing/assets/57578975/18bc2740-0ae8-4cdf-9278-3a9611a28e91)
+
+### 결제
+
+![image](https://github.com/goodmirow-1/ticketing/assets/57578975/b2b5944a-dcae-4393-b1b4-3cedb2d941e3)
 
 
 ## 엔티티 릴래이션 다이어그램 ( ERD )
