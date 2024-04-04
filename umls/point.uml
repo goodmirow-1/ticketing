@@ -1,0 +1,16 @@
+@startuml
+participant "클라이언트" as Client
+participant "서버" as Server
+
+== 잔액 충전 ==
+Client -> Server: 잔액 충전 요청 (/api/balance/recharge) with {UserID, Amount}
+Server -> Server: 사용자 식별 및 잔액 업데이트
+Server -> Server: 충전 성공 시 포인트 로그 기록
+Server -> Client: 충전 성공 응답
+
+== 잔액 조회 ==
+Client -> Server: 잔액 조회 요청 (/api/balance) with UserID
+Server -> Server: 사용자 식별 및 현재 잔액 조회
+Server -> Client: 잔액 정보 응답
+
+@enduml

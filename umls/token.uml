@@ -1,0 +1,20 @@
+@startuml
+participant "클라이언트" as Client
+participant "서버" as Server
+
+== 토큰 요청 ==
+Client -> Server: 토큰 요청 (/api/token)
+
+== UUID 및 큐 정보 생성 ==
+Server -> Server: 새 사용자를 위한 UUID 생성
+Server -> Server: 사용자의 큐 위치 결정
+
+== 토큰 생성 ==
+Server -> Server: UUID 및 대기순번 정보로 토큰 구성
+Server -> Server: 토큰 인코딩
+
+== 클라이언트에게 토큰 발급 ==
+Server -> Client: 토큰으로 응답
+
+
+@enduml

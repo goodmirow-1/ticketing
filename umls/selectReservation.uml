@@ -1,0 +1,26 @@
+@startuml
+participant "클라이언트" as Client
+participant "서버" as Server
+
+== 예약 가능 날짜/좌석 조회 요청 ==
+Client -> Server: 예약 가능 날짜 조회 요청 (/api/reservation/dates) with token
+Server -> Server: 토큰 해석 및 대기 순번 정보 추출
+Server -> Server: 대기 순번이 0인지 확인
+alt 대기 순번이 0일 경우
+    Server -> Server: 사용 가능한 날짜 정보 조회
+    Server -> Client: 사용 가능한 날짜 목록 응답
+else 대기 순번이 0이 아닐 경우
+    Server -> Client: 접근 거부 응답
+end
+
+Client -> Server: 특정 날짜에 대한 예약 가능 좌석 조회 요청 (/api/reservation/seats) with token
+Server -> Server: 토큰 해석 및 대기 순번 정보 추출
+Server -> Server: 대기 순번이 0인지 확인
+alt 대기 순번이 0일 경우
+    Server -> Server: 해당 날짜에 사용 가능한 좌석 정보 조회
+    Server -> Client: 사용 가능한 좌석 정보 응답
+else 대기 순번이 0이 아닐 경우
+    Server -> Client: 접근 거부 응답
+end
+
+@enduml
