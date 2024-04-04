@@ -58,8 +58,10 @@
 
 ## 엔티티 릴래이션 다이어그램 ( ERD )
 
-1. WaitingUser Table의 token,queueNumber 를 Index로 설정 ,expiration 컬럼을 추가 해서 조회에 대한 성능을 높임
-2. 예약 테이블의 consertId,consertDateId,seatId 값을 복합 유니크키로 설정해서 낙관적 락을 사용할 수 있게 함
+1. WaitingUser 테이블의 token,queueNumber 를 Index로 설정하고 expiration 컬럼을 추가 해서 대기열 조회에 대한 성능을 높임
+2. ConsertDate 테이블의 date 를 Index로 설정해서 콘서트 날짜 조회에 대한 성능을 높임
+3. Seat 테이블의 concertDateId, status를 Index로 설정해서 콘서트 좌석 조회에 대한 성능을 높임
+2. Reservation 테이블의 consertId,consertDateId,seatId 값을 복합 유니크키로 설정해서 낙관적 락을 사용할 수 있게 함
 
 ![1](https://github.com/goodmirow-1/ticketing/assets/57578975/63bd7adb-8d35-404e-a527-4042dc2ef75d)
 
