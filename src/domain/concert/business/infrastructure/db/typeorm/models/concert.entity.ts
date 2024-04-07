@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm'
 import { ConcertDate } from './concertDate.entity'
-import type { IConcert } from 'src/domain/concert/models/concert.interface'
+import type { IConcert } from 'src/domain/concert/models/concert.entity.interface'
 
 @Entity()
 export class Concert implements IConcert {

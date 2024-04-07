@@ -25,7 +25,7 @@ import { SeatModule } from './api/concert/seat.module'
                     database: process.env.DATABASE,
                     entities: [__dirname + '/**/*.entity{.ts,.js}'],
                     synchronize: true,
-                    logging: false,
+                    logging: true,
                 } as TypeOrmModuleOptions
             },
         }),

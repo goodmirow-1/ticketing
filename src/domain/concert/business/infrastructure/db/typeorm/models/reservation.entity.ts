@@ -2,8 +2,8 @@ import { Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn, Column, Unique }
 import { Concert } from './concert.entity'
 import { Seat } from './seat.entity'
 import { ConcertDate } from './concertDate.entity'
-import type { IReservation } from 'src/domain/concert/models/reservation.interface'
-import { User } from 'src/domain/user/infrastructure/db/typeORM/models/user.entity'
+import type { IReservation } from 'src/domain/concert/models/reservation.entity.interface'
+import { User } from 'src/infrastructure/user/models/user.entity'
 
 @Entity()
 @Unique(['concert', 'concertDate', 'seat']) // Composite unique constraint

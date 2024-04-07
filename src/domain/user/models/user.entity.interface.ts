@@ -1,4 +1,4 @@
-import type { IReservation } from 'src/domain/concert/models/reservation.interface'
+import type { IReservation } from 'src/domain/concert/models/reservation.entity.interface'
 
 export interface IUser {
     id: string

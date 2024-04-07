@@ -1,5 +1,5 @@
-import type { IConcertDate } from './concertDate.interface'
-import type { IReservation } from './reservation.interface'
+import type { IConcertDate } from './concertDate.entity.interface'
+import type { IReservation } from './reservation.entity.interface'
 
 export interface ISeat {
     id: number

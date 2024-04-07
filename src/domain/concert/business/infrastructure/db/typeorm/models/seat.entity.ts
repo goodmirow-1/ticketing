@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToMany, Index } from 'typeorm'
 import { ConcertDate } from './concertDate.entity'
 import { Reservation } from './reservation.entity'
-import type { ISeat } from 'src/domain/concert/models/seat.interface'
+import type { ISeat } from 'src/domain/concert/models/seat.entity.interface'
 
 @Entity()
 export class Seat implements ISeat {

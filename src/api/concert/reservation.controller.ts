@@ -2,7 +2,7 @@ import { Controller, Get, Param, Post } from '@nestjs/common'
 import type { ConcertDate } from 'src/domain/concert/business/infrastructure/db/typeorm/models/concertDate.entity'
 import type { Reservation } from 'src/domain/concert/business/infrastructure/db/typeorm/models/reservation.entity'
 import type { Seat } from 'src/domain/concert/business/infrastructure/db/typeorm/models/seat.entity'
-import type { PointLog } from 'src/domain/user/infrastructure/db/typeORM/models/point-log.entity'
+import type { PointLog } from 'src/infrastructure/user/models/point-history.entity'
 
 @Controller('reservation')
 export class ReservationController {

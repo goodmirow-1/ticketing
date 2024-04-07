@@ -1,4 +1,4 @@
-import type { IConcertDate } from './concertDate.interface'
+import type { IConcertDate } from './concertDate.entity.interface'
 
 export interface IConcert {
     id: number

@@ -1,4 +1,4 @@
-import type { IValidToken } from 'src/domain/user/models/valid-token.interface'
+import type { IValidToken } from 'src/domain/user/models/valid-token.entity.interface'
 import { Entity, PrimaryGeneratedColumn, Column, Index } from 'typeorm'
 
 @Entity()

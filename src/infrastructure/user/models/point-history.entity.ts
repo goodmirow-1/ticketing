@@ -1,10 +1,10 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm'
 import { User } from './user.entity'
-import type { IPointLog } from 'src/domain/user/models/point-log.interface'
+import type { IPointHistory } from 'src/domain/user/models/point-history.entity.interface'
 import { Reservation } from 'src/domain/concert/business/infrastructure/db/typeorm/models/reservation.entity'
 
 @Entity()
-export class PointLog implements IPointLog {
+export class PointHistory implements IPointHistory {
     @PrimaryGeneratedColumn()
     id: number
 
