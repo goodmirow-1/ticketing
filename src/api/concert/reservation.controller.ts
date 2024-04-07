@@ -11,8 +11,8 @@ export class ReservationController {
     @Get(':concertId/date')
     async readDate(@Param('concertId') concertId: number): Promise<ConcertDate[]> {
         return [
-            { id: '1', date: new Date('2024-01-01'), availableSeats: 50, concert: { id: 1, singerName: 'concert', concertDates: [] }, seats: [] },
-            { id: '2', date: new Date('2024-01-02'), availableSeats: 50, concert: { id: 1, singerName: 'concert', concertDates: [] }, seats: [] },
+            { id: '1', date: new Date('2024-01-01'), availableSeats: 50, concert: { id: '1', singerName: 'concert', concertDates: [] }, seats: [] },
+            { id: '2', date: new Date('2024-01-02'), availableSeats: 50, concert: { id: '1', singerName: 'concert', concertDates: [] }, seats: [] },
         ]
     }
 

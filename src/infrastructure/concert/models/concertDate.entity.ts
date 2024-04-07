@@ -9,6 +9,7 @@ export class ConcertDate implements IConcertDate {
     id: string
 
     @Index() // Adding an index to improve performance for queries filtering by date
+    @Column()
     date: Date
 
     @Column()
