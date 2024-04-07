@@ -2,9 +2,9 @@ import type { IConcert } from './concert.entity.interface'
 import type { ISeat } from './seat.entity.interface'
 
 export interface IConcertDate {
-    id: number
+    id: string
 
-    date: string
+    date: Date
 
     availableSeats: number
 

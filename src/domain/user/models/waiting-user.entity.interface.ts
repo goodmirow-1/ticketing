@@ -1,5 +1,5 @@
 export interface IWaitingUser {
-    id: number
+    id: string
 
     token: string
 }

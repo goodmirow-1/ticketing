@@ -2,7 +2,7 @@ import type { IReservation } from 'src/domain/concert/models/reservation.entity.
 import type { IUser } from './user.entity.interface'
 
 export class IPointHistory {
-    id: number
+    id: string
 
     user: IUser
 

@@ -1,5 +1,5 @@
 import { Controller, Param, Post } from '@nestjs/common'
-import type { Seat } from 'src/domain/concert/business/infrastructure/db/typeorm/models/seat.entity'
+import type { Seat } from 'src/infrastructure/concert/models/seat.entity'
 
 @Controller('seat')
 export class SeatController {
@@ -8,9 +8,15 @@ export class SeatController {
     @Post(':seatId')
     async reserveSeat(@Param('seatId') seatId: number): Promise<Seat> {
         return {
-            id: 1,
+            id: '1',
             seatNumber: 1,
-            concertDate: { id: 1, date: '2024-01-01', availableSeats: 50, concert: { id: 1, singerName: 'concert', concertDates: [] }, seats: [] },
+            concertDate: {
+                id: '1',
+                date: new Date('2024-01-01'),
+                availableSeats: 50,
+                concert: { id: '1', singerName: 'concert', concertDates: [] },
+                seats: [],
+            },
             status: 'available',
             reservations: [],
         }

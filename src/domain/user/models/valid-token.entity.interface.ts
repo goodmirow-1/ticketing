@@ -1,5 +1,5 @@
 export interface IValidToken {
-    id: number
+    id: string
 
     token: string
 

@@ -8,8 +8,8 @@ import { User } from 'src/infrastructure/user/models/user.entity'
 @Entity()
 @Unique(['concert', 'concertDate', 'seat']) // Composite unique constraint
 export class Reservation implements IReservation {
-    @PrimaryGeneratedColumn()
-    id: number
+    @PrimaryGeneratedColumn('uuid')
+    id: string
 
     @ManyToOne(() => User, user => user.reservations)
     @JoinColumn({ name: 'userId' })

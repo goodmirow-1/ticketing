@@ -1,7 +1,7 @@
 import type { IConcertDate } from './concertDate.entity.interface'
 
 export interface IConcert {
-    id: number
+    id: string
 
     singerName: string
 

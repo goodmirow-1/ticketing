@@ -3,7 +3,7 @@ import type { IUserWriterRepository } from 'src/domain/user/business/repositorie
 import { EntityManager } from 'typeorm'
 import { User } from '../models/user.entity'
 import type { WaitingUser } from '../models/waiting-user.entity'
-import type { Reservation } from 'src/domain/concert/business/infrastructure/db/typeorm/models/reservation.entity'
+import type { Reservation } from 'src/infrastructure/concert/models/reservation.entity'
 import type { PointHistory } from '../models/point-history.entity'
 
 @Injectable()
@@ -20,7 +20,7 @@ export class UserWriterRepositoryTypeORM implements IUserWriterRepository {
     }
 
     async createWaitingUser(token: string): Promise<WaitingUser> {
-        return { id: 1, token: 'token' }
+        return { id: '1', token: 'token' }
     }
 
     async deleteWaitingUser(id: string): Promise<boolean> {
@@ -37,7 +37,7 @@ export class UserWriterRepositoryTypeORM implements IUserWriterRepository {
 
     async createPointHistory(userId: string, point: number): Promise<PointHistory> {
         return {
-            id: 1,
+            id: '1',
             amount: 100,
             reason: 'payment',
             user: { id: '1', name: 'user', point: 100, reservations: [] },

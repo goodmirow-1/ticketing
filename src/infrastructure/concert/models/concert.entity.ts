@@ -5,7 +5,7 @@ import type { IConcert } from 'src/domain/concert/models/concert.entity.interfac
 @Entity()
 export class Concert implements IConcert {
     @PrimaryGeneratedColumn()
-    id: number
+    id: string
 
     @Column()
     singerName: string

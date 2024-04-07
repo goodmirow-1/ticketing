@@ -1,4 +1,4 @@
-import { Reservation } from 'src/domain/concert/business/infrastructure/db/typeorm/models/reservation.entity'
+import { Reservation } from 'src/infrastructure/concert/models/reservation.entity'
 import type { IUser } from 'src/domain/user/models/user.entity.interface'
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm'
 

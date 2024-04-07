@@ -3,8 +3,8 @@ import { Entity, PrimaryGeneratedColumn, Column, Index } from 'typeorm'
 
 @Entity()
 export class ValidToken implements IValidToken {
-    @PrimaryGeneratedColumn()
-    id: number
+    @PrimaryGeneratedColumn('uuid')
+    id: string
 
     @Index()
     @Column({ nullable: true })

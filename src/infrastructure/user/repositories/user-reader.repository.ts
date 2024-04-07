@@ -2,9 +2,9 @@ import { Inject, Injectable } from '@nestjs/common'
 import type { IUserReaderRepository } from 'src/domain/user/business/repositories/user-reader.repository.interface'
 import { EntityManager } from 'typeorm'
 import { User } from '../models/user.entity'
-import { WaitingUser } from '../models/waiting-user.entity'
+import type { WaitingUser } from '../models/waiting-user.entity'
 import type { PointHistory } from '../models/point-history.entity'
-import { Reservation } from 'src/domain/concert/business/infrastructure/db/typeorm/models/reservation.entity'
+import type { Reservation } from 'src/infrastructure/concert/models/reservation.entity'
 
 @Injectable()
 export class UserReaderRepositoryTypeORM implements IUserReaderRepository {
@@ -26,6 +26,10 @@ export class UserReaderRepositoryTypeORM implements IUserReaderRepository {
                 where: { id },
             })
             .then(user => user.point)
+    }
+
+    async findWaitingUserById(id: string): Promise<WaitingUser> {
+        return Promise.resolve({ id: '1', token: 'token' } as WaitingUser)
     }
 
     async findWaitingUserPosition(token: string): Promise<number | null> {
@@ -58,9 +62,9 @@ export class UserReaderRepositoryTypeORM implements IUserReaderRepository {
         return true
     }
 
-    async findPointHistoryByUserId(userId: number): Promise<PointHistory> {
+    async findPointHistoryByUserId(userId: string): Promise<PointHistory> {
         return {
-            id: 1,
+            id: '1',
             amount: 100,
             reason: 'payment',
             user: { id: '1', name: 'user', point: 100, reservations: [] },

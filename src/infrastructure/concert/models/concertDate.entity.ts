@@ -5,12 +5,11 @@ import type { IConcertDate } from 'src/domain/concert/models/concertDate.entity.
 
 @Entity()
 export class ConcertDate implements IConcertDate {
-    @PrimaryGeneratedColumn()
-    id: number
+    @PrimaryGeneratedColumn('uuid')
+    id: string
 
     @Index() // Adding an index to improve performance for queries filtering by date
-    @Column({ type: 'date' })
-    date: string
+    date: Date
 
     @Column()
     availableSeats: number

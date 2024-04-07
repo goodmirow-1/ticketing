@@ -5,8 +5,8 @@ import type { ISeat } from 'src/domain/concert/models/seat.entity.interface'
 
 @Entity()
 export class Seat implements ISeat {
-    @PrimaryGeneratedColumn()
-    id: number
+    @PrimaryGeneratedColumn('uuid')
+    id: string
 
     @Column({ type: 'int' })
     seatNumber: number

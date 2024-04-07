@@ -3,8 +3,8 @@ import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm'
 
 @Entity()
 export class WaitingUser implements IWaitingUser {
-    @PrimaryGeneratedColumn()
-    id: number
+    @PrimaryGeneratedColumn('uuid')
+    id: string
 
     @Column()
     token: string
