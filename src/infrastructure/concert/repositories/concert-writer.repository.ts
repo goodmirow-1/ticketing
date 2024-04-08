@@ -4,8 +4,10 @@ import { EntityManager } from 'typeorm'
 import { Concert } from '../models/concert.entity'
 import { ConcertDate } from '../models/concertDate.entity'
 import { Seat } from '../models/seat.entity'
-import type { Reservation } from '../models/reservation.entity'
+import { Reservation } from '../models/reservation.entity'
 import { DuplicateConcertDateError } from 'src/domain/concert/business/exceptions/duplicate-concert-date.exception'
+import { FailedUpdateSeatStatusError } from 'src/domain/concert/business/exceptions/failed-update-seat-status.exception'
+import { FailedCreateReservationError } from 'src/domain/concert/business/exceptions/failed-create-reservation.exception'
 
 @Injectable()
 export class ConcertWriterRepository implements IConcertWriterRepository {
@@ -25,21 +27,42 @@ export class ConcertWriterRepository implements IConcertWriterRepository {
         return this.entityManager.save(ConcertDate, { concert, date })
     }
 
-    createSeat(concertDateId: string, seatNumber: number): Promise<Seat> {
-        return this.entityManager.save(Seat, { concertDateId, seatNumber })
+    createSeat(concertDate: ConcertDate, seatNumber: number): Promise<Seat> {
+        return this.entityManager.save(Seat, { concertDate, seatNumber })
     }
 
-    updateSeatStatus(concertDateId: string, isStatus: boolean): Promise<boolean> {
-        return this.entityManager
+    private async updateSeatStatus(concertDateId: string, status: string): Promise<boolean> {
+        return await this.entityManager
             .createQueryBuilder()
             .update(Seat)
-            .set({ isStatus })
-            .where('concertDateId = :concertDateId', { concertDateId })
+            .set({ status })
+            .where('id = :concertDateId', { concertDateId }) // Add a comma after the placeholder
             .execute()
             .then(result => result.affected > 0)
     }
 
-    createReservation(concertDateId: string, seatId: string, userId: string): Promise<Reservation> {
-        return Promise.resolve({} as Reservation)
+    async createReservation(seat: Seat, userId: string): Promise<Reservation> {
+        const reservation = await this.entityManager.save(Reservation, {
+            userId,
+            seat,
+            concert: seat.concertDate.concert,
+            concertDate: seat.concertDate,
+            holdExpiresAt: new Date(Date.now() + 1000 * 60 * 5), //5분
+        })
+
+        if (!reservation) {
+            throw new FailedCreateReservationError('Failed to create reservation')
+        }
+
+        const result = await this.updateSeatStatus(seat.concertDate.id, 'reserved')
+
+        if (result === false) {
+            //rollback
+            await this.entityManager.delete(Reservation, reservation.id)
+
+            throw new FailedUpdateSeatStatusError('Failed to update seat status')
+        }
+
+        return reservation
     }
 }

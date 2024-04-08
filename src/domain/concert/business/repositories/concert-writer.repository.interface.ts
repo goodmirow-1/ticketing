@@ -7,8 +7,7 @@ export interface IConcertWriterRepository {
     createConcert(singerName: string): Promise<IConcert>
     createConcertDate(concert: IConcert, date: Date): Promise<IConcertDate>
 
-    createSeat(concertDateId: string, seatNumber: number): Promise<ISeat>
-    updateSeatStatus(concertDateId: string, isStatus: boolean): Promise<boolean>
+    createSeat(concert: IConcertDate, seatNumber: number): Promise<ISeat>
 
-    createReservation(concertDateId: string, seatId: string, userId: string): Promise<IReservation>
+    createReservation(seat: ISeat, userId: string): Promise<IReservation>
 }

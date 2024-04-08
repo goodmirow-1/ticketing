@@ -10,5 +10,5 @@ export interface ISeat {
 
     status: string
 
-    reservations: IReservation[]
+    reservation: IReservation
 }

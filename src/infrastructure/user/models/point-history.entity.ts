@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm'
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, CreateDateColumn } from 'typeorm'
 import { User } from './user.entity'
 import type { IPointHistory } from 'src/domain/user/models/point-history.entity.interface'
 import { Reservation } from 'src/infrastructure/concert/models/reservation.entity'
@@ -22,6 +22,6 @@ export class PointHistory implements IPointHistory {
     @Column()
     reason: 'charge' | 'payment'
 
-    @Column({ type: 'timestamp' })
-    paymentDate: Date
+    @CreateDateColumn({ type: 'datetime', nullable: false })
+    created_at: Date
 }

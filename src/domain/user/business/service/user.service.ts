@@ -21,4 +21,16 @@ export class UserService {
 
         return token
     }
+
+    async findUserPointById(userId: string): Promise<number> {
+        return await this.userReaderRepository.findUserPointById(userId)
+    }
+
+    async pointCharge(userId: string, point: number): Promise<number> {
+        this.userWriterRepository.checkValidPoint(point)
+        const user = await this.userReaderRepository.findUserById(userId)
+        const chargePoint = await this.userWriterRepository.calculatePoint(user, point, 'charge')
+
+        return chargePoint.amount
+    }
 }

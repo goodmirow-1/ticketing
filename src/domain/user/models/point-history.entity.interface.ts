@@ -12,5 +12,5 @@ export class IPointHistory {
 
     reason: 'charge' | 'payment'
 
-    paymentDate: Date
+    created_at: Date
 }

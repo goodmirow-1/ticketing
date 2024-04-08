@@ -1,4 +1,5 @@
 import { Controller, Get, Param, Post } from '@nestjs/common'
+import { ConcertService } from 'src/domain/concert/business/service/concert.service'
 import type { ConcertDate } from 'src/infrastructure/concert/models/concertDate.entity'
 import type { Reservation } from 'src/infrastructure/concert/models/reservation.entity'
 import type { Seat } from 'src/infrastructure/concert/models/seat.entity'
@@ -6,14 +7,11 @@ import type { PointHistory } from 'src/infrastructure/user/models/point-history.
 
 @Controller('reservation')
 export class ReservationController {
-    constructor() {}
+    constructor(private readonly concertService: ConcertService) {}
 
     @Get(':concertId/date')
     async readDate(@Param('concertId') concertId: number): Promise<ConcertDate[]> {
-        return [
-            { id: '1', date: new Date('2024-01-01'), availableSeats: 50, concert: { id: '1', singerName: 'concert', concertDates: [] }, seats: [] },
-            { id: '2', date: new Date('2024-01-02'), availableSeats: 50, concert: { id: '1', singerName: 'concert', concertDates: [] }, seats: [] },
-        ]
+        return []
     }
 
     @Get(':concertDateId/seat')
@@ -30,7 +28,7 @@ export class ReservationController {
                     seats: [],
                 },
                 status: 'available',
-                reservations: [],
+                reservation: {} as Reservation,
             },
             {
                 id: '2',
@@ -43,7 +41,7 @@ export class ReservationController {
                     seats: [],
                 },
                 status: 'available',
-                reservations: [],
+                reservation: {} as Reservation,
             },
         ]
     }

@@ -17,12 +17,12 @@ export function initUserReaderMockRepo(): Record<keyof IUserReaderRepository, je
 export function initUserWriterMockRepo(): Record<keyof IUserWriterRepository, jest.Mock> {
     return {
         createUser: jest.fn(),
-        updateUserPoint: jest.fn(),
+        calculatePoint: jest.fn(),
+        checkValidPoint: jest.fn(),
         createWaitingUser: jest.fn(),
         deleteWaitingUser: jest.fn(),
         createValidTokenOrWaitingUser: jest.fn(),
         deleteValidToken: jest.fn(),
-        createPointHistory: jest.fn(),
     }
 }
 

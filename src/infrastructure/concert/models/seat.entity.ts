@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, OneToMany, Index } from 'typeorm'
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, Index, OneToOne } from 'typeorm'
 import { ConcertDate } from './concertDate.entity'
 import { Reservation } from './reservation.entity'
 import type { ISeat } from 'src/domain/concert/models/seat.entity.interface'
@@ -20,6 +20,6 @@ export class Seat implements ISeat {
     @Column({ default: 'available' })
     status: 'available' | 'reserved' | 'held'
 
-    @OneToMany(() => Reservation, reservation => reservation.seat)
-    reservations: Reservation[]
+    @OneToOne(() => Reservation, reservation => reservation.seat)
+    reservation: Reservation
 }

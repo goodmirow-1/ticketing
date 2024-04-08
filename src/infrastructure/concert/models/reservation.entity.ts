@@ -11,11 +11,14 @@ export class Reservation implements IReservation {
     @PrimaryGeneratedColumn('uuid')
     id: string
 
+    @Column()
+    amount: number
+
     @ManyToOne(() => User, user => user.reservations)
     @JoinColumn({ name: 'userId' })
     user: User
 
-    @ManyToOne(() => Seat, seat => seat.reservations)
+    @ManyToOne(() => Seat, seat => seat.reservation)
     @JoinColumn({ name: 'seatId' })
     seat: Seat
 

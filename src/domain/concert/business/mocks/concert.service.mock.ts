@@ -4,8 +4,11 @@ import type { IConcertWriterRepository } from '../repositories/concert-writer.re
 export function initConcertReaderMockRepo(): Record<keyof IConcertReaderRepository, jest.Mock> {
     return {
         findConcertById: jest.fn(),
+        findConcertDateById: jest.fn(),
         findAllConcertsByDate: jest.fn(),
+        findSeatById: jest.fn(),
         findSeatsByConcertDate: jest.fn(),
+        findReservationById: jest.fn(),
     }
 }
 
@@ -15,6 +18,5 @@ export function initConcertWriterMockRepo(): Record<keyof IConcertWriterReposito
         createConcert: jest.fn(),
         createConcertDate: jest.fn(),
         createSeat: jest.fn(),
-        updateSeatStatus: jest.fn(),
     }
 }
