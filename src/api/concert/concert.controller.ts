@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common'
+import { Body, Controller, Get, HttpException, HttpStatus, Param, Post, UseGuards } from '@nestjs/common'
 import { CreateConcertUseCase } from './usecase/create-concert.usecase'
 import { CreateConcertDateUseCase } from './usecase/create-concert-date.usecase'
 import { CreateReservationUseCase } from './usecase/create-reservation.usecase'
@@ -9,6 +9,8 @@ import type { IConcert } from 'src/domain/concert/models/concert.entity.interfac
 import type { ISeat } from 'src/domain/concert/models/seat.entity.interface'
 import type { IConcertDate } from 'src/domain/concert/models/concertDate.entity.interface'
 import type { IReservation } from 'src/domain/concert/models/reservation.entity.interface'
+import { GetUser, JwtAuthGuard } from 'src/domain/common/jwt-token.util'
+import { ApiBearerAuth } from '@nestjs/swagger'
 
 @Controller('concert')
 export class ConcertController {
@@ -22,12 +24,20 @@ export class ConcertController {
     ) {}
 
     @Get()
-    async readAllConcerts(): Promise<IConcert[]> {
+    @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth('access-token') // 인증 토큰을 위한 Swagger 데코레이터
+    async readAllConcerts(@GetUser('isWaiting') isWaiting: boolean): Promise<IConcert[]> {
+        this.checkWaiting(isWaiting)
+
         return this.readAllConcertsUseCase.excute()
     }
 
     @Get(':concertDateId/seats')
-    async readAllSeatsByConcertDateId(concertDateId: string): Promise<ISeat[]> {
+    @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth('access-token') // 인증 토큰을 위한 Swagger 데코레이터
+    async readAllSeatsByConcertDateId(@GetUser('isWaiting') isWaiting: boolean, @Param() concertDateId: string): Promise<ISeat[]> {
+        this.checkWaiting(isWaiting)
+
         return this.readAllSeatsByConcertDateIdUseCase.excute(concertDateId)
     }
 
@@ -36,18 +46,42 @@ export class ConcertController {
         return this.createConcertUseCase.excute(singerName)
     }
 
-    @Post(':concertId/concert-date')
-    async createConcertDate(@Body() concertId: string, concertDate: Date): Promise<IConcertDate> {
+    @Post(':concertId/:concertDateId')
+    @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth('access-token') // 인증 토큰을 위한 Swagger 데코레이터
+    async createConcertDate(
+        @GetUser('isWaiting') isWaiting: boolean,
+        @Param('concertId') concertId: string,
+        @Param('concertDateId') concertDate: Date,
+    ): Promise<IConcertDate> {
+        this.checkWaiting(isWaiting)
+
         return this.createConcertDateUseCase.excute(concertId, concertDate)
     }
 
     @Post(':concertDateId/seat')
-    async createSeat(@Body() concertDateId: string, seatNumber: number): Promise<ISeat> {
+    @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth('access-token') // 인증 토큰을 위한 Swagger 데코레이터
+    async createSeat(@GetUser('isWaiting') isWaiting: boolean, @Param('concertDateId') concertDateId: string, @Body() seatNumber: number): Promise<ISeat> {
+        this.checkWaiting(isWaiting)
+
         return this.createSeatUseCase.excute(concertDateId, seatNumber)
     }
 
     @Post(':seatId/reservation')
-    async createReservation(@Body() seatId: string, userId: string): Promise<IReservation> {
+    @UseGuards(JwtAuthGuard)
+    @ApiBearerAuth('access-token') // 인증 토큰을 위한 Swagger 데코레이터
+    async createReservation(
+        @GetUser('isWaiting') isWaiting: boolean,
+        @GetUser('userId') userId: string,
+        @Param('seatId') seatId: string,
+    ): Promise<IReservation> {
+        this.checkWaiting(isWaiting)
+
         return this.createReservationUseCase.excute(seatId, userId)
+    }
+
+    private checkWaiting(isWaiting: boolean): void {
+        if (isWaiting) throw new HttpException({ message: 'Please wait', waitNumber: 1 }, HttpStatus.ACCEPTED)
     }
 }

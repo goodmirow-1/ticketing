@@ -3,5 +3,5 @@ export interface IValidToken {
 
     token: string
 
-    expiration: Date
+    expiration: number
 }

@@ -1,4 +1,4 @@
-import type { IValidToken } from 'src/domain/user/models/valid-token.entity.interface'
+import type { IValidToken } from 'src/domain/waiting/models/valid-token.entity.interface'
 import { Entity, PrimaryGeneratedColumn, Column, Index } from 'typeorm'
 
 @Entity()
@@ -10,6 +10,6 @@ export class ValidToken implements IValidToken {
     @Column({ nullable: true })
     token: string
 
-    @Column({ type: 'timestamp', nullable: true })
-    expiration: Date
+    @Column({ nullable: true })
+    expiration: number
 }

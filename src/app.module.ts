@@ -7,8 +7,11 @@ import { ConfigModule } from '@nestjs/config'
 import { UserModule } from './api/user/user.module'
 import { UserConcertModule } from './api/user-concert/user-concert.module'
 import { ConcertModule } from './api/concert/concert.module'
+import { ScheduleModule } from '@nestjs/schedule'
+import { UserWaitingModule } from './api/user-waiting/user-waiting.module'
 @Module({
     imports: [
+        ScheduleModule.forRoot(),
         ConfigModule.forRoot({
             envFilePath: '.env',
             isGlobal: true,
@@ -32,6 +35,7 @@ import { ConcertModule } from './api/concert/concert.module'
         UserModule,
         ConcertModule,
         UserConcertModule,
+        UserWaitingModule,
     ],
     controllers: [AppController],
     providers: [AppService],

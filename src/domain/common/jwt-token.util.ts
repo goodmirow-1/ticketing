@@ -10,11 +10,12 @@ export class JwtAuthGuard implements CanActivate {
         const token = request.headers.authorization?.split(' ')[1] // Bearer 토큰에서 실제 토큰 추출
 
         if (!token) {
-            return false
+            request.user = { isWaiting: true }
+            return true
         }
 
         try {
-            request.user = jwt.verify(token, process.env.JWT_SECRET_KEY)
+            request.user = jwt.verify(token, `${process.env.JWT_SECRET_KEY}`)
             return true
         } catch (error) {
             console.log(error)
@@ -23,12 +24,12 @@ export class JwtAuthGuard implements CanActivate {
     }
 }
 
-export function generateAccessToken(uuid: string, waitNumber: number, expTime: number): string {
+export function generateAccessToken(uuid: string, expiration: number): string {
     return jwt.sign(
         {
             uuid: uuid,
-            waitNumber: waitNumber,
-            exp: Math.floor(Date.now() / 1000) + expTime,
+            isWating: false,
+            exp: expiration,
         },
         `${process.env.JWT_SECRET_KEY}`,
     )
@@ -37,11 +38,11 @@ export function generateAccessToken(uuid: string, waitNumber: number, expTime: n
 export function extractToken(token: string) {
     const decodedToken = jwt.verify(token, `${process.env.JWT_SECRET_KEY}`) as {
         uuid: string
-        waitNumber: number
+        isWaiting: boolean
         exp: number
     }
 
-    return { uuid: decodedToken.uuid, waitNumber: decodedToken.waitNumber }
+    return { uuid: decodedToken.uuid }
 }
 
 export const GetUser = createParamDecorator((data: string, ctx: ExecutionContext) => {

@@ -1,12 +1,10 @@
 import { initDataAccesorMock } from '../../../infrastructure/db/data-accesor.interface'
-import { initUserReaderMockRepo, initUserWriterMockRepo, setValidToken, setWaitingUserToken } from './user.service.mock'
+import { initUserReaderMockRepo, initUserWriterMockRepo } from './user.service.mock'
 import { v4 as uuidv4 } from 'uuid'
 import { InValidPointError } from '../../../domain/user/exceptions/invalid-point.exception'
 import { ChargeUserPointUseCase } from '../usecase/charge-user-point.usecase'
 import { CreateUserUseCase } from '../usecase/create-user.usecase'
-import { GenerateTokenUseCase } from '../usecase/generate-token.usecase'
 import { ReadUserPointUseCase } from '../usecase/read-user-point.usecase'
-import { extractToken } from '../../../domain/user/common/jwt-token.util'
 
 describe('유저 서비스 유닛 테스트', () => {
     let mockReaderRepo: ReturnType<typeof initUserReaderMockRepo>
@@ -14,7 +12,6 @@ describe('유저 서비스 유닛 테스트', () => {
     let mockDataAccessor: ReturnType<typeof initDataAccesorMock>
     let chargeUserPointUseCase: ChargeUserPointUseCase
     let createUserUseCase: CreateUserUseCase
-    let generateTokenUseCase: GenerateTokenUseCase
     let readUserPointUseCase: ReadUserPointUseCase
 
     beforeEach(() => {
@@ -23,32 +20,7 @@ describe('유저 서비스 유닛 테스트', () => {
         mockDataAccessor = initDataAccesorMock()
         chargeUserPointUseCase = new ChargeUserPointUseCase(mockReaderRepo, mockWriterRepo, mockDataAccessor)
         createUserUseCase = new CreateUserUseCase(mockWriterRepo)
-        generateTokenUseCase = new GenerateTokenUseCase(mockReaderRepo, mockWriterRepo, mockDataAccessor)
         readUserPointUseCase = new ReadUserPointUseCase(mockReaderRepo)
-    })
-
-    describe('유저 토큰 발급 API', () => {
-        it('isTokenCountUnderThreshold is true waitnumber is 0', async () => {
-            const uuid = uuidv4()
-
-            setValidToken(mockReaderRepo, mockWriterRepo)
-
-            const token = extractToken(await generateTokenUseCase.excute(uuid))
-
-            expect(token.uuid).toBe(uuid)
-            expect(token.waitNumber).toBe(0)
-        })
-
-        it('isTokenCountUnderThreshold is false waitnumber is 1', async () => {
-            const uuid = uuidv4()
-
-            setWaitingUserToken(mockReaderRepo, mockWriterRepo)
-
-            const token = extractToken(await generateTokenUseCase.excute(uuid))
-
-            expect(token.uuid).toBe(uuid)
-            expect(token.waitNumber).toBe(1)
-        })
     })
 
     describe('유저 포인트 API', () => {
