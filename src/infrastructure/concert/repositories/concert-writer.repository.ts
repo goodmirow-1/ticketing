@@ -10,7 +10,7 @@ import { FailedUpdateSeatStatusError } from 'src/domain/concert/exceptions/faile
 import { FailedCreateReservationError } from 'src/domain/concert/exceptions/failed-create-reservation.exception'
 
 @Injectable()
-export class ConcertWriterRepository implements IConcertWriterRepository {
+export class ConcertWriterRepositoryTypeORM implements IConcertWriterRepository {
     constructor(@Inject(EntityManager) private readonly entityManager: EntityManager) {}
 
     async createConcert(singerName: string): Promise<Concert> {

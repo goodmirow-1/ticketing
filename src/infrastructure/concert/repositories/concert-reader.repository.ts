@@ -10,7 +10,7 @@ import { NotAvailableSeatError } from 'src/domain/concert/exceptions/not-availab
 import { Reservation } from '../models/reservation.entity'
 
 @Injectable()
-export class ConcertReaderRepository implements IConcertReaderRepository {
+export class ConcertReaderRepositoryTypeORM implements IConcertReaderRepository {
     constructor(@Inject(EntityManager) private readonly entityManager: EntityManager) {}
 
     async findConcertById(id: string): Promise<Concert> {
@@ -21,7 +21,7 @@ export class ConcertReaderRepository implements IConcertReaderRepository {
         return concert
     }
 
-    async findAllConcertsByDate(): Promise<Concert[]> {
+    async findAllConcerts(): Promise<Concert[]> {
         return this.entityManager.find(Concert, { relations: ['concertDates'] })
     }
 
@@ -37,7 +37,7 @@ export class ConcertReaderRepository implements IConcertReaderRepository {
         return seat
     }
 
-    async findSeatsByConcertDate(id: string): Promise<Seat[]> {
+    async findSeatsByConcertDateId(id: string): Promise<Seat[]> {
         const concertDate = await this.entityManager.findOne(ConcertDate, { where: { id }, relations: ['seats'] })
 
         if (!concertDate) throw new NotFoundConcertError(`Concert date id ${id} not found`)

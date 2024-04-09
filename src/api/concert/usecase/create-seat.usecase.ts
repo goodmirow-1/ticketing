@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { Inject, Injectable } from '@nestjs/common'
 import { IConcertReaderRepository } from 'src/domain/concert/repositories/concert-reader.repository.interface'
 import { IConcertWriterRepository } from 'src/domain/concert/repositories/concert-writer.repository.interface'
 import type { ISeat } from 'src/domain/concert/models/seat.entity.interface'
@@ -6,7 +6,9 @@ import type { ISeat } from 'src/domain/concert/models/seat.entity.interface'
 @Injectable()
 export class CreateSeatUseCase {
     constructor(
+        @Inject('IConcertReaderRepository')
         private readonly concertReaderRepository: IConcertReaderRepository,
+        @Inject('IConcertWriterRepository')
         private readonly concertWriterRepository: IConcertWriterRepository,
     ) {}
 

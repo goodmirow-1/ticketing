@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { Inject, Injectable } from '@nestjs/common'
 import { IUserReaderRepository } from 'src/domain/user/repositories/user-reader.repository.interface'
 import { IUserWriterRepository } from 'src/domain/user/repositories/user-writer.repository.interface'
 import { DataAccessor } from 'src/infrastructure/db/data-accesor.interface'
@@ -6,8 +6,11 @@ import { DataAccessor } from 'src/infrastructure/db/data-accesor.interface'
 @Injectable()
 export class ChargeUserPointUseCase {
     constructor(
+        @Inject('IUserReaderRepository')
         private readonly userReaderRepository: IUserReaderRepository,
+        @Inject('IUserWriterRepository')
         private readonly userWriterRepository: IUserWriterRepository,
+        @Inject('DataAccessor')
         private readonly dataAccessor: DataAccessor,
     ) {}
 

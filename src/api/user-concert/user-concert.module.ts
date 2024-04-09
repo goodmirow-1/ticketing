@@ -5,11 +5,23 @@ import { PointHistory } from 'src/infrastructure/user/models/point-history.entit
 import { Reservation } from 'src/infrastructure/concert/models/reservation.entity'
 import { UserConcertController } from './user-concert.controller'
 import { PaymentUserConcertUseCase } from './usecase/payment-user-concert.usecase'
+import { ConcertReaderRepositoryTypeORM } from 'src/infrastructure/concert/repositories/concert-reader.repository'
+import { UserWriterRepositoryTypeORM } from 'src/infrastructure/user/repositories/user-writer.repository'
 
 @Module({
     imports: [TypeOrmModule.forFeature([User, Reservation, PointHistory])],
     controllers: [UserConcertController],
-    providers: [PaymentUserConcertUseCase],
+    providers: [
+        PaymentUserConcertUseCase,
+        {
+            provide: 'IConcertReaderRepository',
+            useClass: ConcertReaderRepositoryTypeORM,
+        },
+        {
+            provide: 'IUserWriterRepository',
+            useClass: UserWriterRepositoryTypeORM,
+        },
+    ],
     exports: [],
 })
 export class UserConcertModule {}

@@ -11,6 +11,8 @@ import { CreateReservationUseCase } from './usecase/create-reservation.usecase'
 import { CreateSeatUseCase } from './usecase/create-seat.usecase'
 import { ReadAllConcertsUseCase } from './usecase/read-all-concerts.usecase'
 import { ReadAllSeatsByConcertDateIdUseCase } from './usecase/read-all-seats-by-concert-date.usecase'
+import { ConcertReaderRepositoryTypeORM } from 'src/infrastructure/concert/repositories/concert-reader.repository'
+import { ConcertWriterRepositoryTypeORM } from 'src/infrastructure/concert/repositories/concert-writer.repository'
 
 @Module({
     imports: [TypeOrmModule.forFeature([Concert, ConcertDate, Reservation, Seat])],
@@ -22,6 +24,14 @@ import { ReadAllSeatsByConcertDateIdUseCase } from './usecase/read-all-seats-by-
         CreateSeatUseCase,
         ReadAllConcertsUseCase,
         ReadAllSeatsByConcertDateIdUseCase,
+        {
+            provide: 'IConcertReaderRepository',
+            useClass: ConcertReaderRepositoryTypeORM,
+        },
+        {
+            provide: 'IConcertWriterRepository',
+            useClass: ConcertWriterRepositoryTypeORM,
+        },
     ],
     exports: [],
 })
