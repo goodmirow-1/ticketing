@@ -5,8 +5,8 @@ import type { TypeOrmModuleOptions } from '@nestjs/typeorm'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { ConfigModule } from '@nestjs/config'
 import { UserModule } from './api/user/user.module'
-import { ReservationModule } from './api/concert/reservation.module'
-import { SeatModule } from './api/concert/seat.module'
+import { UserConcertModule } from './api/user-concert/user-concert.module'
+import { ConcertModule } from './api/concert/concert.module'
 @Module({
     imports: [
         ConfigModule.forRoot({
@@ -30,8 +30,8 @@ import { SeatModule } from './api/concert/seat.module'
             },
         }),
         UserModule,
-        ReservationModule,
-        SeatModule,
+        ConcertModule,
+        UserConcertModule,
     ],
     controllers: [AppController],
     providers: [AppService],

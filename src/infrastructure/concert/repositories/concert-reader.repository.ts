@@ -1,12 +1,12 @@
 import { Inject, Injectable } from '@nestjs/common'
-import type { IConcertReaderRepository } from 'src/domain/concert/business/repositories/concert-reader.repository.interface'
+import type { IConcertReaderRepository } from 'src/domain/concert/repositories/concert-reader.repository.interface'
 import { EntityManager } from 'typeorm'
 import { Concert } from '../models/concert.entity'
 import { Seat } from '../models/seat.entity'
 import { ConcertDate } from '../models/concertDate.entity'
-import { NotFoundConcertError } from 'src/domain/concert/business/exceptions/not-found-concert.exception'
-import { NotFoundSeatError } from 'src/domain/concert/business/exceptions/not-found-seat.exception'
-import { NotAvailableSeatError } from 'src/domain/concert/business/exceptions/not-available-seat.exception'
+import { NotFoundConcertError } from 'src/domain/concert/exceptions/not-found-concert.exception'
+import { NotFoundSeatError } from 'src/domain/concert/exceptions/not-found-seat.exception'
+import { NotAvailableSeatError } from 'src/domain/concert/exceptions/not-available-seat.exception'
 import { Reservation } from '../models/reservation.entity'
 
 @Injectable()

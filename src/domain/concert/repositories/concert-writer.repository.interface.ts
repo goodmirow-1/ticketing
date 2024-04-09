@@ -1,7 +1,7 @@
-import type { IConcert } from '../../models/concert.entity.interface'
-import type { IConcertDate } from '../../models/concertDate.entity.interface'
-import type { IReservation } from '../../models/reservation.entity.interface'
-import type { ISeat } from '../../models/seat.entity.interface'
+import type { IConcert } from '../models/concert.entity.interface'
+import type { IConcertDate } from '../models/concertDate.entity.interface'
+import type { IReservation } from '../models/reservation.entity.interface'
+import type { ISeat } from '../models/seat.entity.interface'
 
 export interface IConcertWriterRepository {
     createConcert(singerName: string): Promise<IConcert>

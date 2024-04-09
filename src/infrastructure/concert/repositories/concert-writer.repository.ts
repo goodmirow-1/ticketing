@@ -1,13 +1,13 @@
 import { Inject, Injectable } from '@nestjs/common'
-import type { IConcertWriterRepository } from 'src/domain/concert/business/repositories/concert-writer.repository.interface'
+import type { IConcertWriterRepository } from 'src/domain/concert/repositories/concert-writer.repository.interface'
 import { EntityManager } from 'typeorm'
 import { Concert } from '../models/concert.entity'
 import { ConcertDate } from '../models/concertDate.entity'
 import { Seat } from '../models/seat.entity'
 import { Reservation } from '../models/reservation.entity'
-import { DuplicateConcertDateError } from 'src/domain/concert/business/exceptions/duplicate-concert-date.exception'
-import { FailedUpdateSeatStatusError } from 'src/domain/concert/business/exceptions/failed-update-seat-status.exception'
-import { FailedCreateReservationError } from 'src/domain/concert/business/exceptions/failed-create-reservation.exception'
+import { DuplicateConcertDateError } from 'src/domain/concert/exceptions/duplicate-concert-date.exception'
+import { FailedUpdateSeatStatusError } from 'src/domain/concert/exceptions/failed-update-seat-status.exception'
+import { FailedCreateReservationError } from 'src/domain/concert/exceptions/failed-create-reservation.exception'
 
 @Injectable()
 export class ConcertWriterRepository implements IConcertWriterRepository {

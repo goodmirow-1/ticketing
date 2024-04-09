@@ -1,10 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common'
-import type { IUserReaderRepository } from 'src/domain/user/business/repositories/user-reader.repository.interface'
+import type { IUserReaderRepository } from 'src/domain/user/repositories/user-reader.repository.interface'
 import { EntityManager } from 'typeorm'
 import { User } from '../models/user.entity'
 import { WaitingUser } from '../models/waiting-user.entity'
 import { PointHistory } from '../models/point-history.entity'
-import { NotFoundUserError } from 'src/domain/user/business/exceptions/not-found-user.exception'
+import { NotFoundUserError } from 'src/domain/user/exceptions/not-found-user.exception'
 import { ValidToken } from '../models/valid-token.entity'
 
 @Injectable()

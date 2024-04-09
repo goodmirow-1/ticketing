@@ -1,6 +1,6 @@
-import type { IPointHistory } from '../../models/point-history.entity.interface'
-import type { IUser } from '../../models/user.entity.interface'
-import type { IWaitingUser } from '../../models/waiting-user.entity.interface'
+import type { IPointHistory } from '../models/point-history.entity.interface'
+import type { IUser } from '../models/user.entity.interface'
+import type { IWaitingUser } from '../models/waiting-user.entity.interface'
 
 export interface IUserWriterRepository {
     createUser(name: string): Promise<IUser>

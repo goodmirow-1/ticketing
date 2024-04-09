@@ -1,5 +1,5 @@
-import type { IUserReaderRepository } from '../repositories/user-reader.repository.interface'
-import type { IUserWriterRepository } from '../repositories/user-writer.repository.interface'
+import type { IUserReaderRepository } from '../../../domain/user/repositories/user-reader.repository.interface'
+import type { IUserWriterRepository } from '../../../domain/user/repositories/user-writer.repository.interface'
 
 export function initUserReaderMockRepo(): Record<keyof IUserReaderRepository, jest.Mock> {
     return {
