@@ -8,19 +8,15 @@ import type { IWaitingReaderRepository } from 'src/domain/waiting/repositories/w
 export class WaitingReaderRepositoryTypeORM implements IWaitingReaderRepository {
     constructor(@Inject(EntityManager) private readonly entityManager: EntityManager) {}
 
-    async findWaitingUserById(id: string): Promise<WaitingUser> {
-        return this.entityManager.findOne(WaitingUser, { where: { id } })
-    }
-
-    async findWaitingUserPosition(token: string): Promise<number | null> {
+    async findWaitingUserPosition(userId: string): Promise<number> {
         const result = await this.entityManager
             .createQueryBuilder(WaitingUser, 'user')
             .select('ROW_NUMBER() OVER (ORDER BY user.id) as position')
-            .addSelect('user.id')
-            .where('user.token = :token', { token })
+            .addSelect('user.userId')
+            .where('user.userId = :userId', { userId })
             .getRawOne()
 
-        return result ? result.position : null
+        return result ? result.position : NaN
     }
 
     async getWaitingUserCount(isValid: boolean): Promise<number> {

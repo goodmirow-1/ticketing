@@ -1,7 +1,7 @@
 import type { IWaitingUser } from '../../waiting/models/waiting-user.entity.interface'
 
 export interface IWaitingReaderRepository {
-    findWaitingUserById(token: string): Promise<IWaitingUser>
+    findWaitingUserPosition(userId: string): Promise<number>
     getWaitingUserCount(isValid: boolean): Promise<number>
     findLastWaitingUser(): Promise<IWaitingUser>
 
