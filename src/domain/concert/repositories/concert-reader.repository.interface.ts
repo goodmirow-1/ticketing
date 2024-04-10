@@ -8,7 +8,9 @@ export interface IConcertReaderRepository {
     findAllConcerts(): Promise<IConcert[]>
 
     findConcertDateById(concertDateId: string): Promise<IConcertDate>
+    checkValidConcertDate(concertDate: IConcertDate)
 
+    checkValidSeatNumber(seatNumber: number)
     findSeatById(seatId: string): Promise<ISeat>
     findSeatsByConcertDateId(concertDateId: string): Promise<ISeat[]>
 

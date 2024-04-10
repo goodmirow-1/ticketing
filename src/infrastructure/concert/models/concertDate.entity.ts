@@ -12,7 +12,7 @@ export class ConcertDate implements IConcertDate {
     @Column()
     date: Date
 
-    @Column()
+    @Column({ default: process.env.MAX_SEATS })
     availableSeats: number
 
     @ManyToOne(() => Concert, concert => concert.concertDates)

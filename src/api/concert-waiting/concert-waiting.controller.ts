@@ -42,7 +42,7 @@ export class ConcertWaitingController {
     async readAllSeatsByConcertDateId(
         @GetUser('isWaiting') isWaiting: boolean,
         @GetUser('userId') userId: string,
-        @Param() concertDateId: string,
+        @Param('concertDateId') concertDateId: string,
     ): Promise<ISeat[]> {
         this.checkWaiting(userId, isWaiting)
 

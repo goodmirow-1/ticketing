@@ -6,6 +6,8 @@ export function initConcertReaderMockRepo(): Record<keyof IConcertReaderReposito
         findConcertById: jest.fn(),
         findConcertDateById: jest.fn(),
         findAllConcerts: jest.fn(),
+        checkValidConcertDate: jest.fn(),
+        checkValidSeatNumber: jest.fn(),
         findSeatById: jest.fn(),
         findSeatsByConcertDateId: jest.fn(),
         findReservationById: jest.fn(),

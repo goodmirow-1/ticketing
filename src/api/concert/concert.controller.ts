@@ -20,18 +20,19 @@ export class ConcertController {
     @ApiOperation({
         summary: '생성',
     })
-    @ApiBody({ schema: { type: 'object', properties: { name: { type: 'string', example: '아이유' } } } })
-    async createConcert(@Body() singerName: string): Promise<IConcert> {
+    @ApiBody({ schema: { type: 'object', properties: { singerName: { type: 'string', example: '아이유' } } } })
+    async createConcert(@Body('singerName') singerName: string): Promise<IConcert> {
         return this.createConcertUseCase.excute(singerName)
     }
 
-    @Post(':concertId/:concertDateId')
+    @Post(':concertId/')
     @ApiOperation({
         summary: '날짜 생성',
     })
-    @ApiParam({ name: 'concertId', required: true, description: 'concertId ID' })
-    @ApiParam({ name: 'concertDateId', required: true, description: 'concertDateId ID' })
-    async createConcertDate(@Param('concertId') concertId: string, @Param('concertDateId') concertDate: Date): Promise<IConcertDate> {
+    @ApiParam({ name: 'concertId', required: true, description: 'concertId ID', example: '10cb4292-676a-4854-9afc-719b6d03abfe' })
+    @ApiBody({ schema: { type: 'object', properties: { concertDate: { type: 'date', example: '2024-12-10 11:34:00' } } } })
+    async createConcertDate(@Param('concertId') concertId: string, @Body('concertDate') concertDate: Date): Promise<IConcertDate> {
+        console.log(concertDate)
         return this.createConcertDateUseCase.excute(concertId, concertDate)
     }
 
@@ -39,9 +40,9 @@ export class ConcertController {
     @ApiOperation({
         summary: '좌석 생성',
     })
-    @ApiParam({ name: 'concertId', required: true, description: 'concertId ID' })
+    @ApiParam({ name: 'concertDateId', required: true, description: 'concertDateId ID', example: '1be4195c-e170-4d29-9889-9e61f3973684' })
     @ApiBody({ schema: { type: 'object', properties: { seatNumber: { type: 'number', example: 1 } } } })
-    async createSeat(@Param('concertDateId') concertDateId: string, @Body() seatNumber: number): Promise<ISeat> {
+    async createSeat(@Param('concertDateId') concertDateId: string, @Body('seatNumber') seatNumber: number): Promise<ISeat> {
         return this.createSeatUseCase.excute(concertDateId, seatNumber)
     }
 }

@@ -8,10 +8,27 @@ import { NotFoundConcertError } from 'src/domain/concert/exceptions/not-found-co
 import { NotFoundSeatError } from 'src/domain/concert/exceptions/not-found-seat.exception'
 import { NotAvailableSeatError } from 'src/domain/concert/exceptions/not-available-seat.exception'
 import { Reservation } from '../models/reservation.entity'
+import { InValidSeatNumberError } from 'src/domain/concert/exceptions/invalid-seat-number.exception'
 
 @Injectable()
 export class ConcertReaderRepositoryTypeORM implements IConcertReaderRepository {
     constructor(@Inject(EntityManager) private readonly entityManager: EntityManager) {}
+
+    async checkValidSeatNumber(seatNumber: number) {
+        if (seatNumber < 1 || seatNumber > parseInt(process.env.MAX_SEATS)) {
+            throw new InValidSeatNumberError(`Seat number must be between 1 and max seats`)
+        }
+
+        const seat = await this.entityManager.findOne(Seat, { where: { seatNumber } })
+
+        if (seat) throw new InValidSeatNumberError(`Seat number ${seatNumber} already exists`)
+    }
+
+    async checkValidConcertDate(concertDate: ConcertDate) {
+        if (concertDate.availableSeats === 0) {
+            throw new NotAvailableSeatError(`No seats available for concert date ${concertDate.date}`)
+        }
+    }
 
     async findConcertById(id: string): Promise<Concert> {
         const concert = await this.entityManager.findOne(Concert, { where: { id }, relations: ['concertDates'] })
