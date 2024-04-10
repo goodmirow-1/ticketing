@@ -4,7 +4,7 @@ import type { IConcert } from 'src/domain/concert/models/concert.entity.interfac
 import type { ISeat } from 'src/domain/concert/models/seat.entity.interface'
 import type { IReservation } from 'src/domain/concert/models/reservation.entity.interface'
 import { GetUser, JwtAuthGuard } from 'src/domain/common/jwt-token.util'
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
+import { ApiBearerAuth, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger'
 import { ReadWaitingUserUseCase } from './usecase/read-waiting-user.usecase'
 import { CreateReservationUseCase } from './usecase/create-reservation.usecase'
 import { ReadAllConcertsUseCase } from './usecase/read-all-concerts.usecase'
@@ -23,6 +23,9 @@ export class ConcertWaitingController {
     @Get()
     @UseGuards(JwtAuthGuard)
     @ApiBearerAuth('access-token') // 인증 토큰을 위한 Swagger 데코레이터
+    @ApiOperation({
+        summary: '날짜 조회',
+    })
     async readAllConcerts(@GetUser('isWaiting') isWaiting: boolean, @GetUser('userId') userId: string): Promise<IConcert[]> {
         this.checkWaiting(userId, isWaiting)
 
@@ -32,6 +35,10 @@ export class ConcertWaitingController {
     @Get(':concertDateId/seats')
     @UseGuards(JwtAuthGuard)
     @ApiBearerAuth('access-token') // 인증 토큰을 위한 Swagger 데코레이터
+    @ApiOperation({
+        summary: '날짜별 좌석 조회',
+    })
+    @ApiParam({ name: 'concertDateId', required: true, description: 'concertDateId ID' })
     async readAllSeatsByConcertDateId(
         @GetUser('isWaiting') isWaiting: boolean,
         @GetUser('userId') userId: string,
@@ -45,6 +52,10 @@ export class ConcertWaitingController {
     @Post(':seatId/reservation')
     @UseGuards(JwtAuthGuard)
     @ApiBearerAuth('access-token') // 인증 토큰을 위한 Swagger 데코레이터
+    @ApiOperation({
+        summary: '좌석 예약하기',
+    })
+    @ApiParam({ name: 'seatId', required: true, description: 'seat ID' })
     async createReservation(
         @GetUser('isWaiting') isWaiting: boolean,
         @GetUser('userId') userId: string,
