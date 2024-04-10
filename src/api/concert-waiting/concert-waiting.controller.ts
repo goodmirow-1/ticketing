@@ -5,10 +5,10 @@ import type { ISeat } from 'src/domain/concert/models/seat.entity.interface'
 import type { IReservation } from 'src/domain/concert/models/reservation.entity.interface'
 import { GetUser, JwtAuthGuard } from 'src/domain/common/jwt-token.util'
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger'
-import { ReadWaitingUserUseCase } from './usecase/read-waiting-user.usecase'
-import { CreateReservationUseCase } from './usecase/create-reservation.usecase'
-import { ReadAllConcertsUseCase } from './usecase/read-all-concerts.usecase'
-import { ReadAllSeatsByConcertDateIdUseCase } from './usecase/read-all-seats-by-concert-date.usecase'
+import { ReadWaitingUserUseCase } from '../../application/concert-waiting/usecase/read-waiting-user.usecase'
+import { CreateReservationUseCase } from '../../application/concert-waiting/usecase/create-reservation.usecase'
+import { ReadAllConcertsUseCase } from '../../application/concert-waiting/usecase/read-all-concerts.usecase'
+import { ReadAllSeatsByConcertDateIdUseCase } from '../../application/concert-waiting/usecase/read-all-seats-by-concert-date.usecase'
 
 @ApiTags('콘서트 웨이팅 API')
 @Controller('concert-waiting')

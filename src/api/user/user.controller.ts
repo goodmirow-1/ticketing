@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common'
-import { CreateUserUseCase } from './usecase/create-user.usecase'
-import { ChargeUserPointUseCase } from './usecase/charge-user-point.usecase'
-import { ReadUserPointUseCase } from './usecase/read-user-point.usecase'
+import { CreateUserUseCase } from '../../application/user/usecase/create-user.usecase'
+import { ChargeUserPointUseCase } from '../../application/user/usecase/charge-user-point.usecase'
+import { ReadUserPointUseCase } from '../../application/user/usecase/read-user-point.usecase'
 import type { IUser } from 'src/domain/user/models/user.entity.interface'
 import { ApiParam, ApiBody, ApiResponse, ApiTags, ApiOperation } from '@nestjs/swagger'
 

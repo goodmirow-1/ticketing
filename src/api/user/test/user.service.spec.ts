@@ -2,9 +2,9 @@ import { initDataAccesorMock } from '../../../infrastructure/db/data-accesor.int
 import { initUserReaderMockRepo, initUserWriterMockRepo } from './user.service.mock'
 import { v4 as uuidv4 } from 'uuid'
 import { InValidPointError } from '../../../domain/user/exceptions/invalid-point.exception'
-import { ChargeUserPointUseCase } from '../usecase/charge-user-point.usecase'
-import { CreateUserUseCase } from '../usecase/create-user.usecase'
-import { ReadUserPointUseCase } from '../usecase/read-user-point.usecase'
+import { ChargeUserPointUseCase } from '../../../application/user/usecase/charge-user-point.usecase'
+import { CreateUserUseCase } from '../../../application/user/usecase/create-user.usecase'
+import { ReadUserPointUseCase } from '../../../application/user/usecase/read-user-point.usecase'
 
 describe('유저 서비스 유닛 테스트', () => {
     let mockReaderRepo: ReturnType<typeof initUserReaderMockRepo>

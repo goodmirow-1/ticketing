@@ -1,5 +1,5 @@
 import { initUserReaderMockRepo } from '../../user/test/user.service.mock'
-import { GenerateTokenUseCase } from '../usecase/generate-token.usecase'
+import { GenerateTokenUseCase } from '../../../application/user-waiting/usecase/generate-token.usecase'
 import { initWaitingReaderMockRepo, initWaitingWriterMockRepo } from '../../waiting/test/waiting.service.mock'
 import { initDataAccesorMock } from '../../../infrastructure/db/data-accesor.interface'
 import { v4 as uuidv4 } from 'uuid'

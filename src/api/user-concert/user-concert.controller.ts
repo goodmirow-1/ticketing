@@ -1,5 +1,5 @@
 import { Body, Controller, Post } from '@nestjs/common'
-import { PaymentUserConcertUseCase } from './usecase/payment-user-concert.usecase'
+import { PaymentUserConcertUseCase } from '../../application/user-concert/usecase/payment-user-concert.usecase'
 import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger'
 
 @ApiTags('유저 콘서트 API')

@@ -4,7 +4,7 @@ import { WaitingUser } from 'src/infrastructure/waiting/models/waiting-user.enti
 import { ValidToken } from 'src/infrastructure/waiting/models/valid-token.entity'
 import { WaitingReaderRepositoryTypeORM } from 'src/infrastructure/waiting/repositories/waiting-reader.repository'
 import { WaitingWriterRepositoryTypeORM } from 'src/infrastructure/waiting/repositories/waiting-writer.repository'
-import { WaitingSchedulerUseCase } from './usecase/waiting-scheduler.usecase'
+import { WaitingSchedulerUseCase } from '../../application/waiting/usecase/waiting-scheduler.usecase'
 
 @Module({
     imports: [TypeOrmModule.forFeature([WaitingUser, ValidToken])],

@@ -2,9 +2,9 @@ import { v4 as uuidv4 } from 'uuid'
 import { initConcertReaderMockRepo, initConcertWriterMockRepo } from './concert.service.mock'
 import { NotFoundConcertError } from '../../../domain/concert/exceptions/not-found-concert.exception'
 import { DuplicateConcertDateError } from '../../../domain/concert/exceptions/duplicate-concert-date.exception'
-import { CreateConcertUseCase } from '../usecase/create-concert.usecase'
-import { CreateConcertDateUseCase } from '../usecase/create-concert-date.usecase'
-import { CreateSeatUseCase } from '../usecase/create-seat.usecase'
+import { CreateConcertUseCase } from '../../../application/concert/usecase/create-concert.usecase'
+import { CreateConcertDateUseCase } from '../../../application/concert/usecase/create-concert-date.usecase'
+import { CreateSeatUseCase } from '../../../application/concert/usecase/create-seat.usecase'
 
 describe('콘서트 서비스 유닛 테스트', () => {
     let mockReaderRepo: ReturnType<typeof initConcertReaderMockRepo>

@@ -1,5 +1,5 @@
 import { Controller, Get, Param } from '@nestjs/common'
-import { GenerateTokenUseCase } from './usecase/generate-token.usecase'
+import { GenerateTokenUseCase } from '../../application/user-waiting/usecase/generate-token.usecase'
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger'
 
 @ApiTags('유저 웨이팅 API')

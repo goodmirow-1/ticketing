@@ -2,7 +2,7 @@ import { initConcertReaderMockRepo } from '../../concert/test/concert.service.mo
 import { initUserWriterMockRepo } from '../../user/test/user.service.mock'
 import { NotFoundReservationError } from '../../../domain/user/exceptions/not-found-reservation.exception'
 import { InValidPointError } from '../../../domain/user/exceptions/invalid-point.exception'
-import { PaymentUserConcertUseCase } from '../usecase/payment-user-concert.usecase'
+import { PaymentUserConcertUseCase } from '../../../application/user-concert/usecase/payment-user-concert.usecase'
 
 describe('유닛 콘서트 서비스 유닛 테스트', () => {
     let mockReaderRepo: ReturnType<typeof initConcertReaderMockRepo>
