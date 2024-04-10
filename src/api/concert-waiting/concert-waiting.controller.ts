@@ -4,12 +4,13 @@ import type { IConcert } from 'src/domain/concert/models/concert.entity.interfac
 import type { ISeat } from 'src/domain/concert/models/seat.entity.interface'
 import type { IReservation } from 'src/domain/concert/models/reservation.entity.interface'
 import { GetUser, JwtAuthGuard } from 'src/domain/common/jwt-token.util'
-import { ApiBearerAuth } from '@nestjs/swagger'
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
 import { ReadWaitingUserUseCase } from './usecase/read-waiting-user.usecase'
 import { CreateReservationUseCase } from './usecase/create-reservation.usecase'
 import { ReadAllConcertsUseCase } from './usecase/read-all-concerts.usecase'
 import { ReadAllSeatsByConcertDateIdUseCase } from './usecase/read-all-seats-by-concert-date.usecase'
 
+@ApiTags('콘서트 웨이팅 API')
 @Controller('concert-waiting')
 export class ConcertWaitingController {
     constructor(

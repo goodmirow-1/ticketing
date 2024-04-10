@@ -29,8 +29,14 @@ export class WaitingReaderRepositoryTypeORM implements IWaitingReaderRepository 
         return count
     }
 
-    async findLastWaitingUser(): Promise<WaitingUser> {
-        return this.entityManager.findOne(WaitingUser, { order: { id: 'DESC' } })
+    async findLastWaitingUser(): Promise<WaitingUser[]> {
+        return this.entityManager.find(WaitingUser, {
+            order: {
+                id: 'ASC',
+            },
+            relations: ['user'],
+            take: 1,
+        })
     }
 
     async findValidToken(token: string): Promise<boolean> {
@@ -42,6 +48,8 @@ export class WaitingReaderRepositoryTypeORM implements IWaitingReaderRepository 
     async isTokenCountUnderThreshold(): Promise<boolean> {
         const count = await this.entityManager.count(ValidToken)
 
-        return count < 100
+        const maxConnections = parseInt(process.env.MAX_CONNECTIONS, 10)
+
+        return count < maxConnections
     }
 }

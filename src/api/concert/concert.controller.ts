@@ -5,6 +5,9 @@ import { CreateSeatUseCase } from './usecase/create-seat.usecase'
 import type { IConcert } from 'src/domain/concert/models/concert.entity.interface'
 import type { ISeat } from 'src/domain/concert/models/seat.entity.interface'
 import type { IConcertDate } from 'src/domain/concert/models/concertDate.entity.interface'
+import { ApiTags } from '@nestjs/swagger'
+
+@ApiTags('콘서트 API')
 @Controller('concert')
 export class ConcertController {
     constructor(

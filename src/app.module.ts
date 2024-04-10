@@ -1,6 +1,4 @@
 import { Module } from '@nestjs/common'
-import { AppController } from './app.controller'
-import { AppService } from './app.service'
 import type { TypeOrmModuleOptions } from '@nestjs/typeorm'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { ConfigModule } from '@nestjs/config'
@@ -9,6 +7,8 @@ import { UserConcertModule } from './api/user-concert/user-concert.module'
 import { ConcertModule } from './api/concert/concert.module'
 import { ScheduleModule } from '@nestjs/schedule'
 import { UserWaitingModule } from './api/user-waiting/user-waiting.module'
+import { ConcertWaitingModule } from './api/concert-waiting/concert-waiting.module'
+import { WaitingModule } from './api/waiting/waiting.module'
 @Module({
     imports: [
         ScheduleModule.forRoot(),
@@ -34,10 +34,12 @@ import { UserWaitingModule } from './api/user-waiting/user-waiting.module'
         }),
         UserModule,
         ConcertModule,
+        WaitingModule,
         UserConcertModule,
         UserWaitingModule,
+        ConcertWaitingModule,
     ],
-    controllers: [AppController],
-    providers: [AppService],
+    controllers: [],
+    providers: [],
 })
 export class AppModule {}

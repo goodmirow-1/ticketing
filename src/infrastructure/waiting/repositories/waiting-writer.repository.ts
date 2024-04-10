@@ -6,9 +6,12 @@ import { generateAccessToken } from 'src/domain/common/jwt-token.util'
 import { SchedulerRegistry } from '@nestjs/schedule'
 import type { IWaitingWriterRepository } from 'src/domain/waiting/repositories/waiting-writer.repository.interface'
 import type { User } from 'src/infrastructure/user/models/user.entity'
+import { SchedulerState } from 'src/domain/common/schedule-state.instance'
 
 @Injectable()
 export class WaitingWriterRepositoryTypeORM implements IWaitingWriterRepository {
+    private schedulerState = SchedulerState.getInstance()
+
     constructor(
         @Inject(EntityManager) private readonly entityManager: EntityManager,
         private readonly schedulerRegistry: SchedulerRegistry,
@@ -26,17 +29,15 @@ export class WaitingWriterRepositoryTypeORM implements IWaitingWriterRepository 
 
     async createValidTokenOrWaitingUser(user: User, isValid: boolean): Promise<string | number> {
         if (isValid) {
-            const expiration = Math.floor(Date.now() / 1000) + 5 * 60
+            const expirationTime = parseInt(process.env.EXPIRATION_TIME, 10)
+            const expiration = Math.floor(Date.now() / 1000) + expirationTime
             const token = generateAccessToken(user.id, expiration)
 
             this.entityManager.save(ValidToken, { token, expiration })
 
-            const timeout = setTimeout(
-                async () => {
-                    await this.entityManager.delete(ValidToken, { token })
-                },
-                (expiration - Math.floor(Date.now() / 1000)) * 1000,
-            )
+            const timeout = setTimeout(async () => {
+                await this.entityManager.delete(ValidToken, { token })
+            }, expirationTime * 1000)
 
             this.schedulerRegistry.addTimeout(token, timeout)
 
@@ -45,6 +46,7 @@ export class WaitingWriterRepositoryTypeORM implements IWaitingWriterRepository 
             this.entityManager.save(WaitingUser, { user })
 
             const count = await this.entityManager.count(WaitingUser)
+            this.schedulerState.check = true
             return count + 1
         }
     }

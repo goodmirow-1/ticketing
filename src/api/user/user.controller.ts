@@ -3,8 +3,9 @@ import { CreateUserUseCase } from './usecase/create-user.usecase'
 import { ChargeUserPointUseCase } from './usecase/charge-user-point.usecase'
 import { ReadUserPointUseCase } from './usecase/read-user-point.usecase'
 import type { IUser } from 'src/domain/user/models/user.entity.interface'
-import { ApiParam, ApiBody, ApiResponse } from '@nestjs/swagger'
+import { ApiParam, ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger'
 
+@ApiTags('유저 API')
 @Controller('user')
 export class UserController {
     constructor(
