@@ -5,7 +5,6 @@ import { Concert } from '../models/concert.entity'
 import { ConcertDate } from '../models/concertDate.entity'
 import { Seat } from '../models/seat.entity'
 import { Reservation } from '../models/reservation.entity'
-import { DuplicateConcertDateError } from 'src/domain/concert/exceptions/duplicate-concert-date.exception'
 import { FailedUpdateSeatStatusError } from 'src/domain/concert/exceptions/failed-update-seat-status.exception'
 import { FailedCreateReservationError } from 'src/domain/concert/exceptions/failed-create-reservation.exception'
 
@@ -18,12 +17,6 @@ export class ConcertWriterRepositoryTypeORM implements IConcertWriterRepository 
     }
 
     async createConcertDate(concert: Concert, date: Date): Promise<ConcertDate> {
-        const existingConcertDate = await this.entityManager.findOne(ConcertDate, { where: { date } })
-
-        if (existingConcertDate) {
-            throw new DuplicateConcertDateError(`Concert date ${date} already exists`)
-        }
-
         return this.entityManager.save(ConcertDate, { concert, date })
     }
 

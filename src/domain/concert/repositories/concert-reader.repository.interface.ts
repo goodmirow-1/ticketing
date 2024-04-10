@@ -7,6 +7,7 @@ export interface IConcertReaderRepository {
     findConcertById(id: string): Promise<IConcert>
     findAllConcerts(): Promise<IConcert[]>
 
+    checkValidConcertDateByDate(date: Date)
     findConcertDateById(concertDateId: string): Promise<IConcertDate>
     checkValidConcertDate(concertDate: IConcertDate)
 

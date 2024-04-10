@@ -13,6 +13,7 @@ export class CreateConcertDateUseCase {
     ) {}
 
     async excute(concertId: string, date: Date): Promise<IConcertDate> {
+        await this.concertReaderRepository.checkValidConcertDateByDate(date)
         const concert = await this.concertReaderRepository.findConcertById(concertId)
 
         return await this.concertWriterRepository.createConcertDate(concert, date)

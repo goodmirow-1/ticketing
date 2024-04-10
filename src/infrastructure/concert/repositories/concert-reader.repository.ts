@@ -9,10 +9,19 @@ import { NotFoundSeatError } from 'src/domain/concert/exceptions/not-found-seat.
 import { NotAvailableSeatError } from 'src/domain/concert/exceptions/not-available-seat.exception'
 import { Reservation } from '../models/reservation.entity'
 import { InValidSeatNumberError } from 'src/domain/concert/exceptions/invalid-seat-number.exception'
+import { DuplicateConcertDateError } from 'src/domain/concert/exceptions/duplicate-concert-date.exception'
 
 @Injectable()
 export class ConcertReaderRepositoryTypeORM implements IConcertReaderRepository {
     constructor(@Inject(EntityManager) private readonly entityManager: EntityManager) {}
+
+    async checkValidConcertDateByDate(date: Date) {
+        const existingConcertDate = await this.entityManager.findOne(ConcertDate, { where: { date } })
+
+        if (existingConcertDate) {
+            throw new DuplicateConcertDateError(`Concert date ${date} already exists`)
+        }
+    }
 
     async checkValidSeatNumber(seatNumber: number) {
         if (seatNumber < 1 || seatNumber > parseInt(process.env.MAX_SEATS)) {
