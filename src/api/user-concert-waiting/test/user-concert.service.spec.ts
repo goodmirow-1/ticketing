@@ -2,20 +2,23 @@ import { initConcertReaderMockRepo, initConcertWriterMockRepo } from '../../conc
 import { initUserWriterMockRepo } from '../../user/test/user.service.mock'
 import { NotFoundReservationError } from '../../../domain/user/exceptions/not-found-reservation.exception'
 import { InValidPointError } from '../../../domain/user/exceptions/invalid-point.exception'
-import { PaymentUserConcertUseCase } from '../../../application/user-concert/usecase/payment-user-concert.usecase'
+import { PaymentUserConcertUseCase } from '../../../application/user-concert-waiting/usecase/payment-user-concert.usecase'
+import { initWaitingWriterMockRepo } from '../../../api/waiting/test/waiting.service.mock'
 
 describe('유닛 콘서트 서비스 유닛 테스트', () => {
     let mockConcertReaderRepo: ReturnType<typeof initConcertReaderMockRepo>
     let mockConcertWriterRepo: ReturnType<typeof initConcertWriterMockRepo>
     let mockUserWriterRepo: ReturnType<typeof initUserWriterMockRepo>
+    let mockWaitingWriterRepo: ReturnType<typeof initWaitingWriterMockRepo>
     let paymentUserConcertUseCase: PaymentUserConcertUseCase
 
     beforeEach(() => {
         mockConcertReaderRepo = initConcertReaderMockRepo()
         mockUserWriterRepo = initUserWriterMockRepo()
         mockConcertWriterRepo = initConcertWriterMockRepo()
+        mockWaitingWriterRepo = initWaitingWriterMockRepo()
 
-        paymentUserConcertUseCase = new PaymentUserConcertUseCase(mockConcertReaderRepo, mockConcertWriterRepo, mockUserWriterRepo)
+        paymentUserConcertUseCase = new PaymentUserConcertUseCase(mockConcertReaderRepo, mockConcertWriterRepo, mockUserWriterRepo, mockWaitingWriterRepo)
     })
 
     describe('결제 API', () => {

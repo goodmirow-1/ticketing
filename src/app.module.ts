@@ -3,7 +3,7 @@ import type { TypeOrmModuleOptions } from '@nestjs/typeorm'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { ConfigModule } from '@nestjs/config'
 import { UserModule } from './api/user/user.module'
-import { UserConcertModule } from './api/user-concert/user-concert.module'
+import { UserConcertWaitingModule } from './api/user-concert-waiting/user-concert-waiting.module'
 import { ConcertModule } from './api/concert/concert.module'
 import { ScheduleModule } from '@nestjs/schedule'
 import { UserWaitingModule } from './api/user-waiting/user-waiting.module'
@@ -35,7 +35,7 @@ import { WaitingModule } from './api/waiting/waiting.module'
         UserModule,
         ConcertModule,
         WaitingModule,
-        UserConcertModule,
+        UserConcertWaitingModule,
         UserWaitingModule,
         ConcertWaitingModule,
     ],

@@ -8,6 +8,10 @@ import type { IWaitingReaderRepository } from 'src/domain/waiting/repositories/w
 export class WaitingReaderRepositoryTypeORM implements IWaitingReaderRepository {
     constructor(@Inject(EntityManager) private readonly entityManager: EntityManager) {}
 
+    isSameWaitingNumber(positionNumber: number, waitingNumber: number): boolean {
+        return positionNumber === waitingNumber
+    }
+
     async findWaitingUserPosition(userId: string): Promise<number> {
         const result = await this.entityManager
             .createQueryBuilder(WaitingUser, 'user')
@@ -46,7 +50,8 @@ export class WaitingReaderRepositoryTypeORM implements IWaitingReaderRepository 
     }
 
     async isTokenCountUnderThreshold(): Promise<boolean> {
-        const count = await this.entityManager.count(ValidToken)
+        // status가 true ValidToken만 카운트 -> false = 만료 토큰
+        const count = await this.entityManager.count(ValidToken, { where: { status: true } })
 
         const maxConnections = parseInt(process.env.MAX_CONNECTIONS, 10)
 

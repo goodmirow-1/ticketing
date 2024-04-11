@@ -26,8 +26,8 @@ export class ConcertWaitingController {
     @ApiOperation({
         summary: '날짜 조회',
     })
-    async readAllConcerts(@GetUser('isWaiting') isWaiting: boolean, @GetUser('userId') userId: string): Promise<IConcert[]> {
-        this.checkWaiting(userId, isWaiting)
+    async readAllConcerts(@GetUser() token: any): Promise<IConcert[]> {
+        this.checkWaiting(token.waitingNumber)
 
         return this.readAllConcertsUseCase.excute()
     }
@@ -39,12 +39,8 @@ export class ConcertWaitingController {
         summary: '날짜별 좌석 조회',
     })
     @ApiParam({ name: 'concertDateId', required: true, description: 'concertDateId ID', example: '1be4195c-e170-4d29-9889-9e61f3973684' })
-    async readAllSeatsByConcertDateId(
-        @GetUser('isWaiting') isWaiting: boolean,
-        @GetUser('userId') userId: string,
-        @Param('concertDateId') concertDateId: string,
-    ): Promise<ISeat[]> {
-        this.checkWaiting(userId, isWaiting)
+    async readAllSeatsByConcertDateId(@GetUser() token: any, @Param('concertDateId') concertDateId: string): Promise<ISeat[]> {
+        this.checkWaiting(token.waitingNumber)
 
         return this.readAllSeatsByConcertDateIdUseCase.excute(concertDateId)
     }
@@ -56,21 +52,15 @@ export class ConcertWaitingController {
         summary: '좌석 예약하기',
     })
     @ApiParam({ name: 'seatId', required: true, description: 'seat ID' })
-    async createReservation(
-        @GetUser('isWaiting') isWaiting: boolean,
-        @GetUser('userId') userId: string,
-        @Param('seatId') seatId: string,
-    ): Promise<IReservation> {
-        this.checkWaiting(userId, isWaiting)
+    async createReservation(@GetUser() token: any, @Param('seatId') seatId: string): Promise<IReservation> {
+        this.checkWaiting(token.waitingNumber)
 
-        return this.createReservationUseCase.excute(seatId, userId)
+        return this.createReservationUseCase.excute(seatId, token.userId)
     }
 
-    private checkWaiting(userId, isWaiting: boolean): void {
-        if (isWaiting) {
-            const waitNumber = this.readWaitingUserUseCase.excute(userId)
-
-            throw new HttpException({ message: 'Please wait', waitNumber }, HttpStatus.ACCEPTED)
+    private checkWaiting(waitingNumber: number): void {
+        if (waitingNumber) {
+            throw new HttpException({ message: 'Please wait', waitingNumber }, HttpStatus.ACCEPTED)
         }
     }
 }

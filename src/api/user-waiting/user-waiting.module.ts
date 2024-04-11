@@ -9,12 +9,14 @@ import { WaitingWriterRepositoryTypeORM } from 'src/infrastructure/waiting/repos
 import { UserReaderRepositoryTypeORM } from 'src/infrastructure/user/repositories/user-reader.repository'
 import { TypeORMDataAccessor } from 'src/infrastructure/db/typeorm/typeorm-data-accesor'
 import { UserWaitingController } from './user-waiting.controller'
+import { GenerateWaitingTokenUseCase } from 'src/application/user-waiting/usecase/generate-waiting-token.usecase'
 
 @Module({
     imports: [TypeOrmModule.forFeature([User, WaitingUser, ValidToken])],
     controllers: [UserWaitingController],
     providers: [
         GenerateTokenUseCase,
+        GenerateWaitingTokenUseCase,
         {
             provide: 'IUserReaderRepository',
             useClass: UserReaderRepositoryTypeORM,

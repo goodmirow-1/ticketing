@@ -7,9 +7,13 @@ export class ValidToken implements IValidToken {
     id: string
 
     @Index()
-    @Column({ nullable: true })
+    //@Column({ unique: true })
+    @Column()
     token: string
 
-    @Column({ nullable: true })
+    @Column()
     expiration: number
+
+    @Column({ default: true })
+    status: boolean
 }

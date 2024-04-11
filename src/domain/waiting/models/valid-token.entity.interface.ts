@@ -4,4 +4,6 @@ export interface IValidToken {
     token: string
 
     expiration: number
+
+    status: boolean
 }

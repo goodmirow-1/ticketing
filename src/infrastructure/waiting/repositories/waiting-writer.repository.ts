@@ -27,27 +27,50 @@ export class WaitingWriterRepositoryTypeORM implements IWaitingWriterRepository 
         return result.affected !== 0
     }
 
-    async createValidTokenOrWaitingUser(user: User, isValid: boolean): Promise<string | number> {
-        if (isValid) {
-            const expirationTime = parseInt(process.env.VALID_TOKEN_EXPIRATION_TIME, 10)
-            const expiration = Math.floor(Date.now() / 1000) + expirationTime
-            const token = generateAccessToken(user.id, expiration)
+    async createValidToken(userId: string): Promise<string> {
+        const expirationTime = parseInt(process.env.VALID_TOKEN_EXPIRATION_TIME, 10)
+        const expiration = Math.floor(Date.now() / 1000) + expirationTime
 
-            this.entityManager.save(ValidToken, { token, expiration })
+        const token = generateAccessToken(userId, expiration, 0)
+        this.entityManager.save(ValidToken, { token, expiration })
 
-            const timeout = setTimeout(async () => {
-                await this.entityManager.delete(ValidToken, { token })
-            }, expirationTime * 1000)
+        const timeout = setTimeout(async () => {
+            await this.entityManager.delete(ValidToken, { token })
+        }, expirationTime * 1000)
 
-            this.schedulerRegistry.addTimeout(token, timeout)
+        this.schedulerRegistry.addTimeout(token, timeout)
 
-            return token
+        return token
+    }
+
+    async createWaitingToken(userId: string, position?: number): Promise<string> {
+        const expiration = Math.floor(Date.now() / 1000) + parseInt(process.env.VALID_TOKEN_EXPIRATION_TIME, 10)
+
+        if (position) {
+            return generateAccessToken(userId, expiration, position)
         } else {
-            this.entityManager.save(WaitingUser, { user })
+            this.entityManager.save(WaitingUser, { user: { id: userId } })
 
             const count = await this.entityManager.count(WaitingUser)
+
+            const token = generateAccessToken(userId, expiration, count + 1)
             this.schedulerState.check = true
-            return count + 1
+
+            return token
         }
+    }
+
+    async createValidTokenOrWaitingUser(userId: string, isValid: boolean): Promise<string> {
+        if (isValid) {
+            return this.createValidToken(userId)
+        } else {
+            return this.createWaitingToken(userId)
+        }
+    }
+
+    async expiredValidToken(token?: string) {
+        if (token == undefined || token == '') return
+
+        await this.entityManager.createQueryBuilder().update(ValidToken).set({ status: false }).where('token = :token', { token }).execute()
     }
 }

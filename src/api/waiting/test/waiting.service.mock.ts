@@ -8,6 +8,7 @@ export function initWaitingReaderMockRepo(): Record<keyof IWaitingReaderReposito
         findLastWaitingUser: jest.fn(),
         findValidToken: jest.fn(),
         isTokenCountUnderThreshold: jest.fn(),
+        isSameWaitingNumber: jest.fn(),
     }
 }
 
@@ -15,6 +16,9 @@ export function initWaitingWriterMockRepo(): Record<keyof IWaitingWriterReposito
     return {
         createWaitingUser: jest.fn(),
         deleteWaitingUser: jest.fn(),
+        createValidToken: jest.fn(),
+        createWaitingToken: jest.fn(),
         createValidTokenOrWaitingUser: jest.fn(),
+        expiredValidToken: jest.fn(),
     }
 }
