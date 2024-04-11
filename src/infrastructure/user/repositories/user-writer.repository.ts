@@ -6,7 +6,6 @@ import { PointHistory } from '../models/point-history.entity'
 import { FailedUserChargePointError } from 'src/domain/user/exceptions/failed-user-charge-point.exception'
 import { InValidPointError } from 'src/domain/user/exceptions/invalid-point.exception'
 import { FailedCreatePointHistoryError } from 'src/domain/user/exceptions/failed-create-point-history.exception'
-import type { Reservation } from '../../concert/models/reservation.entity'
 
 @Injectable()
 export class UserWriterRepositoryTypeORM implements IUserWriterRepository {
@@ -22,7 +21,7 @@ export class UserWriterRepositoryTypeORM implements IUserWriterRepository {
         return this.entityManager.save(User, { name, point: 0, reservations: [] })
     }
 
-    async calculatePoint(user: User, amount: number, reason: 'charge' | 'payment', reservation?: Reservation): Promise<PointHistory> {
+    async calculatePoint(user: User, amount: number, reason: 'charge' | 'payment', reservationId?: string): Promise<PointHistory> {
         if (reason == 'payment' && user.point < Math.abs(amount)) {
             throw new InValidPointError('Not enough point')
         }
@@ -37,7 +36,7 @@ export class UserWriterRepositoryTypeORM implements IUserWriterRepository {
             user,
             amount: amount,
             reason,
-            reservation: reservation,
+            reservation: reason == 'payment' ? { id: reservationId } : null,
         })
 
         if (!pointHistory) {
