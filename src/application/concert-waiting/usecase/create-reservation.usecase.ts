@@ -1,14 +1,14 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { IConcertReaderRepository } from 'src/domain/concert/repositories/concert-reader.repository.interface'
-import { IConcertWriterRepository } from 'src/domain/concert/repositories/concert-writer.repository.interface'
-import type { IReservation } from 'src/domain/concert/models/reservation.entity.interface'
+import { IConcertReaderRepository, IConcertReaderRepositoryToken } from '../../../domain/concert/repositories/concert-reader.repository.interface'
+import { IConcertWriterRepository, IConcertWriterRepositoryToken } from '../../../domain/concert/repositories/concert-writer.repository.interface'
+import type { IReservation } from '../../../domain/concert/models/reservation.entity.interface'
 
 @Injectable()
 export class CreateReservationUseCase {
     constructor(
-        @Inject('IConcertReaderRepository')
+        @Inject(IConcertReaderRepositoryToken)
         private readonly concertReaderRepository: IConcertReaderRepository,
-        @Inject('IConcertWriterRepository')
+        @Inject(IConcertWriterRepositoryToken)
         private readonly concertWriterRepository: IConcertWriterRepository,
     ) {}
 

@@ -1,4 +1,6 @@
 type Session = any
+
+export const DataAccessorToken = Symbol('DataAccessor')
 export interface DataAccessor {
     getSession(option?: any): Promise<Session>
     commitTransaction(session: Session): Promise<void>

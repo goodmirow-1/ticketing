@@ -1,11 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { IConcertReaderRepository } from 'src/domain/concert/repositories/concert-reader.repository.interface'
-import type { ISeat } from 'src/domain/concert/models/seat.entity.interface'
+import { IConcertReaderRepository, IConcertReaderRepositoryToken } from '../../../domain/concert/repositories/concert-reader.repository.interface'
+import type { ISeat } from '../../../domain/concert/models/seat.entity.interface'
 
 @Injectable()
 export class ReadAllSeatsByConcertDateIdUseCase {
     constructor(
-        @Inject('IConcertReaderRepository')
+        @Inject(IConcertReaderRepositoryToken)
         private readonly concertReaderRepository: IConcertReaderRepository,
     ) {}
 

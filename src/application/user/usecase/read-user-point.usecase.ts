@@ -1,10 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { IUserReaderRepository } from 'src/domain/user/repositories/user-reader.repository.interface'
+import { IUserReaderRepository, IUserReaderRepositoryToken } from '../../../domain/user/repositories/user-reader.repository.interface'
 
 @Injectable()
 export class ReadUserPointUseCase {
     constructor(
-        @Inject('IUserReaderRepository')
+        @Inject(IUserReaderRepositoryToken)
         private readonly userReaderRepository: IUserReaderRepository,
     ) {}
 

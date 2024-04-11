@@ -9,6 +9,8 @@ import { CreateConcertDateUseCase } from '../../application/concert/usecase/crea
 import { CreateSeatUseCase } from '../../application/concert/usecase/create-seat.usecase'
 import { ConcertReaderRepositoryTypeORM } from 'src/infrastructure/concert/repositories/concert-reader.repository'
 import { ConcertWriterRepositoryTypeORM } from 'src/infrastructure/concert/repositories/concert-writer.repository'
+import { IConcertReaderRepositoryToken } from 'src/domain/concert/repositories/concert-reader.repository.interface'
+import { IConcertWriterRepositoryToken } from 'src/domain/concert/repositories/concert-writer.repository.interface'
 
 @Module({
     imports: [TypeOrmModule.forFeature([Concert, ConcertDate, Seat])],
@@ -18,11 +20,11 @@ import { ConcertWriterRepositoryTypeORM } from 'src/infrastructure/concert/repos
         CreateConcertDateUseCase,
         CreateSeatUseCase,
         {
-            provide: 'IConcertReaderRepository',
+            provide: IConcertReaderRepositoryToken,
             useClass: ConcertReaderRepositoryTypeORM,
         },
         {
-            provide: 'IConcertWriterRepository',
+            provide: IConcertWriterRepositoryToken,
             useClass: ConcertWriterRepositoryTypeORM,
         },
     ],

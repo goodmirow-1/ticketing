@@ -1,11 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { IUserWriterRepository } from 'src/domain/user/repositories/user-writer.repository.interface'
-import type { IUser } from 'src/domain/user/models/user.entity.interface'
+import { IUserWriterRepository, IUserWriterRepositoryToken } from '../../../domain/user/repositories/user-writer.repository.interface'
+import type { IUser } from '../../../domain/user/models/user.entity.interface'
 
 @Injectable()
 export class CreateUserUseCase {
     constructor(
-        @Inject('IUserWriterRepository')
+        @Inject(IUserWriterRepositoryToken)
         private readonly userWriterRepository: IUserWriterRepository,
     ) {}
 

@@ -1,16 +1,16 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { IUserReaderRepository } from 'src/domain/user/repositories/user-reader.repository.interface'
-import { IUserWriterRepository } from 'src/domain/user/repositories/user-writer.repository.interface'
-import { DataAccessor } from 'src/infrastructure/db/data-accesor.interface'
+import { IUserReaderRepository, IUserReaderRepositoryToken } from '../../../domain/user/repositories/user-reader.repository.interface'
+import { IUserWriterRepository, IUserWriterRepositoryToken } from '../../../domain/user/repositories/user-writer.repository.interface'
+import { DataAccessor, DataAccessorToken } from '../../../infrastructure/db/data-accesor.interface'
 
 @Injectable()
 export class ChargeUserPointUseCase {
     constructor(
-        @Inject('IUserReaderRepository')
+        @Inject(IUserReaderRepositoryToken)
         private readonly userReaderRepository: IUserReaderRepository,
-        @Inject('IUserWriterRepository')
+        @Inject(IUserWriterRepositoryToken)
         private readonly userWriterRepository: IUserWriterRepository,
-        @Inject('DataAccessor')
+        @Inject(DataAccessorToken)
         private readonly dataAccessor: DataAccessor,
     ) {}
 

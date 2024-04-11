@@ -2,8 +2,6 @@ import { initConcertReaderMockRepo, initConcertWriterMockRepo } from '../../../a
 import { CreateReservationUseCase } from '../../../application/concert-waiting/usecase/create-reservation.usecase'
 import { ReadAllConcertsUseCase } from '../../../application/concert-waiting/usecase/read-all-concerts.usecase'
 import { ReadAllSeatsByConcertDateIdUseCase } from '../../../application/concert-waiting/usecase/read-all-seats-by-concert-date.usecase'
-import { ReadWaitingUserUseCase } from '../../../application/concert-waiting/usecase/read-waiting-user.usecase'
-import { initWaitingReaderMockRepo } from '../../../api/waiting/test/waiting.service.mock'
 import { v4 as uuidv4 } from 'uuid'
 import { NotFoundConcertError } from '../../../domain/concert/exceptions/not-found-concert.exception'
 import { NotAvailableSeatError } from '../../../domain/concert/exceptions/not-available-seat.exception'
@@ -14,21 +12,17 @@ import { FailedUpdateSeatStatusError } from '../../../domain/concert/exceptions/
 describe('콘서트 웨이팅 서비스 유닛 테스트', () => {
     let mockConcertReaderRepo: ReturnType<typeof initConcertReaderMockRepo>
     let mockConcertWriterRepo: ReturnType<typeof initConcertWriterMockRepo>
-    let mockWaitingReaderRepo: ReturnType<typeof initWaitingReaderMockRepo>
     let createReservationUseCase: CreateReservationUseCase
     let readAllConcertsUseCase: ReadAllConcertsUseCase
     let readAllSeatsByConcertDateIdUseCase: ReadAllSeatsByConcertDateIdUseCase
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    let readWaitingUserUseCase: ReadWaitingUserUseCase
 
     beforeEach(() => {
         mockConcertReaderRepo = initConcertReaderMockRepo()
         mockConcertWriterRepo = initConcertWriterMockRepo()
-        mockWaitingReaderRepo = initWaitingReaderMockRepo()
         createReservationUseCase = new CreateReservationUseCase(mockConcertReaderRepo, mockConcertWriterRepo)
         readAllConcertsUseCase = new ReadAllConcertsUseCase(mockConcertReaderRepo)
         readAllSeatsByConcertDateIdUseCase = new ReadAllSeatsByConcertDateIdUseCase(mockConcertReaderRepo)
-        readWaitingUserUseCase = new ReadWaitingUserUseCase(mockWaitingReaderRepo)
     })
 
     describe('콘서트 날짜 조회 API', () => {

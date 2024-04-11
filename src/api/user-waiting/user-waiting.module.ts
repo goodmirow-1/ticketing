@@ -10,6 +10,10 @@ import { UserReaderRepositoryTypeORM } from 'src/infrastructure/user/repositorie
 import { TypeORMDataAccessor } from 'src/infrastructure/db/typeorm/typeorm-data-accesor'
 import { UserWaitingController } from './user-waiting.controller'
 import { GenerateWaitingTokenUseCase } from 'src/application/user-waiting/usecase/generate-waiting-token.usecase'
+import { IUserReaderRepositoryToken } from 'src/domain/user/repositories/user-reader.repository.interface'
+import { IWaitingReaderRepositoryToken } from 'src/domain/waiting/repositories/waiting-reader.repository.interface'
+import { IWaitingWriterRepositoryToken } from 'src/domain/waiting/repositories/waiting-writer.repository.interface'
+import { DataAccessorToken } from 'src/infrastructure/db/data-accesor.interface'
 
 @Module({
     imports: [TypeOrmModule.forFeature([User, WaitingUser, ValidToken])],
@@ -18,19 +22,19 @@ import { GenerateWaitingTokenUseCase } from 'src/application/user-waiting/usecas
         GenerateTokenUseCase,
         GenerateWaitingTokenUseCase,
         {
-            provide: 'IUserReaderRepository',
+            provide: IUserReaderRepositoryToken,
             useClass: UserReaderRepositoryTypeORM,
         },
         {
-            provide: 'IWaitingReaderRepository',
+            provide: IWaitingReaderRepositoryToken,
             useClass: WaitingReaderRepositoryTypeORM,
         },
         {
-            provide: 'IWaitingWriterRepository',
+            provide: IWaitingWriterRepositoryToken,
             useClass: WaitingWriterRepositoryTypeORM,
         },
         {
-            provide: 'DataAccessor',
+            provide: DataAccessorToken,
             useValue: TypeORMDataAccessor,
         },
     ],

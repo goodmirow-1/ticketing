@@ -3,6 +3,8 @@ import type { IConcertDate } from '../models/concertDate.entity.interface'
 import type { IReservation } from '../models/reservation.entity.interface'
 import type { ISeat } from '../models/seat.entity.interface'
 
+export const IConcertReaderRepositoryToken = Symbol.for('IConcertReaderRepository')
+
 export interface IConcertReaderRepository {
     findConcertById(id: string): Promise<IConcert>
     findAllConcerts(): Promise<IConcert[]>

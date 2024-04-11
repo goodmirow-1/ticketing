@@ -1,5 +1,6 @@
 import type { IWaitingUser } from '../../waiting/models/waiting-user.entity.interface'
 
+export const IWaitingReaderRepositoryToken = Symbol('IWaitingReaderRepository')
 export interface IWaitingReaderRepository {
     isSameWaitingNumber(positionNumber: number, waitingNumber: number): boolean
 

@@ -9,6 +9,9 @@ import { ReadUserPointUseCase } from '../../application/user/usecase/read-user-p
 import { UserWriterRepositoryTypeORM } from 'src/infrastructure/user/repositories/user-writer.repository'
 import { UserReaderRepositoryTypeORM } from 'src/infrastructure/user/repositories/user-reader.repository'
 import { TypeORMDataAccessor } from 'src/infrastructure/db/typeorm/typeorm-data-accesor'
+import { IUserReaderRepositoryToken } from 'src/domain/user/repositories/user-reader.repository.interface'
+import { IUserWriterRepositoryToken } from 'src/domain/user/repositories/user-writer.repository.interface'
+import { DataAccessorToken } from 'src/infrastructure/db/data-accesor.interface'
 
 @Module({
     imports: [TypeOrmModule.forFeature([User, PointHistory])],
@@ -18,15 +21,15 @@ import { TypeORMDataAccessor } from 'src/infrastructure/db/typeorm/typeorm-data-
         CreateUserUseCase,
         ReadUserPointUseCase,
         {
-            provide: 'IUserReaderRepository',
+            provide: IUserReaderRepositoryToken,
             useClass: UserReaderRepositoryTypeORM,
         },
         {
-            provide: 'IUserWriterRepository',
+            provide: IUserWriterRepositoryToken,
             useClass: UserWriterRepositoryTypeORM,
         },
         {
-            provide: 'DataAccessor',
+            provide: DataAccessorToken,
             useClass: TypeORMDataAccessor,
         },
     ],

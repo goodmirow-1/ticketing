@@ -1,13 +1,13 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { IWaitingReaderRepository } from 'src/domain/waiting/repositories/waiting-reader.repository.interface'
-import { IWaitingWriterRepository } from 'src/domain/waiting/repositories/waiting-writer.repository.interface'
+import { IWaitingReaderRepository, IWaitingReaderRepositoryToken } from 'src/domain/waiting/repositories/waiting-reader.repository.interface'
+import { IWaitingWriterRepository, IWaitingWriterRepositoryToken } from 'src/domain/waiting/repositories/waiting-writer.repository.interface'
 
 @Injectable()
 export class GenerateWaitingTokenUseCase {
     constructor(
-        @Inject('IWaitingReaderRepository')
+        @Inject(IWaitingReaderRepositoryToken)
         private readonly waitingReaderRepository: IWaitingReaderRepository,
-        @Inject('IWaitingWriterRepository')
+        @Inject(IWaitingWriterRepositoryToken)
         private readonly waitingWriterRepository: IWaitingWriterRepository,
     ) {}
 

@@ -9,6 +9,10 @@ import { UserWriterRepositoryTypeORM } from 'src/infrastructure/user/repositorie
 import { ConcertWriterRepositoryTypeORM } from 'src/infrastructure/concert/repositories/concert-writer.repository'
 import { UserConcertWaitingController } from './user-concert-waiting.controller'
 import { WaitingWriterRepositoryTypeORM } from 'src/infrastructure/waiting/repositories/waiting-writer.repository'
+import { IConcertReaderRepositoryToken } from 'src/domain/concert/repositories/concert-reader.repository.interface'
+import { IConcertWriterRepositoryToken } from 'src/domain/concert/repositories/concert-writer.repository.interface'
+import { IUserWriterRepositoryToken } from 'src/domain/user/repositories/user-writer.repository.interface'
+import { IWaitingWriterRepositoryToken } from 'src/domain/waiting/repositories/waiting-writer.repository.interface'
 
 @Module({
     imports: [TypeOrmModule.forFeature([User, Reservation, PointHistory])],
@@ -16,19 +20,19 @@ import { WaitingWriterRepositoryTypeORM } from 'src/infrastructure/waiting/repos
     providers: [
         PaymentUserConcertUseCase,
         {
-            provide: 'IConcertReaderRepository',
+            provide: IConcertReaderRepositoryToken,
             useClass: ConcertReaderRepositoryTypeORM,
         },
         {
-            provide: 'IConcertWriterRepository',
+            provide: IConcertWriterRepositoryToken,
             useClass: ConcertWriterRepositoryTypeORM,
         },
         {
-            provide: 'IUserWriterRepository',
+            provide: IUserWriterRepositoryToken,
             useClass: UserWriterRepositoryTypeORM,
         },
         {
-            provide: 'IWatingWriterRepository',
+            provide: IWaitingWriterRepositoryToken,
             useClass: WaitingWriterRepositoryTypeORM,
         },
     ],

@@ -1,19 +1,19 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { IUserReaderRepository } from 'src/domain/user/repositories/user-reader.repository.interface'
-import { IWaitingReaderRepository } from 'src/domain/waiting/repositories/waiting-reader.repository.interface'
-import { IWaitingWriterRepository } from 'src/domain/waiting/repositories/waiting-writer.repository.interface'
-import { DataAccessor } from 'src/infrastructure/db/data-accesor.interface'
+import { IUserReaderRepository, IUserReaderRepositoryToken } from '../../../domain/user/repositories/user-reader.repository.interface'
+import { IWaitingReaderRepository, IWaitingReaderRepositoryToken } from '../../../domain/waiting/repositories/waiting-reader.repository.interface'
+import { IWaitingWriterRepository, IWaitingWriterRepositoryToken } from '../../../domain/waiting/repositories/waiting-writer.repository.interface'
+import { DataAccessor, DataAccessorToken } from '../../../infrastructure/db/data-accesor.interface'
 
 @Injectable()
 export class GenerateTokenUseCase {
     constructor(
-        @Inject('IUserReaderRepository')
+        @Inject(IUserReaderRepositoryToken)
         private readonly userReaderRepository: IUserReaderRepository,
-        @Inject('IWaitingReaderRepository')
+        @Inject(IWaitingReaderRepositoryToken)
         private readonly waitingReaderRepository: IWaitingReaderRepository,
-        @Inject('IWaitingWriterRepository')
+        @Inject(IWaitingWriterRepositoryToken)
         private readonly waitingWriterRepository: IWaitingWriterRepository,
-        @Inject('DataAccessor')
+        @Inject(DataAccessorToken)
         private readonly dataAccessor: DataAccessor,
     ) {}
 

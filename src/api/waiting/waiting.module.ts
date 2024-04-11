@@ -5,6 +5,8 @@ import { ValidToken } from 'src/infrastructure/waiting/models/valid-token.entity
 import { WaitingReaderRepositoryTypeORM } from 'src/infrastructure/waiting/repositories/waiting-reader.repository'
 import { WaitingWriterRepositoryTypeORM } from 'src/infrastructure/waiting/repositories/waiting-writer.repository'
 import { WaitingSchedulerUseCase } from '../../application/waiting/usecase/waiting-scheduler.usecase'
+import { IWaitingReaderRepositoryToken } from 'src/domain/waiting/repositories/waiting-reader.repository.interface'
+import { IWaitingWriterRepositoryToken } from 'src/domain/waiting/repositories/waiting-writer.repository.interface'
 
 @Module({
     imports: [TypeOrmModule.forFeature([WaitingUser, ValidToken])],
@@ -12,11 +14,11 @@ import { WaitingSchedulerUseCase } from '../../application/waiting/usecase/waiti
     providers: [
         WaitingSchedulerUseCase,
         {
-            provide: 'IWaitingReaderRepository',
+            provide: IWaitingReaderRepositoryToken,
             useClass: WaitingReaderRepositoryTypeORM,
         },
         {
-            provide: 'IWaitingWriterRepository',
+            provide: IWaitingWriterRepositoryToken,
             useClass: WaitingWriterRepositoryTypeORM,
         },
     ],
