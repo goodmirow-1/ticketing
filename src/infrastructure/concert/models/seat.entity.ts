@@ -11,6 +11,9 @@ export class Seat implements ISeat {
     @Column({ type: 'int' })
     seatNumber: number
 
+    @Column({ type: 'int', default: 0 })
+    price: number
+
     @Index() // Indexing concertDateId for faster lookups by date
     @ManyToOne(() => ConcertDate, concertDate => concertDate.seats)
     @JoinColumn({ name: 'concertDateId' })

@@ -24,19 +24,13 @@ export class ConcertReaderRepositoryTypeORM implements IConcertReaderRepository 
     }
 
     async checkValidSeatNumber(seatNumber: number) {
-        if (seatNumber < 1 || seatNumber > parseInt(process.env.MAX_SEATS)) {
+        if (seatNumber < 1 || seatNumber > parseInt(process.env.MAX_SEATS, 10)) {
             throw new InValidSeatNumberError(`Seat number must be between 1 and max seats`)
         }
 
         const seat = await this.entityManager.findOne(Seat, { where: { seatNumber } })
 
         if (seat) throw new InValidSeatNumberError(`Seat number ${seatNumber} already exists`)
-    }
-
-    async checkValidConcertDate(concertDate: ConcertDate) {
-        if (concertDate.availableSeats === 0) {
-            throw new NotAvailableSeatError(`No seats available for concert date ${concertDate.date}`)
-        }
     }
 
     async findConcertById(id: string): Promise<Concert> {
@@ -73,6 +67,6 @@ export class ConcertReaderRepositoryTypeORM implements IConcertReaderRepository 
     }
 
     async findReservationById(id: string): Promise<Reservation> {
-        return this.entityManager.findOne(Reservation, { where: { id } })
+        return this.entityManager.findOne(Reservation, { where: { id }, relations: ['seat', 'user'] })
     }
 }

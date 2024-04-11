@@ -29,7 +29,7 @@ export class WaitingWriterRepositoryTypeORM implements IWaitingWriterRepository 
 
     async createValidTokenOrWaitingUser(user: User, isValid: boolean): Promise<string | number> {
         if (isValid) {
-            const expirationTime = parseInt(process.env.EXPIRATION_TIME, 10)
+            const expirationTime = parseInt(process.env.VALID_TOKEN_EXPIRATION_TIME, 10)
             const expiration = Math.floor(Date.now() / 1000) + expirationTime
             const token = generateAccessToken(user.id, expiration)
 
@@ -49,11 +49,5 @@ export class WaitingWriterRepositoryTypeORM implements IWaitingWriterRepository 
             this.schedulerState.check = true
             return count + 1
         }
-    }
-
-    async deleteValidToken(token: string): Promise<boolean> {
-        const result = await this.entityManager.delete(ValidToken, { token })
-
-        return result.affected !== 0
     }
 }

@@ -1,6 +1,6 @@
 export class SchedulerState {
     private static instance: SchedulerState
-    public check: boolean = true
+    public check: boolean = false
 
     private constructor() {}
 

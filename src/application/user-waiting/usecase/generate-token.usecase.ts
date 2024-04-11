@@ -21,6 +21,8 @@ export class GenerateTokenUseCase {
         const user = await this.userReaderRepository.findUserById(userId)
         const isValidToken = await this.waitingReaderRepository.isTokenCountUnderThreshold()
 
+        //todo: 대기열에 예상 입장 시간을 넣어서 토큰을 반환할수있게끔하는거 고려
+
         return await this.waitingWriterRepository.createValidTokenOrWaitingUser(user, isValidToken)
     }
 }

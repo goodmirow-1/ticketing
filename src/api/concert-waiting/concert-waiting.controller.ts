@@ -38,7 +38,7 @@ export class ConcertWaitingController {
     @ApiOperation({
         summary: '날짜별 좌석 조회',
     })
-    @ApiParam({ name: 'concertDateId', required: true, description: 'concertDateId ID' })
+    @ApiParam({ name: 'concertDateId', required: true, description: 'concertDateId ID', example: '1be4195c-e170-4d29-9889-9e61f3973684' })
     async readAllSeatsByConcertDateId(
         @GetUser('isWaiting') isWaiting: boolean,
         @GetUser('userId') userId: string,

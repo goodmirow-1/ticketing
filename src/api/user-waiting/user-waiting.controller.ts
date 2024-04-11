@@ -9,7 +9,7 @@ export class UserWaitingController {
 
     @Get(':userId/generateToken')
     @ApiOperation({
-        summary: '토큰 등록',
+        summary: '토큰 발급',
     })
     @ApiParam({ name: 'userId', required: true, description: 'User ID', example: '6b9d7e44-04bf-4487-9777-faf55fb87b49' })
     @ApiResponse({ status: 200, description: 'Returns a new token | waiting for the user.' })

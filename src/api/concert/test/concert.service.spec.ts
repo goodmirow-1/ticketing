@@ -66,7 +66,7 @@ describe('콘서트 서비스 유닛 테스트', () => {
         it('Seat create is failed cause concertDateId is NotFound', async () => {
             mockReaderRepo.findConcertDateById.mockRejectedValue(new NotFoundConcertError())
 
-            await expect(createSeatUseCase.excute('1', 1)).rejects.toThrow(NotFoundConcertError)
+            await expect(createSeatUseCase.excute('1', 1, 1000)).rejects.toThrow(NotFoundConcertError)
         })
 
         it('Seat create is success', async () => {
@@ -76,7 +76,7 @@ describe('콘서트 서비스 유닛 테스트', () => {
             mockReaderRepo.findConcertDateById.mockResolvedValue({ id: concertDateId })
             mockWriterRepo.createSeat.mockResolvedValue({ id: seatId, concertDate: { id: concertDateId }, seatNumber: 1 })
 
-            const result = await createSeatUseCase.excute(concertDateId, 1)
+            const result = await createSeatUseCase.excute(concertDateId, 1, 1000)
 
             expect(result.concertDate.id).toBe(concertDateId)
         })

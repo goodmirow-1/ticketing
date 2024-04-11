@@ -7,6 +7,7 @@ import { UserConcertController } from './user-concert.controller'
 import { PaymentUserConcertUseCase } from '../../application/user-concert/usecase/payment-user-concert.usecase'
 import { ConcertReaderRepositoryTypeORM } from 'src/infrastructure/concert/repositories/concert-reader.repository'
 import { UserWriterRepositoryTypeORM } from 'src/infrastructure/user/repositories/user-writer.repository'
+import { ConcertWriterRepositoryTypeORM } from 'src/infrastructure/concert/repositories/concert-writer.repository'
 
 @Module({
     imports: [TypeOrmModule.forFeature([User, Reservation, PointHistory])],
@@ -16,6 +17,10 @@ import { UserWriterRepositoryTypeORM } from 'src/infrastructure/user/repositorie
         {
             provide: 'IConcertReaderRepository',
             useClass: ConcertReaderRepositoryTypeORM,
+        },
+        {
+            provide: 'IConcertWriterRepository',
+            useClass: ConcertWriterRepositoryTypeORM,
         },
         {
             provide: 'IUserWriterRepository',

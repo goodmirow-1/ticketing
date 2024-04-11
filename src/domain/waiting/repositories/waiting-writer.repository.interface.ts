@@ -6,5 +6,4 @@ export interface IWaitingWriterRepository {
     deleteWaitingUser(id: string): Promise<boolean>
 
     createValidTokenOrWaitingUser(user: IUser, isValid: boolean): Promise<string | number>
-    deleteValidToken(token: string): Promise<boolean>
 }

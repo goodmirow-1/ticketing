@@ -6,6 +6,8 @@ export interface ISeat {
 
     seatNumber: number
 
+    price: number
+
     concertDate: IConcertDate
 
     status: string

@@ -16,6 +16,5 @@ export function initWaitingWriterMockRepo(): Record<keyof IWaitingWriterReposito
         createWaitingUser: jest.fn(),
         deleteWaitingUser: jest.fn(),
         createValidTokenOrWaitingUser: jest.fn(),
-        deleteValidToken: jest.fn(),
     }
 }

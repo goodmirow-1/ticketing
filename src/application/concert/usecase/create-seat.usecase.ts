@@ -12,11 +12,10 @@ export class CreateSeatUseCase {
         private readonly concertWriterRepository: IConcertWriterRepository,
     ) {}
 
-    async excute(concertDateId: string, seatNumber: number): Promise<ISeat> {
+    async excute(concertDateId: string, seatNumber: number, price: number): Promise<ISeat> {
         await this.concertReaderRepository.checkValidSeatNumber(seatNumber)
         const concertDate = await this.concertReaderRepository.findConcertDateById(concertDateId)
-        await this.concertReaderRepository.checkValidConcertDate(concertDate)
 
-        return await this.concertWriterRepository.createSeat(concertDate, seatNumber)
+        return await this.concertWriterRepository.createSeat(concertDate, seatNumber, price)
     }
 }

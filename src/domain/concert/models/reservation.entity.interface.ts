@@ -6,8 +6,6 @@ import type { IConcertDate } from './concertDate.entity.interface'
 export interface IReservation {
     id: string
 
-    amount: number
-
     user: IUser
 
     seat: ISeat

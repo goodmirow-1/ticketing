@@ -42,7 +42,8 @@ export class ConcertController {
     })
     @ApiParam({ name: 'concertDateId', required: true, description: 'concertDateId ID', example: '1be4195c-e170-4d29-9889-9e61f3973684' })
     @ApiBody({ schema: { type: 'object', properties: { seatNumber: { type: 'number', example: 1 } } } })
-    async createSeat(@Param('concertDateId') concertDateId: string, @Body('seatNumber') seatNumber: number): Promise<ISeat> {
-        return this.createSeatUseCase.excute(concertDateId, seatNumber)
+    @ApiBody({ schema: { type: 'object', properties: { price: { type: 'number', example: 1000 } } } })
+    async createSeat(@Param('concertDateId') concertDateId: string, @Body('seatNumber') seatNumber: number, @Body('price') price: number): Promise<ISeat> {
+        return this.createSeatUseCase.excute(concertDateId, seatNumber, price)
     }
 }

@@ -15,6 +15,7 @@ export class CreateReservationUseCase {
     async excute(seatId: string, userId: string): Promise<IReservation> {
         const seat = await this.concertReaderRepository.findSeatById(seatId)
         const reservation = await this.concertWriterRepository.createReservation(seat, userId)
+        await this.concertWriterRepository.updateConcertDateAvailableSeat(seat.concertDate.id, -1)
 
         return reservation
     }

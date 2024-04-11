@@ -24,10 +24,10 @@ export class JwtAuthGuard implements CanActivate {
     }
 }
 
-export function generateAccessToken(uuid: string, expiration: number): string {
+export function generateAccessToken(userId: string, expiration: number): string {
     return jwt.sign(
         {
-            uuid: uuid,
+            userId: userId,
             isWating: false,
             exp: expiration,
         },
@@ -37,12 +37,12 @@ export function generateAccessToken(uuid: string, expiration: number): string {
 
 export function extractToken(token: string) {
     const decodedToken = jwt.verify(token, `${process.env.JWT_SECRET_KEY}`) as {
-        uuid: string
+        userId: string
         isWaiting: boolean
         exp: number
     }
 
-    return { uuid: decodedToken.uuid }
+    return { userId: decodedToken.userId }
 }
 
 export const GetUser = createParamDecorator((data: string, ctx: ExecutionContext) => {
