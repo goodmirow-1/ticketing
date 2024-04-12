@@ -5,7 +5,6 @@ import { ValidToken } from '../../waiting/models/valid-token.entity'
 import { generateAccessToken } from 'src/domain/common/jwt-token.util'
 import { SchedulerRegistry } from '@nestjs/schedule'
 import type { IWaitingWriterRepository } from 'src/domain/waiting/repositories/waiting-writer.repository.interface'
-import type { User } from 'src/infrastructure/user/models/user.entity'
 import { SchedulerState } from 'src/domain/common/schedule-state.instance'
 
 @Injectable()
@@ -16,10 +15,6 @@ export class WaitingWriterRepositoryTypeORM implements IWaitingWriterRepository 
         @Inject(EntityManager) private readonly entityManager: EntityManager,
         private readonly schedulerRegistry: SchedulerRegistry,
     ) {}
-
-    async createWaitingUser(user: User): Promise<WaitingUser> {
-        return this.entityManager.save(WaitingUser, { user })
-    }
 
     async deleteWaitingUser(id: string): Promise<boolean> {
         const result = await this.entityManager.delete(WaitingUser, { id })

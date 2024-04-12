@@ -1,9 +1,5 @@
-import type { IUser } from 'src/domain/user/models/user.entity.interface'
-import type { IWaitingUser } from '../../waiting/models/waiting-user.entity.interface'
-
 export const IWaitingWriterRepositoryToken = Symbol('IWaitingWriterRepository')
 export interface IWaitingWriterRepository {
-    createWaitingUser(user: IUser): Promise<IWaitingUser>
     deleteWaitingUser(id: string): Promise<boolean>
 
     createValidToken(userId: string, position?: number): Promise<string>

@@ -17,7 +17,7 @@ export class GenerateTokenUseCase {
         private readonly dataAccessor: DataAccessor,
     ) {}
 
-    async excute(userId: string): Promise<string | number> {
+    async excute(userId: string): Promise<string> {
         await this.userReaderRepository.findUserById(userId)
         const isValidToken = await this.waitingReaderRepository.isTokenCountUnderThreshold()
 
