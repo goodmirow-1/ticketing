@@ -29,6 +29,7 @@ export class UserWaitingController {
     @ApiBody({ schema: { type: 'object', properties: { token: { type: 'string', nullable: true, default: '' } } } })
     @ApiResponse({ status: 200, description: 'Returns a new token | waiting for the user.' })
     async generateToken(@Param('userId') userId: string, @Body() body: { token?: string }): Promise<string | number> {
+        //token이 없으면 대기열or유효 토큰 생성
         if (body.token == undefined || body.token == '') {
             return this.generateTokenUseCase.excute(userId)
         } else {
