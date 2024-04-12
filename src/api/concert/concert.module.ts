@@ -11,6 +11,9 @@ import { ConcertReaderRepositoryTypeORM } from 'src/infrastructure/concert/repos
 import { ConcertWriterRepositoryTypeORM } from 'src/infrastructure/concert/repositories/concert-writer.repository'
 import { IConcertReaderRepositoryToken } from 'src/domain/concert/repositories/concert-reader.repository.interface'
 import { IConcertWriterRepositoryToken } from 'src/domain/concert/repositories/concert-writer.repository.interface'
+import { CreateReservationUseCase } from 'src/application/concert-waiting/usecase/create-reservation.usecase'
+import { ReadAllConcertsUseCase } from 'src/application/concert-waiting/usecase/read-all-concerts.usecase'
+import { ReadAllSeatsByConcertDateIdUseCase } from 'src/application/concert-waiting/usecase/read-all-seats-by-concert-date.usecase'
 
 @Module({
     imports: [TypeOrmModule.forFeature([Concert, ConcertDate, Seat])],
@@ -19,6 +22,9 @@ import { IConcertWriterRepositoryToken } from 'src/domain/concert/repositories/c
         CreateConcertUseCase,
         CreateConcertDateUseCase,
         CreateSeatUseCase,
+        CreateReservationUseCase,
+        ReadAllConcertsUseCase,
+        ReadAllSeatsByConcertDateIdUseCase,
         {
             provide: IConcertReaderRepositoryToken,
             useClass: ConcertReaderRepositoryTypeORM,

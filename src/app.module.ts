@@ -7,7 +7,6 @@ import { UserConcertWaitingModule } from './api/user-concert-waiting/user-concer
 import { ConcertModule } from './api/concert/concert.module'
 import { ScheduleModule } from '@nestjs/schedule'
 import { UserWaitingModule } from './api/user-waiting/user-waiting.module'
-import { ConcertWaitingModule } from './api/concert-waiting/concert-waiting.module'
 import { WaitingModule } from './api/waiting/waiting.module'
 @Module({
     imports: [
@@ -37,7 +36,6 @@ import { WaitingModule } from './api/waiting/waiting.module'
         WaitingModule,
         UserConcertWaitingModule,
         UserWaitingModule,
-        ConcertWaitingModule,
     ],
     controllers: [],
     providers: [],
