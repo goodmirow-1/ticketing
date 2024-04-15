@@ -1,8 +1,8 @@
 import { Entity, Column, ManyToOne, JoinColumn, CreateDateColumn, PrimaryColumn, BeforeInsert } from 'typeorm'
 import { v4 as uuidv4 } from 'uuid'
 import { User } from './user.entity'
-import type { IPointHistory } from 'src/domain/user/models/point-history.entity.interface'
-import { Reservation } from 'src/infrastructure/concert/models/reservation.entity'
+import type { IPointHistory } from '../../../domain/user/models/point-history.entity.interface'
+import { Reservation } from '../../../infrastructure/concert/models/reservation.entity'
 
 @Entity()
 export class PointHistory implements IPointHistory {

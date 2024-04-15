@@ -1,5 +1,5 @@
-import { Reservation } from 'src/infrastructure/concert/models/reservation.entity'
-import type { IUser } from 'src/domain/user/models/user.entity.interface'
+import { Reservation } from '../../../infrastructure/concert/models/reservation.entity'
+import type { IUser } from '../../../domain/user/models/user.entity.interface'
 import { Entity, Column, OneToMany, PrimaryColumn, BeforeInsert } from 'typeorm'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -11,7 +11,7 @@ export class User implements IUser {
     @Column()
     name: string
 
-    @Column({ default: 0 })
+    @Column({ default: 10000 })
     point: number
 
     @OneToMany(() => Reservation, reservation => reservation.user)

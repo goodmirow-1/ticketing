@@ -27,6 +27,10 @@ function setupSwagger(app: INestApplication): void {
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule)
+    const server = app.getHttpAdapter().getInstance()
+
+    server.maxConnections = Infinity
+
     setupSwagger(app)
     await app.listen(3000)
 }

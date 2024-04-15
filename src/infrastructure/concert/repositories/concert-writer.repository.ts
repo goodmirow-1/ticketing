@@ -1,15 +1,16 @@
 import type { OnModuleInit } from '@nestjs/common'
 import { Inject, Injectable } from '@nestjs/common'
-import type { IConcertWriterRepository } from 'src/domain/concert/repositories/concert-writer.repository.interface'
+import type { IConcertWriterRepository } from '../../../domain/concert/repositories/concert-writer.repository.interface'
 import { EntityManager } from 'typeorm'
 import { Concert } from '../models/concert.entity'
 import { ConcertDate } from '../models/concertDate.entity'
 import { Seat } from '../models/seat.entity'
 import { Reservation } from '../models/reservation.entity'
-import { FailedUpdateSeatStatusError } from 'src/domain/concert/exceptions/failed-update-seat-status.exception'
-import { FailedCreateReservationError } from 'src/domain/concert/exceptions/failed-create-reservation.exception'
+import { FailedUpdateSeatStatusError } from '../../../domain/concert/exceptions/failed-update-seat-status.exception'
+import { FailedCreateReservationError } from '../../../domain/concert/exceptions/failed-create-reservation.exception'
 import { SchedulerRegistry } from '@nestjs/schedule'
-import { FailedUpdateReservationError } from 'src/domain/concert/exceptions/faild-update-reservation.exception'
+import { FailedUpdateReservationError } from '../../../domain/concert/exceptions/faild-update-reservation.exception'
+import { v4 as uuidv4 } from 'uuid'
 
 @Injectable()
 export class ConcertWriterRepositoryTypeORM implements IConcertWriterRepository, OnModuleInit {
@@ -24,19 +25,24 @@ export class ConcertWriterRepositoryTypeORM implements IConcertWriterRepository,
     }
 
     async createConcert(singerName: string): Promise<Concert> {
-        return await this.entityManager.save(Concert, { singerName })
+        const uuid = uuidv4()
+        return await this.entityManager.save(Concert, { id: uuid, singerName })
     }
 
     async createConcertDate(concert: Concert, date: Date): Promise<ConcertDate> {
-        return this.entityManager.save(ConcertDate, { concert, date })
+        const uuid = uuidv4()
+        return this.entityManager.save(ConcertDate, { id: uuid, availableSeats: parseInt(process.env.MAX_SEATS, 10), concert, date })
     }
 
     createSeat(concertDate: ConcertDate, seatNumber: number, price: number): Promise<Seat> {
-        return this.entityManager.save(Seat, { concertDate, seatNumber, price })
+        const uuid = uuidv4()
+        return this.entityManager.save(Seat, { id: uuid, concertDate, seatNumber, price })
     }
 
     async createReservation(seat: Seat, userId: string): Promise<Reservation> {
+        const uuid = uuidv4()
         const reservation = await this.entityManager.save(Reservation, {
+            id: uuid,
             user: { id: userId },
             seat,
             concert: seat.concertDate.concert,

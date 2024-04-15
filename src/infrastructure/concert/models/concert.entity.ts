@@ -1,7 +1,7 @@
 import { Entity, Column, OneToMany, PrimaryColumn, BeforeInsert } from 'typeorm'
 import { v4 as uuidv4 } from 'uuid'
 import { ConcertDate } from './concertDate.entity'
-import type { IConcert } from 'src/domain/concert/models/concert.entity.interface'
+import type { IConcert } from '../../../domain/concert/models/concert.entity.interface'
 
 @Entity()
 export class Concert implements IConcert {

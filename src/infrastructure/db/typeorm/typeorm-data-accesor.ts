@@ -3,29 +3,28 @@ import type { QueryRunner } from 'typeorm'
 import { EntityManager } from 'typeorm'
 import { InjectEntityManager } from '@nestjs/typeorm'
 import type { DataAccessor } from '../data-accesor.interface'
-import type { IsolationLevel } from 'typeorm/driver/types/IsolationLevel'
 
 @Injectable()
 export class TypeORMDataAccessor implements DataAccessor {
     constructor(@InjectEntityManager() private entityManager: EntityManager) {}
 
-    async getSession(option?: IsolationLevel): Promise<QueryRunner> {
+    async getSession(option?: any): Promise<QueryRunner> {
         const queryRunner = this.entityManager.connection.createQueryRunner()
         await queryRunner.connect()
         await queryRunner.startTransaction(option)
         return queryRunner
     }
 
-    async commitTransaction(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.commitTransaction()
+    async commitTransaction(session: QueryRunner): Promise<void> {
+        await session.commitTransaction()
     }
 
-    async rollbackTransaction(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.rollbackTransaction()
+    async rollbackTransaction(session: QueryRunner): Promise<void> {
+        await session.rollbackTransaction()
     }
 
-    async releaseQueryRunner(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.release()
+    async releaseQueryRunner(session: QueryRunner): Promise<void> {
+        await session.release()
     }
 }
 

@@ -5,8 +5,9 @@ export function initWaitingReaderMockRepo(): Record<keyof IWaitingReaderReposito
     return {
         findWaitingUserPosition: jest.fn(),
         getWaitingUserCount: jest.fn(),
+        getTokenStatus: jest.fn(),
         findLastWaitingUser: jest.fn(),
-        findValidToken: jest.fn(),
+        findValidTokenByUserId: jest.fn(),
         isTokenCountUnderThreshold: jest.fn(),
         isSameWaitingNumber: jest.fn(),
     }

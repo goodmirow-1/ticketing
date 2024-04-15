@@ -2,7 +2,7 @@ import { Entity, Column, OneToMany, Index, ManyToOne, JoinColumn, PrimaryColumn,
 import { v4 as uuidv4 } from 'uuid'
 import { Concert } from './concert.entity'
 import { Seat } from './seat.entity'
-import type { IConcertDate } from 'src/domain/concert/models/concertDate.entity.interface'
+import type { IConcertDate } from '../../../domain/concert/models/concertDate.entity.interface'
 
 @Entity()
 export class ConcertDate implements IConcertDate {
@@ -13,7 +13,7 @@ export class ConcertDate implements IConcertDate {
     @Column()
     date: Date
 
-    @Column({ default: process.env.MAX_SEATS })
+    @Column({ type: 'int' })
     availableSeats: number
 
     @ManyToOne(() => Concert, concert => concert.concertDates)

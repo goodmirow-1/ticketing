@@ -1,5 +1,5 @@
-import type { IWaitingUser } from 'src/domain/waiting/models/waiting-user.entity.interface'
-import { Entity, ManyToOne, JoinColumn, PrimaryColumn, BeforeInsert } from 'typeorm'
+import type { IWaitingUser } from '../../../domain/waiting/models/waiting-user.entity.interface'
+import { Entity, ManyToOne, JoinColumn, PrimaryColumn, BeforeInsert, CreateDateColumn } from 'typeorm'
 import { v4 as uuidv4 } from 'uuid'
 import { User } from '../../user/models/user.entity'
 
@@ -11,6 +11,9 @@ export class WaitingUser implements IWaitingUser {
     @ManyToOne(() => User, user => user.id)
     @JoinColumn({ name: 'userId' })
     user: User
+
+    @CreateDateColumn({ type: 'datetime' })
+    created_at: Date
 
     @BeforeInsert()
     generateId() {

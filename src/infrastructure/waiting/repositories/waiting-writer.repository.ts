@@ -2,10 +2,11 @@ import { Inject, Injectable } from '@nestjs/common'
 import { EntityManager } from 'typeorm'
 import { WaitingUser } from '../../waiting/models/waiting-user.entity'
 import { ValidToken } from '../../waiting/models/valid-token.entity'
-import { generateAccessToken } from 'src/domain/common/jwt-token.util'
+import { generateAccessToken } from '../../../domain/common/jwt-token.util'
 import { SchedulerRegistry } from '@nestjs/schedule'
-import type { IWaitingWriterRepository } from 'src/domain/waiting/repositories/waiting-writer.repository.interface'
-import { SchedulerState } from 'src/domain/common/schedule-state.instance'
+import type { IWaitingWriterRepository } from '../../../domain/waiting/repositories/waiting-writer.repository.interface'
+import { SchedulerState } from '../../../domain/common/schedule-state.instance'
+import { v4 as uuidv4 } from 'uuid'
 
 @Injectable()
 export class WaitingWriterRepositoryTypeORM implements IWaitingWriterRepository {
@@ -22,12 +23,15 @@ export class WaitingWriterRepositoryTypeORM implements IWaitingWriterRepository 
         return result.affected !== 0
     }
 
-    async createValidToken(userId: string): Promise<string> {
+    async createValidToken(userId: string, querryRunner?: any) {
+        const manager = querryRunner ? querryRunner.manager : this.entityManager
+
         const expirationTime = parseInt(process.env.VALID_TOKEN_EXPIRATION_TIME, 10)
         const expiration = Math.floor(Date.now() / 1000) + expirationTime
 
+        const uuid = uuidv4()
         const token = generateAccessToken(userId, expiration, 0)
-        this.entityManager.save(ValidToken, { token, expiration })
+        await manager.save(ValidToken, { id: uuid, userId, token, expiration })
 
         const timeout = setTimeout(async () => {
             await this.entityManager.delete(ValidToken, { token })
@@ -35,31 +39,35 @@ export class WaitingWriterRepositoryTypeORM implements IWaitingWriterRepository 
 
         this.schedulerRegistry.addTimeout(token, timeout)
 
-        return token
+        return { token: token, waitingNumber: 0 }
     }
 
-    async createWaitingToken(userId: string, position?: number): Promise<string> {
-        const expiration = Math.floor(Date.now() / 1000) + parseInt(process.env.VALID_TOKEN_EXPIRATION_TIME, 10)
+    async createWaitingToken(userId: string, querryRunner?: any, lockOption?: any, position?: number) {
+        const manager = querryRunner ? querryRunner.manager : this.entityManager
+        const expiration = Math.floor(Date.now() / 1000) + parseInt(process.env.VALID_TOKEN_EXPIRATION_TIME, 10) + 6000 //대기 토큰은 폴링해야해서 1시간 추가
 
         if (position) {
-            return generateAccessToken(userId, expiration, position)
+            console.log(position)
+            const token = generateAccessToken(userId, expiration, position)
+            return { token, waitingNumber: position }
         } else {
-            this.entityManager.save(WaitingUser, { user: { id: userId } })
+            const uuid = uuidv4()
+            await manager.save(WaitingUser, { id: uuid, user: { id: userId } })
 
-            const count = await this.entityManager.count(WaitingUser)
+            const count: number = await manager.count(WaitingUser, { lock: lockOption })
 
-            const token = generateAccessToken(userId, expiration, count + 1)
+            const token = generateAccessToken(userId, expiration, count)
             this.schedulerState.check = true
 
-            return token
+            return { token, waitingNumber: count }
         }
     }
 
-    async createValidTokenOrWaitingUser(userId: string, isValid: boolean): Promise<string> {
+    async createValidTokenOrWaitingUser(userId: string, isValid: boolean, querryRunner?: any, lockOption?: any) {
         if (isValid) {
-            return this.createValidToken(userId)
+            return this.createValidToken(userId, querryRunner)
         } else {
-            return this.createWaitingToken(userId)
+            return this.createWaitingToken(userId, querryRunner, lockOption)
         }
     }
 

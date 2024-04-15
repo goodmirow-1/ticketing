@@ -1,11 +1,12 @@
 import { Inject, Injectable } from '@nestjs/common'
-import type { IUserWriterRepository } from 'src/domain/user/repositories/user-writer.repository.interface'
+import type { IUserWriterRepository } from '../../../domain/user/repositories/user-writer.repository.interface'
 import { EntityManager } from 'typeorm'
 import { User } from '../models/user.entity'
 import { PointHistory } from '../models/point-history.entity'
-import { FailedUserChargePointError } from 'src/domain/user/exceptions/failed-user-charge-point.exception'
-import { InValidPointError } from 'src/domain/user/exceptions/invalid-point.exception'
-import { FailedCreatePointHistoryError } from 'src/domain/user/exceptions/failed-create-point-history.exception'
+import { FailedUserChargePointError } from '../../../domain/user/exceptions/failed-user-charge-point.exception'
+import { InValidPointError } from '../../../domain/user/exceptions/invalid-point.exception'
+import { FailedCreatePointHistoryError } from '../../../domain/user/exceptions/failed-create-point-history.exception'
+import { v4 as uuidv4 } from 'uuid'
 
 @Injectable()
 export class UserWriterRepositoryTypeORM implements IUserWriterRepository {
@@ -18,7 +19,9 @@ export class UserWriterRepositoryTypeORM implements IUserWriterRepository {
     }
 
     async createUser(name: string): Promise<User> {
-        return this.entityManager.save(User, { name, point: 0, reservations: [] })
+        const uuid = uuidv4()
+
+        return this.entityManager.save(User, { id: uuid, name, point: 0, reservations: [] })
     }
 
     async calculatePoint(user: User, amount: number, reason: 'charge' | 'payment', reservationId?: string): Promise<PointHistory> {
@@ -32,7 +35,9 @@ export class UserWriterRepositoryTypeORM implements IUserWriterRepository {
 
         if (result.affected === 0) throw new FailedUserChargePointError('Failed to charge point')
 
+        const uuid = uuidv4()
         const pointHistory = await this.entityManager.save(PointHistory, {
+            id: uuid,
             user,
             amount: amount,
             reason,

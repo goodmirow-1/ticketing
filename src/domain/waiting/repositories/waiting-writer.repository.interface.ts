@@ -2,9 +2,9 @@ export const IWaitingWriterRepositoryToken = Symbol('IWaitingWriterRepository')
 export interface IWaitingWriterRepository {
     deleteWaitingUser(id: string): Promise<boolean>
 
-    createValidToken(userId: string, position?: number): Promise<string>
-    createWaitingToken(userId: string): Promise<string>
-    createValidTokenOrWaitingUser(userId: string, isValid: boolean): Promise<string>
+    createValidToken(userId: string, querryRunner?: any)
+    createWaitingToken(userId: string, querryRunner?: any, lockOption?: any, position?: number)
+    createValidTokenOrWaitingUser(userId: string, isValid: boolean, querryRunner?: any, lockOption?: any)
 
     expiredValidToken(token?: string)
 }

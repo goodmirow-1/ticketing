@@ -12,7 +12,7 @@ export interface IConcertReaderRepository {
     checkValidConcertDateByDate(date: Date)
     findConcertDateById(concertDateId: string): Promise<IConcertDate>
 
-    checkValidSeatNumber(seatNumber: number)
+    checkValidSeatNumber(concertDateId: string, seatNumber: number)
     findSeatById(seatId: string): Promise<ISeat>
     findSeatsByConcertDateId(concertDateId: string): Promise<ISeat[]>
 

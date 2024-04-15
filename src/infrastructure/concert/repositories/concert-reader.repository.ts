@@ -1,15 +1,15 @@
 import { Inject, Injectable } from '@nestjs/common'
-import type { IConcertReaderRepository } from 'src/domain/concert/repositories/concert-reader.repository.interface'
+import type { IConcertReaderRepository } from '../../../domain/concert/repositories/concert-reader.repository.interface'
 import { EntityManager } from 'typeorm'
 import { Concert } from '../models/concert.entity'
 import { Seat } from '../models/seat.entity'
 import { ConcertDate } from '../models/concertDate.entity'
-import { NotFoundConcertError } from 'src/domain/concert/exceptions/not-found-concert.exception'
-import { NotFoundSeatError } from 'src/domain/concert/exceptions/not-found-seat.exception'
-import { NotAvailableSeatError } from 'src/domain/concert/exceptions/not-available-seat.exception'
+import { NotFoundConcertError } from '../../../domain/concert/exceptions/not-found-concert.exception'
+import { NotFoundSeatError } from '../../../domain/concert/exceptions/not-found-seat.exception'
+import { NotAvailableSeatError } from '../../../domain/concert/exceptions/not-available-seat.exception'
 import { Reservation } from '../models/reservation.entity'
-import { InValidSeatNumberError } from 'src/domain/concert/exceptions/invalid-seat-number.exception'
-import { DuplicateConcertDateError } from 'src/domain/concert/exceptions/duplicate-concert-date.exception'
+import { InValidSeatNumberError } from '../../../domain/concert/exceptions/invalid-seat-number.exception'
+import { DuplicateConcertDateError } from '../../../domain/concert/exceptions/duplicate-concert-date.exception'
 
 @Injectable()
 export class ConcertReaderRepositoryTypeORM implements IConcertReaderRepository {
@@ -23,12 +23,12 @@ export class ConcertReaderRepositoryTypeORM implements IConcertReaderRepository 
         }
     }
 
-    async checkValidSeatNumber(seatNumber: number) {
+    async checkValidSeatNumber(concertDateId: string, seatNumber: number) {
         if (seatNumber < 1 || seatNumber > parseInt(process.env.MAX_SEATS, 10)) {
             throw new InValidSeatNumberError(`Seat number must be between 1 and max seats`)
         }
 
-        const seat = await this.entityManager.findOne(Seat, { where: { seatNumber } })
+        const seat = await this.entityManager.findOne(Seat, { where: { id: concertDateId, seatNumber } })
 
         if (seat) throw new InValidSeatNumberError(`Seat number ${seatNumber} already exists`)
     }
