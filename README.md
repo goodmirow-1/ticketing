@@ -65,4 +65,5 @@
 
 ## swagger
 
-![1](https://github.com/goodmirow-1/ticketing/assets/57578975/c5fd6a05-dc2e-43e7-a68d-9629bf70b80a)
+![image](https://github.com/goodmirow-1/ticketing/assets/57578975/ff05bc42-7549-448a-aa19-f8798e2abeeb)
+
