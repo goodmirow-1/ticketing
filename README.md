@@ -58,9 +58,8 @@
 ## 엔티티 릴래이션 다이어그램 ( ERD )
 
 1. 대기열 역할을 하는 WaitingUser 테이블, 유효한 토큰을 관리하는 ValidToken 테이블로 대기열을 관리함
-2. ConsertDate 테이블의 date 를 Index로 설정해서 콘서트 날짜 조회에 대한 성능을 높임
-3. Seat 테이블의 concertDateId, status를 Index로 설정해서 콘서트 좌석 조회에 대한 성능을 높임
-2. Reservation 테이블의 consertId,consertDateId,seatId 값을 복합 유니크키로 설정해서 낙관적 락을 사용할 수 있게 함
+2. Seat 테이블의 concertDateId, status를 Index로 설정해서 콘서트 좌석 조회에 대한 성능을 높임
+3. Reservation 테이블의 consertId,consertDateId,seatId 값을 복합 유니크키로 설정해서 낙관적 락을 사용할 수 있게 함
 
 ![image](https://github.com/goodmirow-1/ticketing/assets/57578975/feb12932-0879-48f0-a0a8-68e701618f60)
 
