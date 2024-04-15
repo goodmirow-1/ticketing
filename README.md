@@ -61,7 +61,7 @@
 2. Seat 테이블의 concertDateId, status를 Index로 설정해서 콘서트 좌석 조회에 대한 성능을 높임
 3. Reservation 테이블의 consertId,consertDateId,seatId 값을 복합 유니크키로 설정해서 낙관적 락을 사용할 수 있게 함
 
-![image](https://github.com/goodmirow-1/ticketing/assets/57578975/feb12932-0879-48f0-a0a8-68e701618f60)
+![1](https://github.com/goodmirow-1/ticketing/assets/57578975/eff8f658-b15f-4f1d-9801-b28bf49e03c6)
 
 ## swagger
 
