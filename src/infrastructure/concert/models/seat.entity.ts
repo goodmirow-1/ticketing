@@ -1,11 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, Index, OneToOne } from 'typeorm'
+import { Entity, Column, ManyToOne, JoinColumn, Index, OneToOne, PrimaryColumn, BeforeInsert } from 'typeorm'
+import { v4 as uuidv4 } from 'uuid'
 import { ConcertDate } from './concertDate.entity'
 import { Reservation } from './reservation.entity'
 import type { ISeat } from 'src/domain/concert/models/seat.entity.interface'
 
 @Entity()
 export class Seat implements ISeat {
-    @PrimaryGeneratedColumn('uuid')
+    @PrimaryColumn({ type: 'char', length: 36 })
     id: string
 
     @Column({ type: 'int' })
@@ -25,4 +26,9 @@ export class Seat implements ISeat {
 
     @OneToOne(() => Reservation, reservation => reservation.seat)
     reservation: Reservation
+
+    @BeforeInsert()
+    generateId() {
+        this.id = uuidv4()
+    }
 }

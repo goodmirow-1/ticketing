@@ -1,9 +1,10 @@
 import type { IValidToken } from 'src/domain/waiting/models/valid-token.entity.interface'
-import { Entity, PrimaryGeneratedColumn, Column, Index } from 'typeorm'
+import { Entity, Column, Index, BeforeInsert, PrimaryColumn } from 'typeorm'
+import { v4 as uuidv4 } from 'uuid'
 
 @Entity()
 export class ValidToken implements IValidToken {
-    @PrimaryGeneratedColumn('uuid')
+    @PrimaryColumn({ type: 'char', length: 36 })
     id: string
 
     @Index()
@@ -16,4 +17,9 @@ export class ValidToken implements IValidToken {
 
     @Column({ default: true })
     status: boolean
+
+    @BeforeInsert()
+    generateId() {
+        this.id = uuidv4()
+    }
 }

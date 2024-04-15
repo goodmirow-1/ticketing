@@ -1,10 +1,11 @@
 import { Reservation } from 'src/infrastructure/concert/models/reservation.entity'
 import type { IUser } from 'src/domain/user/models/user.entity.interface'
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm'
+import { Entity, Column, OneToMany, PrimaryColumn, BeforeInsert } from 'typeorm'
+import { v4 as uuidv4 } from 'uuid'
 
 @Entity()
 export class User implements IUser {
-    @PrimaryGeneratedColumn('uuid')
+    @PrimaryColumn({ type: 'char', length: 36 })
     id: string
 
     @Column()
@@ -15,4 +16,9 @@ export class User implements IUser {
 
     @OneToMany(() => Reservation, reservation => reservation.user)
     reservations: Reservation[]
+
+    @BeforeInsert()
+    generateId() {
+        this.id = uuidv4()
+    }
 }

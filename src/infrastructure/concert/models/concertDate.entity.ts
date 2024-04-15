@@ -1,11 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, Index, ManyToOne, JoinColumn } from 'typeorm'
+import { Entity, Column, OneToMany, Index, ManyToOne, JoinColumn, PrimaryColumn, BeforeInsert } from 'typeorm'
+import { v4 as uuidv4 } from 'uuid'
 import { Concert } from './concert.entity'
 import { Seat } from './seat.entity'
 import type { IConcertDate } from 'src/domain/concert/models/concertDate.entity.interface'
 
 @Entity()
 export class ConcertDate implements IConcertDate {
-    @PrimaryGeneratedColumn('uuid')
+    @PrimaryColumn({ type: 'char', length: 36 })
     id: string
 
     @Index() // Adding an index to improve performance for queries filtering by date
@@ -21,4 +22,9 @@ export class ConcertDate implements IConcertDate {
 
     @OneToMany(() => Seat, seat => seat.concertDate)
     seats: Seat[]
+
+    @BeforeInsert()
+    generateId() {
+        this.id = uuidv4()
+    }
 }

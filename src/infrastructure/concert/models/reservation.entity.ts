@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn, Column, Unique } from 'typeorm'
+import { Entity, ManyToOne, JoinColumn, Column, Unique, PrimaryColumn, BeforeInsert } from 'typeorm'
+import { v4 as uuidv4 } from 'uuid'
 import { Concert } from './concert.entity'
 import { Seat } from './seat.entity'
 import { ConcertDate } from './concertDate.entity'
@@ -8,7 +9,7 @@ import { User } from 'src/infrastructure/user/models/user.entity'
 @Entity()
 @Unique(['concert', 'concertDate', 'seat']) // Composite unique constraint
 export class Reservation implements IReservation {
-    @PrimaryGeneratedColumn('uuid')
+    @PrimaryColumn({ type: 'char', length: 36 })
     id: string
 
     @ManyToOne(() => User, user => user.reservations)
@@ -32,4 +33,9 @@ export class Reservation implements IReservation {
 
     @Column({ default: false })
     paymentCompleted: boolean
+
+    @BeforeInsert()
+    generateId() {
+        this.id = uuidv4()
+    }
 }

@@ -1,11 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, CreateDateColumn } from 'typeorm'
+import { Entity, Column, ManyToOne, JoinColumn, CreateDateColumn, PrimaryColumn, BeforeInsert } from 'typeorm'
+import { v4 as uuidv4 } from 'uuid'
 import { User } from './user.entity'
 import type { IPointHistory } from 'src/domain/user/models/point-history.entity.interface'
 import { Reservation } from 'src/infrastructure/concert/models/reservation.entity'
 
 @Entity()
 export class PointHistory implements IPointHistory {
-    @PrimaryGeneratedColumn('uuid')
+    @PrimaryColumn({ type: 'char', length: 36 })
     id: string
 
     @ManyToOne(() => User, user => user.id)
@@ -24,4 +25,9 @@ export class PointHistory implements IPointHistory {
 
     @CreateDateColumn({ type: 'datetime', nullable: false })
     created_at: Date
+
+    @BeforeInsert()
+    generateId() {
+        this.id = uuidv4()
+    }
 }
