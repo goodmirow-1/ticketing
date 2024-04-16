@@ -58,14 +58,14 @@ describe('AppController (e2e)', () => {
     })
 
     afterAll(async () => {
-        // await entityManager.delete('valid_token', {})
-        // await entityManager.delete('point_history', {})
-        // await entityManager.delete('reservation', {})
-        // await entityManager.delete('seat', {})
-        // await entityManager.delete('concert_date', {})
-        // await entityManager.delete('concert', {})
-        // await entityManager.delete('waiting_user', {})
-        // await entityManager.delete('user', {})
+        await entityManager.delete('valid_token', {})
+        await entityManager.delete('point_history', {})
+        await entityManager.delete('reservation', {})
+        await entityManager.delete('seat', {})
+        await entityManager.delete('concert_date', {})
+        await entityManager.delete('concert', {})
+        await entityManager.delete('waiting_user', {})
+        await entityManager.delete('user', {})
 
         await app.close()
     })
@@ -73,9 +73,9 @@ describe('AppController (e2e)', () => {
     it(
         'should create 100 users and charge them each 10,000 points',
         async () => {
-            const MAX_CONNECTIONS = parseInt(process.env.MAX_CONNECTIONS, 10)
+            const MAX_CONNECTIONS = parseInt(process.env.MAX_CONNECTIONS, 10) * 2
 
-            for (let i = 0; i < MAX_CONNECTIONS + 10; i++) {
+            for (let i = 0; i < MAX_CONNECTIONS; i++) {
                 const response = await request(app.getHttpServer())
                     .post('/user')
                     .send({ name: `User${i}` }) // 유저 이름을 User0, User1, ..., User99 로 설정
@@ -84,45 +84,45 @@ describe('AppController (e2e)', () => {
                 userIds.push(response.body.id) // 응답에서 받은 ID를 userIds 배열에 추가
             }
 
-            // // 생성된 모든 사용자에 대해 포인트 충전
-            // for (const userId of userIds) {
-            //     const chargeResponse = await request(app.getHttpServer()).patch(`/user/charge/${userId}/point`).send({ amount: 10000 }) // 각 사용자에게 10,000 포인트 충전
+            // 생성된 모든 사용자에 대해 포인트 충전
+            for (const userId of userIds) {
+                const chargeResponse = await request(app.getHttpServer()).patch(`/user/charge/${userId}/point`).send({ amount: 10000 }) // 각 사용자에게 10,000 포인트 충전
 
-            //     expect(chargeResponse.status).toBe(200) // HTTP 200 OK 응답을 확인
-            //     expect(parseInt(chargeResponse.text)).toEqual(10000) // 새로운 포인트가 10,000인지 확인
-            // }
+                expect(chargeResponse.status).toBe(200) // HTTP 200 OK 응답을 확인
+                expect(parseInt(chargeResponse.text)).toEqual(10000) // 새로운 포인트가 10,000인지 확인
+            }
         },
         6000 * 1000,
     )
 
-    // it('should create concerts, dates, and seats', async () => {
-    //     // 1. 아이유 콘서트 생성
-    //     const concertResponse = await request(app.getHttpServer()).post('/concert').send({ singerName: '아이유' })
-    //     expect(concertResponse.status).toBe(201)
-    //     const concertId = concertResponse.body.id
+    it('should create concerts, dates, and seats', async () => {
+        // 1. 아이유 콘서트 생성
+        const concertResponse = await request(app.getHttpServer()).post('/concert').send({ singerName: '아이유' })
+        expect(concertResponse.status).toBe(201)
+        const concertId = concertResponse.body.id
 
-    //     // 2. 7월 7, 8, 9일 콘서트 날짜 생성
-    //     const dates = ['2024-07-07', '2024-07-08', '2024-07-09']
-    //     const concertDates = []
+        // 2. 7월 7, 8, 9일 콘서트 날짜 생성
+        const dates = ['2024-07-07', '2024-07-08', '2024-07-09']
+        const concertDates = []
 
-    //     for (const date of dates) {
-    //         const dateResponse = await request(app.getHttpServer())
-    //             .post(`/concert/${concertId}/`)
-    //             .send({ concertDate: `${date} 20:00:00` })
-    //         expect(dateResponse.status).toBe(201)
-    //         concertDates.push(dateResponse.body.id)
-    //     }
+        for (const date of dates) {
+            const dateResponse = await request(app.getHttpServer())
+                .post(`/concert/${concertId}/`)
+                .send({ concertDate: `${date} 20:00:00` })
+            expect(dateResponse.status).toBe(201)
+            concertDates.push(dateResponse.body.id)
+        }
 
-    //     // 3. 각 콘서트 날짜에 1~50개의 좌석 생성
-    //     const MAX_SEATS = parseInt(process.env.MAX_SEATS, 10)
-    //     for (const concertDateId of concertDates) {
-    //         for (let seatNumber = 1; seatNumber <= MAX_SEATS; seatNumber++) {
-    //             const price = randomInt(1000, 3001) // 1000원에서 3000원 사이의 가격
-    //             const seatResponse = await request(app.getHttpServer()).post(`/concert/${concertDateId}/seat`).send({ seatNumber, price })
-    //             expect(seatResponse.status).toBe(201)
-    //         }
-    //     }
-    // })
+        // 3. 각 콘서트 날짜에 1~50개의 좌석 생성
+        const MAX_SEATS = parseInt(process.env.MAX_SEATS, 10)
+        for (const concertDateId of concertDates) {
+            for (let seatNumber = 1; seatNumber <= MAX_SEATS; seatNumber++) {
+                const price = randomInt(1000, 3001) // 1000원에서 3000원 사이의 가격
+                const seatResponse = await request(app.getHttpServer()).post(`/concert/${concertDateId}/seat`).send({ seatNumber, price })
+                expect(seatResponse.status).toBe(201)
+            }
+        }
+    })
 
     it(
         'should handle the token issuance and concert access process for multiple users simultaneously',
@@ -139,7 +139,7 @@ describe('AppController (e2e)', () => {
                     const { token, waitingNumber } = response.value.body
                     // 유효 토큰일 경우 즉시 콘서트 접근 시도
                     if (waitingNumber === 0) {
-                        return request(app.getHttpServer()).get('/concert/').set('Authorization', `Bearer ${token}`)
+                        return handleConcertAccess(token)
                     } else {
                         // 대기 토큰일 경우 폴링을 통해 콘서트 접근 시도
                         return pollForTokenAvailability(token, waitingNumber)
@@ -158,14 +158,18 @@ describe('AppController (e2e)', () => {
     // 폴링 함수: 폴링이 성공적으로 완료될 때까지 재귀적으로 자기 자신을 호출
     async function pollForTokenAvailability(token, waitingNumber) {
         if (waitingNumber === 0) {
-            return request(app.getHttpServer()).get('/concert/').set('Authorization', `Bearer ${token}`)
+            return handleConcertAccess(token)
         } else {
             const delay = calculatePollingDelay(waitingNumber)
             await new Promise(resolve => setTimeout(resolve, delay))
 
             try {
                 const statusResponse = await request(app.getHttpServer()).post('/user-waiting/token/status').set('Authorization', `Bearer ${token}`)
-                return pollForTokenAvailability(token, parseInt(statusResponse.text))
+                if (statusResponse.body.token) {
+                    return pollForTokenAvailability(statusResponse.body.token, statusResponse.body.waitingNumber)
+                } else {
+                    return pollForTokenAvailability(token, parseInt(statusResponse.text))
+                }
             } catch (error) {
                 console.error('Error during polling token availability:', error)
                 throw error // 에러를 다시 발생시켜 호출자에게 알림
@@ -191,5 +195,88 @@ describe('AppController (e2e)', () => {
         const failedCount = rejectedResponses.length
 
         console.log('Success count:', successCount, 'Failed count:', failedCount)
+    }
+
+    async function handleConcertAccess(token: string): Promise<void> {
+        try {
+            // 1. 콘서트 날짜 조회
+            const concertsResponse = await request(app.getHttpServer()).get('/concert/dates').set('Authorization', `Bearer ${token}`)
+            if (concertsResponse.status !== HttpStatus.OK || !concertsResponse.body.length) {
+                console.error('Failed to fetch concert dates or no dates available.')
+                return
+            }
+
+            // 2. 랜덤으로 콘서트 날짜 선택
+            // 콘서트 목록 중 concertDates가 있는 콘서트만 필터링
+            const validConcerts = concertsResponse.body.filter(concert => concert.concertDates && concert.concertDates.length > 0)
+            if (!validConcerts.length) {
+                console.error('No valid concerts with available dates.')
+                return
+            }
+
+            // 랜덤으로 하나의 콘서트 선택
+            const selectedConcert = validConcerts[Math.floor(Math.random() * validConcerts.length)]
+
+            const avaliableConcerts = selectedConcert.concertDates.filter(concertDate => concertDate.availableSeats > 0)
+
+            if (!avaliableConcerts.length) {
+                console.error('No available concert dates for the selected concert.')
+                return
+            }
+
+            // 선택된 콘서트에서 랜덤으로 하나의 날짜 선택
+            const randomDate = avaliableConcerts[Math.floor(Math.random() * avaliableConcerts.length)]
+            const concertDateId = randomDate.id
+
+            let attempt = 0
+            const maxAttempts = 1 // 최대 시도 횟수 설정
+
+            while (attempt < maxAttempts) {
+                attempt++
+                // 3. 선택된 콘서트 날짜의 좌석 조회
+                const seatsResponse = await request(app.getHttpServer()).get(`/concert/${concertDateId}/seats`).set('Authorization', `Bearer ${token}`)
+                if (seatsResponse.status !== HttpStatus.OK) {
+                    console.error('Failed to fetch seats for the selected concert date.')
+                    continue
+                }
+
+                // 4. 사용 가능한 좌석 찾기
+                const availableSeats = seatsResponse.body.filter(seat => seat.status === 'available')
+                for (const seat of availableSeats) {
+                    try {
+                        const reservationResponse = await request(app.getHttpServer())
+                            .post(`/concert/${seat.id}/reservation`)
+                            .set('Authorization', `Bearer ${token}`)
+
+                        if (reservationResponse.status === HttpStatus.CREATED) {
+                            console.log('Seat reserved successfully:', reservationResponse.body)
+                            // 5. 예약 후 결제 시도
+                            const reservationId = reservationResponse.body.id
+                            const paymentResponse = await request(app.getHttpServer()).post(`/user-concert/payment/${reservationId}`).send({ token })
+
+                            if (paymentResponse.status === HttpStatus.CREATED) {
+                                console.log('Payment successful:', paymentResponse.body)
+                                return // 6. 성공적으로 예약 및 결제 완료
+                            } else {
+                                throw new Error('Failed to pay for reservation.')
+                            }
+                        }
+                    } catch (error) {
+                        if (error.response?.status === HttpStatus.CONFLICT) {
+                            console.log('Conflict detected, trying next available seat.')
+                            continue // 다음 좌석에 대해 시도
+                        } else {
+                            console.error('Failed to reserve seat:', error.message)
+                            break
+                        }
+                    }
+                }
+            }
+
+            console.error('Failed to reserve any seat after multiple attempts.')
+        } catch (error) {
+            console.error('Error during concert access handling:', error)
+            throw error
+        }
     }
 })

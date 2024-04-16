@@ -30,7 +30,7 @@ export class GenerateTokenUseCase {
             const session = await this.dataAccessor.getSession('READ COMMITTED')
 
             try {
-                const isValidToken = await this.waitingReaderRepository.isTokenCountUnderThreshold(session, { mode: 'pessimistic_write' })
+                const isValidToken = await this.waitingReaderRepository.isValidTokenCountUnderThreshold(session, { mode: 'pessimistic_write' })
 
                 const { token, waitingNumber } = await this.waitingWriterRepository.createValidTokenOrWaitingUser(userId, isValidToken, session, {
                     mode: 'pessimistic_write',

@@ -11,7 +11,7 @@ export class User implements IUser {
     @Column()
     name: string
 
-    @Column({ default: 10000 })
+    @Column({ default: 0 })
     point: number
 
     @OneToMany(() => Reservation, reservation => reservation.user)

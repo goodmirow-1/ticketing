@@ -6,9 +6,9 @@ export interface IWaitingReaderRepository {
 
     findWaitingUserPosition(userId: string): Promise<number>
     getWaitingUserCount(isValid: boolean): Promise<number>
-    getTokenStatus(userId: string, isValid: boolean): Promise<number>
+    getTokenStatus(userId: string, token: string)
     findLastWaitingUser(): Promise<IWaitingUser[]>
 
-    findValidTokenByUserId(userId: string): Promise<boolean>
-    isTokenCountUnderThreshold(queryRunner?: any, lockOption?: any): Promise<boolean>
+    findValidTokenByUserId(userId: string): Promise<string>
+    isValidTokenCountUnderThreshold(queryRunner?: any, lockOption?: any): Promise<boolean>
 }

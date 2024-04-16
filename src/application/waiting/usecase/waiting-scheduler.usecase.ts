@@ -18,7 +18,7 @@ export class WaitingSchedulerUseCase {
     @Cron(CronExpression.EVERY_SECOND)
     async handleCron() {
         if (this.schedulerState.check) {
-            if (await this.waitingReaderRepository.isTokenCountUnderThreshold()) {
+            if (await this.waitingReaderRepository.isValidTokenCountUnderThreshold()) {
                 // WaitingUser 테이블에서 가장 오래된 사용자를 조회합니다.
                 const oldestWaitingUsers = await this.waitingReaderRepository.findLastWaitingUser()
 

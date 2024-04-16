@@ -35,8 +35,8 @@ export class WaitingReaderRepositoryTypeORM implements IWaitingReaderRepository 
         return count
     }
 
-    async getTokenStatus(userId: string, isValid: boolean): Promise<number> {
-        if (isValid) return 0
+    async getTokenStatus(userId: string, token: string) {
+        if (token != '') return { token, waitingNumber: 0 }
 
         return await this.findWaitingUserPosition(userId)
     }
@@ -51,13 +51,13 @@ export class WaitingReaderRepositoryTypeORM implements IWaitingReaderRepository 
         })
     }
 
-    async findValidTokenByUserId(userId: string): Promise<boolean> {
+    async findValidTokenByUserId(userId: string): Promise<string> {
         const validToken = await this.entityManager.findOne(ValidToken, { where: { userId } })
 
-        return !!validToken
+        return validToken ? validToken.token : ''
     }
 
-    async isTokenCountUnderThreshold(queryRunner?: any, lockOption?: any): Promise<boolean> {
+    async isValidTokenCountUnderThreshold(queryRunner?: any, lockOption?: any): Promise<boolean> {
         const manager = queryRunner ? queryRunner.manager : this.entityManager
 
         // status가 true ValidToken만 카운트 -> false = 만료 토큰

@@ -24,7 +24,7 @@ export class ConcertController {
         private readonly readAllSeatsByConcertDateIdUseCase: ReadAllSeatsByConcertDateIdUseCase,
     ) {}
 
-    @Get()
+    @Get('dates')
     @UseGuards(JwtAuthGuard)
     @ApiBearerAuth('access-token') // 인증 토큰을 위한 Swagger 데코레이터
     @ApiOperation({

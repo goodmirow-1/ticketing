@@ -1,5 +1,5 @@
 import type { OnModuleInit } from '@nestjs/common'
-import { Inject, Injectable } from '@nestjs/common'
+import { ConflictException, Inject, Injectable } from '@nestjs/common'
 import type { IConcertWriterRepository } from '../../../domain/concert/repositories/concert-writer.repository.interface'
 import { EntityManager } from 'typeorm'
 import { Concert } from '../models/concert.entity'
@@ -11,6 +11,7 @@ import { FailedCreateReservationError } from '../../../domain/concert/exceptions
 import { SchedulerRegistry } from '@nestjs/schedule'
 import { FailedUpdateReservationError } from '../../../domain/concert/exceptions/faild-update-reservation.exception'
 import { v4 as uuidv4 } from 'uuid'
+import { DuplicateReservationError } from 'src/domain/concert/exceptions/duplicate-reservation.exception'
 
 @Injectable()
 export class ConcertWriterRepositoryTypeORM implements IConcertWriterRepository, OnModuleInit {
@@ -41,17 +42,24 @@ export class ConcertWriterRepositoryTypeORM implements IConcertWriterRepository,
 
     async createReservation(seat: Seat, userId: string): Promise<Reservation> {
         const uuid = uuidv4()
-        const reservation = await this.entityManager.save(Reservation, {
-            id: uuid,
-            user: { id: userId },
-            seat,
-            concert: seat.concertDate.concert,
-            concertDate: seat.concertDate,
-            holdExpiresAt: new Date(Date.now() + 1000 * 60 * 5), //5분
-        })
+        let reservation
 
-        if (!reservation) {
-            throw new FailedCreateReservationError('Failed to create reservation')
+        try {
+            reservation = await this.entityManager.save(Reservation, {
+                id: uuid,
+                user: { id: userId },
+                seat,
+                concert: seat.concertDate.concert,
+                concertDate: seat.concertDate,
+                holdExpiresAt: new Date(Date.now() + 1000 * 60 * 5), // 5분
+            })
+        } catch (error) {
+            // Unique constraint violation check
+            if (error.code === 'ER_DUP_ENTRY' || error.code === '23505') {
+                throw new ConflictException('Reservation already exists for the given seat and concert date.')
+            } else {
+                throw new FailedCreateReservationError(error.message)
+            }
         }
 
         const result = await this.updateSeatStatus(seat.id, 'reserved')

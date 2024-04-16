@@ -39,7 +39,7 @@ export class UserWaitingController {
     })
     @UseGuards(JwtAuthGuard)
     @ApiBearerAuth('access-token') // 인증 토큰을 위한 Swagger 데코레이터
-    async checkTokenStatus(@GetUser('userId') userId: string): Promise<number> {
+    async checkTokenStatus(@GetUser('userId') userId: string) {
         return await this.generateWaitingTokenUseCase.excute(userId)
     }
 }
