@@ -24,6 +24,7 @@ export class PaymentUserConcertUseCase {
     async excute(userId: string, reservationId: string, token?: string): Promise<IPointHistory> {
         const reservation = await this.concertReaderRepository.findReservationById(reservationId)
         const user = await this.userReaderRepository.findUserById(userId)
+        this.concertReaderRepository.checkValidReservation(reservation, userId)
         const pointHistory = await this.userWriterRepository.calculatePoint(user, -reservation.seat.price, 'payment', reservation.id)
 
         await this.concertWriterRepository.doneReservationPaid(reservation)

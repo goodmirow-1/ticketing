@@ -15,7 +15,7 @@ export class ChargeUserPointUseCase {
     ) {}
 
     async excute(userId: string, point: number): Promise<number> {
-        this.userWriterRepository.checkValidPoint(point)
+        this.userReaderRepository.checkValidPoint(point)
         const user = await this.userReaderRepository.findUserById(userId)
         const chargePoint = await this.userWriterRepository.calculatePoint(user, point, 'charge')
 

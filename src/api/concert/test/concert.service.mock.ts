@@ -11,6 +11,7 @@ export function initConcertReaderMockRepo(): Record<keyof IConcertReaderReposito
         findSeatById: jest.fn(),
         findSeatsByConcertDateId: jest.fn(),
         findReservationById: jest.fn(),
+        checkValidReservation: jest.fn(),
     }
 }
 

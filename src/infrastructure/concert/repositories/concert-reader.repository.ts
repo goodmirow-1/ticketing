@@ -74,4 +74,10 @@ export class ConcertReaderRepositoryTypeORM implements IConcertReaderRepository 
 
         return reservation
     }
+
+    checkValidReservation(reservation: Reservation, userId: string) {
+        if (reservation.userId != userId) {
+            throw new NotFoundReservationError(`Invalid reservation id ${reservation.id} for user id ${userId}`)
+        }
+    }
 }

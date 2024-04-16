@@ -5,6 +5,7 @@ export function initUserReaderMockRepo(): Record<keyof IUserReaderRepository, je
     return {
         findUserById: jest.fn(),
         findUserPointById: jest.fn(),
+        checkValidPoint: jest.fn(),
     }
 }
 
@@ -12,6 +13,5 @@ export function initUserWriterMockRepo(): Record<keyof IUserWriterRepository, je
     return {
         createUser: jest.fn(),
         calculatePoint: jest.fn(),
-        checkValidPoint: jest.fn(),
     }
 }

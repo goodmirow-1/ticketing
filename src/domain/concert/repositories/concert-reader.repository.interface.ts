@@ -17,4 +17,5 @@ export interface IConcertReaderRepository {
     findSeatsByConcertDateId(concertDateId: string): Promise<ISeat[]>
 
     findReservationById(reservationId: string): Promise<IReservation>
+    checkValidReservation(reservation: IReservation, userId: string)
 }

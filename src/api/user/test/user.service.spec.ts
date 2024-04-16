@@ -45,7 +45,7 @@ describe('유저 서비스 유닛 테스트', () => {
         })
 
         it('chargePoint is failed cause point is invalid', async () => {
-            mockWriterRepo.checkValidPoint.mockImplementation(() => {
+            mockReaderRepo.checkValidPoint.mockImplementation(() => {
                 throw new InValidPointError()
             })
 

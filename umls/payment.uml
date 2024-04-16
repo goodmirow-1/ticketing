@@ -9,6 +9,7 @@ Server -> Server: 사용자 잔액 검증
 alt 사용자 잔액 충분
     Server -> Server: 결제 처리 및 예약 상태 업데이트
     Server -> Server: 결제 성공 시 포인트 로그 기록
+    Server -> Server: 유효 토큰 status false로 변경 -> 만료 토큰
     Server -> Client: 결제 성공 응답
 else 사용자 잔액 부족
     Server -> Client: 결제 실패 응답 (잔액 부족)

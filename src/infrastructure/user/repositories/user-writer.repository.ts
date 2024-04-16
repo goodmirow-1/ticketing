@@ -11,12 +11,6 @@ import { v4 as uuidv4 } from 'uuid'
 export class UserWriterRepositoryTypeORM implements IUserWriterRepository {
     constructor(@Inject(EntityManager) private readonly entityManager: EntityManager) {}
 
-    checkValidPoint(point: number) {
-        if (point < 0) {
-            throw new InValidPointError()
-        }
-    }
-
     async createUser(name: string): Promise<User> {
         const uuid = uuidv4()
 
