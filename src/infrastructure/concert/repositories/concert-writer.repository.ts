@@ -1,5 +1,5 @@
 import type { OnModuleInit } from '@nestjs/common'
-import { ConflictException, Inject, Injectable } from '@nestjs/common'
+import { Inject, Injectable } from '@nestjs/common'
 import type { IConcertWriterRepository } from '../../../domain/concert/repositories/concert-writer.repository.interface'
 import { EntityManager } from 'typeorm'
 import { Concert } from '../models/concert.entity'
@@ -56,7 +56,7 @@ export class ConcertWriterRepositoryTypeORM implements IConcertWriterRepository,
         } catch (error) {
             // Unique constraint violation check
             if (error.code === 'ER_DUP_ENTRY' || error.code === '23505') {
-                throw new ConflictException('Reservation already exists for the given seat and concert date.')
+                throw new DuplicateReservationError('Reservation already exists for the given seat and concert date.')
             } else {
                 throw new FailedCreateReservationError(error.message)
             }

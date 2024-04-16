@@ -1,8 +1,8 @@
-export class NotFoundUserError extends Error {
+import { HttpStatus } from '@nestjs/common'
+import { CustomException } from 'src/custom-exception'
+
+export class NotFoundUserError extends CustomException {
     constructor(msg?: string) {
-        const message = msg ?? 'User not found'
-        super(message)
-        this.message = message
-        Object.setPrototypeOf(this, NotFoundUserError.prototype)
+        super(msg ?? 'User not found', HttpStatus.NOT_FOUND)
     }
 }

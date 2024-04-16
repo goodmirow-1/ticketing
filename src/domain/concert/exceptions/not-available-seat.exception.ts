@@ -1,8 +1,8 @@
-export class NotAvailableSeatError extends Error {
+import { HttpStatus } from '@nestjs/common'
+import { CustomException } from 'src/custom-exception'
+
+export class NotAvailableSeatError extends CustomException {
     constructor(msg?: string) {
-        const message = msg ?? 'Not available seat'
-        super(message)
-        this.message = message
-        Object.setPrototypeOf(this, NotAvailableSeatError.prototype)
+        super(msg ?? 'Not available seat', HttpStatus.BAD_REQUEST)
     }
 }

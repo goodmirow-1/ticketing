@@ -1,8 +1,8 @@
-export class DuplicateConcertDateError extends Error {
+import { HttpStatus } from '@nestjs/common'
+import { CustomException } from 'src/custom-exception'
+
+export class DuplicateConcertDateError extends CustomException {
     constructor(msg?: string) {
-        const message = msg ?? 'ConcertDate is Duplicate'
-        super(message)
-        this.message = message
-        Object.setPrototypeOf(this, DuplicateConcertDateError.prototype)
+        super(msg ?? 'ConcertDate is Duplicate', HttpStatus.CONFLICT)
     }
 }

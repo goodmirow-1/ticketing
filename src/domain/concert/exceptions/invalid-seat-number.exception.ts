@@ -1,8 +1,8 @@
-export class InValidSeatNumberError extends Error {
+import { HttpStatus } from '@nestjs/common'
+import { CustomException } from 'src/custom-exception'
+
+export class InValidSeatNumberError extends CustomException {
     constructor(msg?: string) {
-        const message = msg ?? 'invalid seat number'
-        super(message)
-        this.message = message
-        Object.setPrototypeOf(this, InValidSeatNumberError.prototype)
+        super(msg ?? 'invalid seat number', HttpStatus.BAD_REQUEST)
     }
 }

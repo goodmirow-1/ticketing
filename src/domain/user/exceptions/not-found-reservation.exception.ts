@@ -1,8 +1,8 @@
-export class NotFoundReservationError extends Error {
+import { HttpStatus } from '@nestjs/common'
+import { CustomException } from 'src/custom-exception'
+
+export class NotFoundReservationError extends CustomException {
     constructor(msg?: string) {
-        const message = msg ?? 'User not found'
-        super(message)
-        this.message = message
-        Object.setPrototypeOf(this, NotFoundReservationError.prototype)
+        super(msg ?? 'Reservation not found', HttpStatus.NOT_FOUND)
     }
 }

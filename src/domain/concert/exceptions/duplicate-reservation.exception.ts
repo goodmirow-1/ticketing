@@ -1,8 +1,8 @@
-export class DuplicateReservationError extends Error {
+import { HttpStatus } from '@nestjs/common'
+import { CustomException } from 'src/custom-exception'
+
+export class DuplicateReservationError extends CustomException {
     constructor(msg?: string) {
-        const message = msg ?? 'Reservation multiple unique is Duplicate'
-        super(message)
-        this.message = message
-        Object.setPrototypeOf(this, DuplicateReservationError.prototype)
+        super(msg ?? 'Reservation multiple unique is Duplicate', HttpStatus.CONFLICT)
     }
 }

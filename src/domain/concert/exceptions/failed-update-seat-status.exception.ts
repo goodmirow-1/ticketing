@@ -1,8 +1,8 @@
-export class FailedUpdateSeatStatusError extends Error {
+import { HttpStatus } from '@nestjs/common'
+import { CustomException } from 'src/custom-exception'
+
+export class FailedUpdateSeatStatusError extends CustomException {
     constructor(msg?: string) {
-        const message = msg ?? 'Failed update seat status'
-        super(message)
-        this.message = message
-        Object.setPrototypeOf(this, FailedUpdateSeatStatusError.prototype)
+        super(msg ?? 'Failed update seat status', HttpStatus.NOT_FOUND)
     }
 }

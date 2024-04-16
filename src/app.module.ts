@@ -8,6 +8,8 @@ import { ConcertModule } from './api/concert/concert.module'
 import { ScheduleModule } from '@nestjs/schedule'
 import { UserWaitingModule } from './api/user-waiting/user-waiting.module'
 import { WaitingModule } from './api/waiting/waiting.module'
+import { APP_FILTER } from '@nestjs/core'
+import { GlobalExceptionFilter } from './custom-exception'
 @Module({
     imports: [
         ScheduleModule.forRoot(),
@@ -38,6 +40,11 @@ import { WaitingModule } from './api/waiting/waiting.module'
         UserWaitingModule,
     ],
     controllers: [],
-    providers: [],
+    providers: [
+        {
+            provide: APP_FILTER,
+            useClass: GlobalExceptionFilter,
+        },
+    ],
 })
 export class AppModule {}

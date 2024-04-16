@@ -5,7 +5,6 @@ import { User } from '../models/user.entity'
 import { PointHistory } from '../models/point-history.entity'
 import { FailedUserChargePointError } from '../../../domain/user/exceptions/failed-user-charge-point.exception'
 import { InValidPointError } from '../../../domain/user/exceptions/invalid-point.exception'
-import { FailedCreatePointHistoryError } from '../../../domain/user/exceptions/failed-create-point-history.exception'
 import { v4 as uuidv4 } from 'uuid'
 
 @Injectable()
@@ -36,21 +35,12 @@ export class UserWriterRepositoryTypeORM implements IUserWriterRepository {
         if (result.affected === 0) throw new FailedUserChargePointError('Failed to charge point')
 
         const uuid = uuidv4()
-        const pointHistory = await this.entityManager.save(PointHistory, {
+        return await this.entityManager.save(PointHistory, {
             id: uuid,
             user,
             amount: amount,
             reason,
             reservation: reason == 'payment' ? { id: reservationId } : null,
         })
-
-        if (!pointHistory) {
-            //roll back
-            await this.entityManager.createQueryBuilder().update(User).set({ point: user.point }).where('id = :id', { id: user.id }).execute()
-
-            throw new FailedCreatePointHistoryError('Failed to create point history')
-        }
-
-        return pointHistory
     }
 }

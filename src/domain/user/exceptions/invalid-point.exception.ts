@@ -1,8 +1,8 @@
-export class InValidPointError extends Error {
+import { HttpStatus } from '@nestjs/common'
+import { CustomException } from 'src/custom-exception'
+
+export class InValidPointError extends CustomException {
     constructor(msg?: string) {
-        const message = msg ?? 'invalid point'
-        super(message)
-        this.message = message
-        Object.setPrototypeOf(this, InValidPointError.prototype)
+        super(msg ?? 'invalid point', HttpStatus.BAD_REQUEST)
     }
 }

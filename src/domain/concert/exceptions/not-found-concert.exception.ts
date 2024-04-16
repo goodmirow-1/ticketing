@@ -1,8 +1,8 @@
-export class NotFoundConcertError extends Error {
+import { HttpStatus } from '@nestjs/common'
+import { CustomException } from 'src/custom-exception'
+
+export class NotFoundConcertError extends CustomException {
     constructor(msg?: string) {
-        const message = msg ?? 'Concert not found'
-        super(message)
-        this.message = message
-        Object.setPrototypeOf(this, NotFoundConcertError.prototype)
+        super(msg ?? 'Concert not found', HttpStatus.NOT_FOUND)
     }
 }

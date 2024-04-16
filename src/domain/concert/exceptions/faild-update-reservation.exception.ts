@@ -1,8 +1,8 @@
-export class FailedUpdateReservationError extends Error {
+import { HttpStatus } from '@nestjs/common'
+import { CustomException } from 'src/custom-exception'
+
+export class FailedUpdateReservationError extends CustomException {
     constructor(msg?: string) {
-        const message = msg ?? 'Failed update reservation'
-        super(message)
-        this.message = message
-        Object.setPrototypeOf(this, FailedUpdateReservationError.prototype)
+        super(msg ?? 'Failed update reservation', HttpStatus.NOT_FOUND)
     }
 }

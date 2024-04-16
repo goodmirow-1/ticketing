@@ -1,8 +1,8 @@
-export class FailedUserChargePointError extends Error {
+import { HttpStatus } from '@nestjs/common'
+import { CustomException } from 'src/custom-exception'
+
+export class FailedUserChargePointError extends CustomException {
     constructor(msg?: string) {
-        const message = msg ?? 'Failed user charge point'
-        super(message)
-        this.message = message
-        Object.setPrototypeOf(this, FailedUserChargePointError.prototype)
+        super(msg ?? 'Failed user charge point', HttpStatus.NOT_FOUND)
     }
 }

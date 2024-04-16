@@ -1,8 +1,8 @@
-export class FailedCreateReservationError extends Error {
+import { HttpStatus } from '@nestjs/common'
+import { CustomException } from 'src/custom-exception'
+
+export class FailedCreateReservationError extends CustomException {
     constructor(msg?: string) {
-        const message = msg ?? 'Failed create reservation'
-        super(message)
-        this.message = message
-        Object.setPrototypeOf(this, FailedCreateReservationError.prototype)
+        super(msg ?? 'Failed create reservation', HttpStatus.BAD_REQUEST)
     }
 }
