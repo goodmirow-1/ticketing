@@ -12,7 +12,7 @@ export class WaitingReaderRepositoryTypeORM implements IWaitingReaderRepository 
         const result = await this.entityManager
             .createQueryBuilder(WaitingUser, 'user')
             .select('ROW_NUMBER() OVER (ORDER BY user.created_at) as position')
-            .addSelect('user.userId')
+            .addSelect('userId')
             .orderBy('user.created_at', 'ASC')
             .getRawMany()
 
@@ -32,7 +32,6 @@ export class WaitingReaderRepositoryTypeORM implements IWaitingReaderRepository 
             order: {
                 id: 'ASC',
             },
-            relations: ['user'],
             take: 1,
         })
     }

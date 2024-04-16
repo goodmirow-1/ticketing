@@ -24,7 +24,7 @@ export class WaitingSchedulerUseCase {
 
                 // 만약 대기 중인 사용자가 있으면, ValidToken에 새로운 토큰을 생성하여 삽입합니다.
                 if (oldestWaitingUsers.length > 0) {
-                    await this.waitingWriterRepository.createValidTokenOrWaitingUser(oldestWaitingUsers[0].user.id, true)
+                    await this.waitingWriterRepository.createValidTokenOrWaitingUser(oldestWaitingUsers[0].userId, true)
 
                     // 처리된 WaitingUser 항목을 삭제합니다.
                     await this.waitingWriterRepository.deleteWaitingUser(oldestWaitingUsers[0].id)

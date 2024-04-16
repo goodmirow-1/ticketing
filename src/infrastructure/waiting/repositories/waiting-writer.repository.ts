@@ -52,7 +52,7 @@ export class WaitingWriterRepositoryTypeORM implements IWaitingWriterRepository 
             return { token, waitingNumber: position }
         } else {
             const uuid = uuidv4()
-            await manager.save(WaitingUser, { id: uuid, user: { id: userId } })
+            await manager.save(WaitingUser, { id: uuid, userId })
 
             const count: number = await manager.count(WaitingUser, { lock: lockOption })
 
