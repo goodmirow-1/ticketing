@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Post, UseGuards, Headers } from '@nestjs/common'
+import { Controller, Get, Param, Post, UseGuards } from '@nestjs/common'
 import { GenerateTokenUseCase } from '../../application/user-waiting/usecase/generate-token.usecase'
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { GetUser, JwtAuthGuard } from '../../domain/common/jwt-token.util'
