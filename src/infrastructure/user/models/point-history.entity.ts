@@ -12,9 +12,6 @@ export class PointHistory implements IPointHistory {
     @JoinColumn({ name: 'userId' })
     user: User
 
-    // @ManyToOne(() => Reservation, reservation => reservation.id)
-    // @JoinColumn({ name: 'reservationId' })
-    // reservation: Reservation
     @Column({ nullable: true })
     reservationId: string
 

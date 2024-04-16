@@ -165,7 +165,6 @@ describe('콘서트 서비스 유닛 테스트', () => {
             const result = await createReservationUseCase.excute(seatId, userId)
 
             expect(result.seat.id).toBe(seatId)
-            expect(result.user.id).toBe(userId)
         })
     })
 })

@@ -10,6 +10,7 @@ import { NotAvailableSeatError } from '../../../domain/concert/exceptions/not-av
 import { Reservation } from '../models/reservation.entity'
 import { InValidSeatNumberError } from '../../../domain/concert/exceptions/invalid-seat-number.exception'
 import { DuplicateConcertDateError } from '../../../domain/concert/exceptions/duplicate-concert-date.exception'
+import { NotFoundReservationError } from 'src/domain/user/exceptions/not-found-reservation.exception'
 
 @Injectable()
 export class ConcertReaderRepositoryTypeORM implements IConcertReaderRepository {
@@ -67,6 +68,10 @@ export class ConcertReaderRepositoryTypeORM implements IConcertReaderRepository 
     }
 
     async findReservationById(id: string): Promise<Reservation> {
-        return this.entityManager.findOne(Reservation, { where: { id }, relations: ['seat', 'user'] })
+        const reservation = await this.entityManager.findOne(Reservation, { where: { id }, relations: ['seat'] })
+
+        if (!reservation) throw new NotFoundReservationError(`Reservation id ${id} not found`)
+
+        return reservation
     }
 }

@@ -13,6 +13,8 @@ import { IConcertReaderRepositoryToken } from '../../domain/concert/repositories
 import { IConcertWriterRepositoryToken } from '../../domain/concert/repositories/concert-writer.repository.interface'
 import { IUserWriterRepositoryToken } from '../../domain/user/repositories/user-writer.repository.interface'
 import { IWaitingWriterRepositoryToken } from '../../domain/waiting/repositories/waiting-writer.repository.interface'
+import { IUserReaderRepositoryToken } from 'src/domain/user/repositories/user-reader.repository.interface'
+import { UserReaderRepositoryTypeORM } from 'src/infrastructure/user/repositories/user-reader.repository'
 
 @Module({
     imports: [TypeOrmModule.forFeature([User, Reservation, PointHistory])],
@@ -26,6 +28,10 @@ import { IWaitingWriterRepositoryToken } from '../../domain/waiting/repositories
         {
             provide: IConcertWriterRepositoryToken,
             useClass: ConcertWriterRepositoryTypeORM,
+        },
+        {
+            provide: IUserReaderRepositoryToken,
+            useClass: UserReaderRepositoryTypeORM,
         },
         {
             provide: IUserWriterRepositoryToken,

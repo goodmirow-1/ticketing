@@ -47,7 +47,7 @@ export class ConcertWriterRepositoryTypeORM implements IConcertWriterRepository,
         try {
             reservation = await this.entityManager.save(Reservation, {
                 id: uuid,
-                user: { id: userId },
+                userId,
                 seat,
                 concert: seat.concertDate.concert,
                 concertDate: seat.concertDate,

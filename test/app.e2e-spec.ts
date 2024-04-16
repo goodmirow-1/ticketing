@@ -262,7 +262,8 @@ describe('AppController (e2e)', () => {
                             console.log('Seat reserved successfully:', reservationResponse.body)
                             // 5. 예약 후 결제 시도
                             const reservationId = reservationResponse.body.id
-                            const paymentResponse = await request(app.getHttpServer()).post(`/user-concert/payment/${reservationId}`).send({ token })
+                            const userId = reservationResponse.body.userId
+                            const paymentResponse = await request(app.getHttpServer()).post(`/user-concert/payment/${userId}/${reservationId}`).send({ token })
 
                             if (paymentResponse.status === HttpStatus.CREATED) {
                                 console.log('Payment successful:', paymentResponse.body)

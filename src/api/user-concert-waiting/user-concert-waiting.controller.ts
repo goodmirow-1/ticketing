@@ -7,13 +7,14 @@ import { ApiBody, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger'
 export class UserConcertWaitingController {
     constructor(private readonly paymentUserConcertUseCase: PaymentUserConcertUseCase) {}
 
-    @Post('payment/:reservationId')
+    @Post('payment/:userId/:reservationId')
     @ApiOperation({
         summary: '결제',
     })
+    @ApiParam({ name: 'userId', required: true, description: 'user ID' })
     @ApiParam({ name: 'reservationId', required: true, description: 'reservation ID' })
     @ApiBody({ schema: { type: 'object', properties: { token: { type: 'string', nullable: true, default: '' } } } })
-    async payment(@Param('reservationId') reservationId: string, @Body() body: { token?: string }) {
-        return this.paymentUserConcertUseCase.excute(reservationId, body.token)
+    async payment(@Param('userId') userId: string, @Param('reservationId') reservationId: string, @Body() body: { token?: string }) {
+        return this.paymentUserConcertUseCase.excute(userId, reservationId, body.token)
     }
 }

@@ -4,6 +4,7 @@ import { IConcertWriterRepository, IConcertWriterRepositoryToken } from '../../.
 import type { IPointHistory } from '../../../domain/user/models/point-history.entity.interface'
 import { IUserWriterRepository, IUserWriterRepositoryToken } from '../../../domain/user/repositories/user-writer.repository.interface'
 import { IWaitingWriterRepository, IWaitingWriterRepositoryToken } from '../../../domain/waiting/repositories/waiting-writer.repository.interface'
+import { IUserReaderRepository, IUserReaderRepositoryToken } from 'src/domain/user/repositories/user-reader.repository.interface'
 
 @Injectable()
 export class PaymentUserConcertUseCase {
@@ -12,15 +13,19 @@ export class PaymentUserConcertUseCase {
         private readonly concertReaderRepository: IConcertReaderRepository,
         @Inject(IConcertWriterRepositoryToken)
         private readonly concertWriterRepository: IConcertWriterRepository,
+        @Inject(IUserReaderRepositoryToken)
+        private readonly userReaderRepository: IUserReaderRepository,
         @Inject(IUserWriterRepositoryToken)
         private readonly userWriterRepository: IUserWriterRepository,
         @Inject(IWaitingWriterRepositoryToken)
         private readonly waitingWriterRepository: IWaitingWriterRepository,
     ) {}
 
-    async excute(reservationId: string, token?: string): Promise<IPointHistory> {
+    async excute(userId: string, reservationId: string, token?: string): Promise<IPointHistory> {
         const reservation = await this.concertReaderRepository.findReservationById(reservationId)
-        const pointHistory = await this.userWriterRepository.calculatePoint(reservation.user, -reservation.seat.price, 'payment', reservation.id)
+        const user = await this.userReaderRepository.findUserById(userId)
+        const pointHistory = await this.userWriterRepository.calculatePoint(user, -reservation.seat.price, 'payment', reservation.id)
+
         await this.concertWriterRepository.doneReservationPaid(reservation)
         await this.waitingWriterRepository.expiredValidToken(token)
 

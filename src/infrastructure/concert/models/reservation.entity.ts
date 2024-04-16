@@ -4,7 +4,6 @@ import { Concert } from './concert.entity'
 import { Seat } from './seat.entity'
 import { ConcertDate } from './concertDate.entity'
 import type { IReservation } from '../../../domain/concert/models/reservation.entity.interface'
-import { User } from '../../../infrastructure/user/models/user.entity'
 
 @Entity()
 @Unique(['concert', 'concertDate', 'seat']) // Composite unique constraint
@@ -12,9 +11,8 @@ export class Reservation implements IReservation {
     @PrimaryColumn({ type: 'char', length: 36 })
     id: string
 
-    @ManyToOne(() => User, user => user.reservations)
-    @JoinColumn({ name: 'userId' })
-    user: User
+    @Column({ type: 'char', length: 36 })
+    userId: string
 
     @ManyToOne(() => Seat, seat => seat.reservation)
     @JoinColumn({ name: 'seatId' })
