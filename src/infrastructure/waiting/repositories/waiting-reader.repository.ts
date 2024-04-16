@@ -8,10 +8,6 @@ import type { IWaitingReaderRepository } from '../../../domain/waiting/repositor
 export class WaitingReaderRepositoryTypeORM implements IWaitingReaderRepository {
     constructor(@Inject(EntityManager) private readonly entityManager: EntityManager) {}
 
-    isSameWaitingNumber(positionNumber: number, waitingNumber: number): boolean {
-        return positionNumber == waitingNumber
-    }
-
     async findWaitingUserPosition(userId: string): Promise<number> {
         const result = await this.entityManager
             .createQueryBuilder(WaitingUser, 'user')
@@ -23,16 +19,6 @@ export class WaitingReaderRepositoryTypeORM implements IWaitingReaderRepository 
         // 결과에서 특정 userId의 position 찾기
         const userPosition = result.find(u => u.userId === userId)?.position
         return userPosition ? userPosition : NaN
-    }
-
-    async getWaitingUserCount(isValid: boolean): Promise<number> {
-        let count = 0
-
-        if (!isValid) {
-            count = await this.entityManager.count(WaitingUser)
-        }
-
-        return count
     }
 
     async getTokenStatus(userId: string, token: string) {

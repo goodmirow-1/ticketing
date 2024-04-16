@@ -1,17 +1,18 @@
 import { v4 as uuidv4 } from 'uuid'
 import { initConcertReaderMockRepo, initConcertWriterMockRepo } from './concert.service.mock'
-import { NotFoundConcertError } from '../../../domain/concert/exceptions/not-found-concert.exception'
-import { DuplicateConcertDateError } from '../../../domain/concert/exceptions/duplicate-concert-date.exception'
 import { CreateConcertUseCase } from '../../../application/concert/usecase/create-concert.usecase'
 import { CreateConcertDateUseCase } from '../../../application/concert/usecase/create-concert-date.usecase'
 import { CreateSeatUseCase } from '../../../application/concert/usecase/create-seat.usecase'
-import { FailedUpdateSeatStatusError } from '../../../domain/concert/exceptions/failed-update-seat-status.exception'
-import { FailedCreateReservationError } from '../../../domain/concert/exceptions/failed-create-reservation.exception'
-import { NotFoundSeatError } from '../../../domain/concert/exceptions/not-found-seat.exception'
-import { NotAvailableSeatError } from '../../../domain/concert/exceptions/not-available-seat.exception'
 import { ReadAllSeatsByConcertDateIdUseCase } from '../../../application/concert-waiting/usecase/read-all-seats-by-concert-date.usecase'
 import { ReadAllConcertsUseCase } from '../../../application/concert-waiting/usecase/read-all-concerts.usecase'
 import { CreateReservationUseCase } from '../../../application/concert-waiting/usecase/create-reservation.usecase'
+import { HttpStatus } from '@nestjs/common'
+import { CustomException } from 'src/custom-exception'
+import { NotFoundConcertError } from '../../../domain/concert/exceptions/not-found-concert.exception'
+import { NotAvailableSeatError } from '../../../domain/concert/exceptions/not-available-seat.exception'
+import { NotFoundSeatError } from '../../../domain/concert/exceptions/not-found-seat.exception'
+import { FailedCreateReservationError } from '../../../domain/concert/exceptions/failed-create-reservation.exception'
+import { FailedUpdateSeatStatusError } from '../../../domain/concert/exceptions/failed-update-seat-status.exception'
 
 describe('콘서트 서비스 유닛 테스트', () => {
     let mockReaderRepo: ReturnType<typeof initConcertReaderMockRepo>
@@ -57,9 +58,11 @@ describe('콘서트 서비스 유닛 테스트', () => {
         it('ConcertDate create is failed cause date is duplicate', async () => {
             const concertId = uuidv4()
 
-            mockWriterRepo.createConcertDate.mockRejectedValue(new DuplicateConcertDateError())
+            mockReaderRepo.checkValidConcertDateByDate.mockRejectedValue(new CustomException(`Concert date is duplicate`, HttpStatus.CONFLICT))
 
-            await expect(createConcertDateUseCase.excute(concertId, new Date())).rejects.toThrow(DuplicateConcertDateError)
+            await expect(createConcertDateUseCase.excute(concertId, new Date())).rejects.toThrow(
+                new CustomException('Concert date is duplicate', HttpStatus.CONFLICT),
+            )
         })
 
         it('ConcertDate create is success', async () => {

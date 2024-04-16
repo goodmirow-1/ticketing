@@ -25,12 +25,4 @@ export class UserReaderRepositoryTypeORM implements IUserReaderRepository {
             })
             .then(user => user.point)
     }
-
-    async findPointHistoryByUserId(userId: string): Promise<PointHistory> {
-        const user = await this.entityManager.findOne(User, { where: { id: userId } })
-
-        if (!user) throw new NotFoundUserError(`User id ${userId} not found`)
-
-        return this.entityManager.findOne(PointHistory, { where: { user } })
-    }
 }

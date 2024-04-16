@@ -4,12 +4,10 @@ import type { IWaitingWriterRepository } from 'src/domain/waiting/repositories/w
 export function initWaitingReaderMockRepo(): Record<keyof IWaitingReaderRepository, jest.Mock> {
     return {
         findWaitingUserPosition: jest.fn(),
-        getWaitingUserCount: jest.fn(),
         getTokenStatus: jest.fn(),
         findLastWaitingUser: jest.fn(),
         findValidTokenByUserId: jest.fn(),
         isValidTokenCountUnderThreshold: jest.fn(),
-        isSameWaitingNumber: jest.fn(),
     }
 }
 

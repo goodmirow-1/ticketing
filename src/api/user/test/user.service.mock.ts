@@ -5,7 +5,6 @@ export function initUserReaderMockRepo(): Record<keyof IUserReaderRepository, je
     return {
         findUserById: jest.fn(),
         findUserPointById: jest.fn(),
-        findPointHistoryByUserId: jest.fn(),
     }
 }
 
