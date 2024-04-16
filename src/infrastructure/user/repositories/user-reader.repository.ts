@@ -2,7 +2,6 @@ import { Inject, Injectable } from '@nestjs/common'
 import type { IUserReaderRepository } from '../../../domain/user/repositories/user-reader.repository.interface'
 import { EntityManager } from 'typeorm'
 import { User } from '../models/user.entity'
-import { PointHistory } from '../models/point-history.entity'
 import { NotFoundUserError } from '../../../domain/user/exceptions/not-found-user.exception'
 
 @Injectable()

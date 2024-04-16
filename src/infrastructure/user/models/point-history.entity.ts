@@ -2,7 +2,6 @@ import { Entity, Column, ManyToOne, JoinColumn, CreateDateColumn, PrimaryColumn,
 import { v4 as uuidv4 } from 'uuid'
 import { User } from './user.entity'
 import type { IPointHistory } from '../../../domain/user/models/point-history.entity.interface'
-import { Reservation } from '../../../infrastructure/concert/models/reservation.entity'
 
 @Entity()
 export class PointHistory implements IPointHistory {
@@ -13,9 +12,11 @@ export class PointHistory implements IPointHistory {
     @JoinColumn({ name: 'userId' })
     user: User
 
-    @ManyToOne(() => Reservation, reservation => reservation.id)
-    @JoinColumn({ name: 'reservationId' })
-    reservation: Reservation
+    // @ManyToOne(() => Reservation, reservation => reservation.id)
+    // @JoinColumn({ name: 'reservationId' })
+    // reservation: Reservation
+    @Column({ nullable: true })
+    reservationId: string
 
     @Column()
     amount: number

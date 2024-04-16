@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpException, HttpStatus, Param, Post, UseGuards } from '@nestjs/common'
+import { Body, Controller, Get, HttpStatus, Param, Post, UseGuards } from '@nestjs/common'
 import { CreateConcertUseCase } from '../../application/concert/usecase/create-concert.usecase'
 import { CreateConcertDateUseCase } from '../../application/concert/usecase/create-concert-date.usecase'
 import { CreateSeatUseCase } from '../../application/concert/usecase/create-seat.usecase'
@@ -11,6 +11,7 @@ import { ReadAllSeatsByConcertDateIdUseCase } from '../../application/concert-wa
 import { GetUser, JwtAuthGuard } from '../../domain/common/jwt-token.util'
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger'
 import type { IReservation } from 'src/domain/concert/models/reservation.entity.interface'
+import { CustomException } from 'src/custom-exception'
 
 @ApiTags('콘서트 API')
 @Controller('concert')
@@ -94,7 +95,7 @@ export class ConcertController {
 
     private checkWaiting(waitingNumber: number): void {
         if (waitingNumber) {
-            throw new HttpException({ message: 'Please wait', waitingNumber }, HttpStatus.ACCEPTED)
+            throw new CustomException('Invalid Token', HttpStatus.FORBIDDEN)
         }
     }
 }

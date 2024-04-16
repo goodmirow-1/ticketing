@@ -40,7 +40,7 @@ export class UserWriterRepositoryTypeORM implements IUserWriterRepository {
             user,
             amount: amount,
             reason,
-            reservation: reason == 'payment' ? { id: reservationId } : null,
+            reservationId: reason == 'payment' ? reservationId : null,
         })
     }
 }

@@ -179,7 +179,17 @@ describe('AppController (e2e)', () => {
 
     // 폴링 주기를 계산하는 함수
     function calculatePollingDelay(waitingNumber: number): number {
-        return 1000 * Math.min(waitingNumber, 10) // 최대 10초 대기
+        if (waitingNumber <= 10) {
+            return 1000 * 1 // 1초 대기
+        } else if (waitingNumber <= 30) {
+            return 1000 * 3 // 3초 대기
+        } else if (waitingNumber <= 60) {
+            return 1000 * 5 // 5초 대기
+        } else if (waitingNumber <= 100) {
+            return 1000 * 7 // 7초 대기
+        } else {
+            return 1000 * 10 // 10초 대기
+        }
     }
 
     function resultControl(results: any) {
