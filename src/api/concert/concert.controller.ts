@@ -34,8 +34,8 @@ export class ConcertController {
     @ApiOperation({
         summary: '날짜 조회',
     })
-    async readAllConcerts(@GetUser() token: any): Promise<IConcert[]> {
-        this.checkWaiting(token.waitingNumber)
+    async readAllConcerts(@GetUser('waitingNumber') waitingNumber: number): Promise<IConcert[]> {
+        this.checkWaiting(waitingNumber)
 
         return this.readAllConcertsUseCase.excute()
     }
@@ -47,8 +47,8 @@ export class ConcertController {
         summary: '날짜별 좌석 조회',
     })
     @ApiParam({ name: 'concertDateId', required: true, description: 'concertDateId ID', example: '' })
-    async readAllSeatsByConcertDateId(@GetUser() token: any, @Param('concertDateId') concertDateId: string): Promise<ISeat[]> {
-        this.checkWaiting(token.waitingNumber)
+    async readAllSeatsByConcertDateId(@GetUser('waitingNumber') waitingNumber: number, @Param('concertDateId') concertDateId: string): Promise<ISeat[]> {
+        this.checkWaiting(waitingNumber)
 
         return this.readAllSeatsByConcertDateIdUseCase.excute(concertDateId)
     }
@@ -90,10 +90,14 @@ export class ConcertController {
         summary: '좌석 예약하기',
     })
     @ApiParam({ name: 'seatId', required: true, description: 'seat ID' })
-    async createReservation(@GetUser() token: any, @Param('seatId') seatId: string): Promise<IReservation> {
-        this.checkWaiting(token.waitingNumber)
+    async createReservation(
+        @GetUser('waitingNumber') waitingNumber: number,
+        @GetUser('userId') userId: string,
+        @Param('seatId') seatId: string,
+    ): Promise<IReservation> {
+        this.checkWaiting(waitingNumber)
 
-        return this.createReservationUseCase.excute(seatId, token.userId)
+        return this.createReservationUseCase.excute(seatId, userId)
     }
 
     private checkWaiting(waitingNumber: number): void {
