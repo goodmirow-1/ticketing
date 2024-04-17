@@ -3,7 +3,9 @@ import { CreateUserUseCase } from '../../application/user/usecase/create-user.us
 import { ChargeUserPointUseCase } from '../../application/user/usecase/charge-user-point.usecase'
 import { ReadUserPointUseCase } from '../../application/user/usecase/read-user-point.usecase'
 import type { IUser } from 'src/domain/user/models/user.entity.interface'
-import { ApiParam, ApiBody, ApiResponse, ApiTags, ApiOperation } from '@nestjs/swagger'
+import { ApiParam, ApiBody, ApiTags, ApiOperation } from '@nestjs/swagger'
+import { ChargePointDto } from './dtos/charge-point.request.dto'
+import { CreateUserDto } from './dtos/create-user.request.dto'
 
 @ApiTags('유저 API')
 @Controller('user')
@@ -18,8 +20,7 @@ export class UserController {
     @ApiOperation({
         summary: '포인트 조회',
     })
-    @ApiParam({ name: 'userId', required: true, description: 'User ID', example: '6b9d7e44-04bf-4487-9777-faf55fb87b49' })
-    @ApiResponse({ status: 200, description: 'Returns the point of the user.' })
+    @ApiParam({ name: 'userId', required: true, description: 'User ID', example: '' })
     async getPoint(@Param('userId') userId: string): Promise<number> {
         return this.readUserPointUseCase.excute(userId)
     }
@@ -28,11 +29,10 @@ export class UserController {
     @ApiOperation({
         summary: '포인트 충전',
     })
-    @ApiParam({ name: 'userId', required: true, description: 'User ID', example: '6b9d7e44-04bf-4487-9777-faf55fb87b49' })
+    @ApiParam({ name: 'userId', required: true, description: 'User ID', example: '' })
     @ApiBody({ schema: { type: 'object', properties: { amount: { type: 'number', example: 100 } } } })
-    @ApiResponse({ status: 200, description: "Charges the user's point and returns the new point total." })
-    async chargePoint(@Param('userId') userId: string, @Body('amount') amount: number): Promise<number> {
-        return this.chargePointUseCase.excute(userId, amount)
+    async chargePoint(@Param('userId') userId: string, @Body() chargePointDto: ChargePointDto): Promise<number> {
+        return this.chargePointUseCase.excute(userId, chargePointDto.amount)
     }
 
     @Post()
@@ -40,8 +40,7 @@ export class UserController {
         summary: '생성',
     })
     @ApiBody({ schema: { type: 'object', properties: { name: { type: 'string', example: 'John Doe' } } } })
-    @ApiResponse({ status: 201, description: 'Creates a new user and returns the user object.' })
-    async createUser(@Body('name') name: string): Promise<IUser> {
-        return this.createUserUseCase.excute(name)
+    async createUser(@Body() createUserDto: CreateUserDto): Promise<IUser> {
+        return this.createUserUseCase.excute(createUserDto.name)
     }
 }

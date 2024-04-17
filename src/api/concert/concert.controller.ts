@@ -12,6 +12,9 @@ import { GetUser, JwtAuthGuard } from '../../domain/common/jwt-token.util'
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger'
 import type { IReservation } from 'src/domain/concert/models/reservation.entity.interface'
 import { CustomException } from 'src/custom-exception'
+import { CreateConcertDto } from './dtos/create-concert.request.dto'
+import { CreateConcertDateDto } from './dtos/create-concert-date.request.dto'
+import { CreateSeatDto } from './dtos/create-seat.request.dto'
 
 @ApiTags('콘서트 API')
 @Controller('concert')
@@ -55,8 +58,8 @@ export class ConcertController {
         summary: '생성',
     })
     @ApiBody({ schema: { type: 'object', properties: { singerName: { type: 'string', example: '아이유' } } } })
-    async createConcert(@Body('singerName') singerName: string): Promise<IConcert> {
-        return this.createConcertUseCase.excute(singerName)
+    async createConcert(@Body() createConcertDto: CreateConcertDto): Promise<IConcert> {
+        return this.createConcertUseCase.excute(createConcertDto.singerName)
     }
 
     @Post(':concertId/')
@@ -65,8 +68,8 @@ export class ConcertController {
     })
     @ApiParam({ name: 'concertId', required: true, description: 'concertId ID', example: '' })
     @ApiBody({ schema: { type: 'object', properties: { concertDate: { type: 'date', example: '2024-12-10 11:34:00' } } } })
-    async createConcertDate(@Param('concertId') concertId: string, @Body('concertDate') concertDate: Date): Promise<IConcertDate> {
-        return this.createConcertDateUseCase.excute(concertId, concertDate)
+    async createConcertDate(@Param('concertId') concertId: string, @Body() createConcertDateDto: CreateConcertDateDto): Promise<IConcertDate> {
+        return this.createConcertDateUseCase.excute(concertId, createConcertDateDto.concertDate)
     }
 
     @Post(':concertDateId/seat')
@@ -76,8 +79,8 @@ export class ConcertController {
     @ApiParam({ name: 'concertDateId', required: true, description: 'concertDateId ID', example: '' })
     @ApiBody({ schema: { type: 'object', properties: { seatNumber: { type: 'number', example: 1 } } } })
     @ApiBody({ schema: { type: 'object', properties: { price: { type: 'number', example: 1000 } } } })
-    async createSeat(@Param('concertDateId') concertDateId: string, @Body('seatNumber') seatNumber: number, @Body('price') price: number): Promise<ISeat> {
-        return this.createSeatUseCase.excute(concertDateId, seatNumber, price)
+    async createSeat(@Param('concertDateId') concertDateId: string, @Body() createSeatDto: CreateSeatDto): Promise<ISeat> {
+        return this.createSeatUseCase.excute(concertDateId, createSeatDto.seatNumber, createSeatDto.price)
     }
 
     @Post(':seatId/reservation')

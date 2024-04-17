@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Post, UseGuards } from '@nestjs/common'
+import { Controller, Param, Post, UseGuards } from '@nestjs/common'
 import { GenerateTokenUseCase } from '../../application/user-waiting/usecase/generate-token.usecase'
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { GetUser, JwtAuthGuard } from '../../domain/common/jwt-token.util'
@@ -12,16 +12,6 @@ export class UserWaitingController {
         private readonly generateTokenUseCase: GenerateTokenUseCase,
         private readonly generateWaitingTokenUseCase: GenerateWaitingTokenUseCase,
     ) {}
-
-    @Get()
-    @ApiOperation({
-        summary: '토큰 조회',
-    })
-    @UseGuards(JwtAuthGuard)
-    @ApiBearerAuth('access-token') // 인증 토큰을 위한 Swagger 데코레이터
-    async readToken(@GetUser() token: any): Promise<string> {
-        return token
-    }
 
     @Post(':userId/token/generate')
     @ApiOperation({
