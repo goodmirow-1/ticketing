@@ -47,7 +47,6 @@ export class WaitingWriterRepositoryTypeORM implements IWaitingWriterRepository 
         const expiration = Math.floor(Date.now() / 1000) + parseInt(process.env.VALID_TOKEN_EXPIRATION_TIME, 10) + 6000 //대기 토큰은 폴링해야해서 1시간 추가
 
         if (position) {
-            console.log(position)
             const token = generateAccessToken(userId, expiration, position)
             return { token, waitingNumber: position }
         } else {

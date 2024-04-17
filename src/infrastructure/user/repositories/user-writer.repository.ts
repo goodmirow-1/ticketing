@@ -17,19 +17,22 @@ export class UserWriterRepositoryTypeORM implements IUserWriterRepository {
         return this.entityManager.save(User, { id: uuid, name, point: 0, reservations: [] })
     }
 
-    async calculatePoint(user: User, amount: number, reason: 'charge' | 'payment', reservationId?: string): Promise<PointHistory> {
+    async calculatePoint(user: User, amount: number, reservationId?: string, querryRunner?: any): Promise<PointHistory> {
+        const reason = reservationId ? 'payment' : 'charge'
+        const manager = querryRunner ? querryRunner.manager : this.entityManager
+
         if (reason == 'payment' && user.point < Math.abs(amount)) {
             throw new InValidPointError('Not enough point')
         }
 
         const point = user.point + amount
 
-        const result = await this.entityManager.createQueryBuilder().update(User).set({ point }).where('id = :id', { id: user.id }).execute()
+        const result = await manager.createQueryBuilder().update(User).set({ point }).where('id = :id', { id: user.id }).execute()
 
         if (result.affected === 0) throw new FailedUserChargePointError('Failed to charge point')
 
         const uuid = uuidv4()
-        return await this.entityManager.save(PointHistory, {
+        return await manager.save(PointHistory, {
             id: uuid,
             user,
             amount: amount,

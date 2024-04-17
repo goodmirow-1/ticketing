@@ -15,8 +15,10 @@ export class UserReaderRepositoryTypeORM implements IUserReaderRepository {
         }
     }
 
-    async findUserById(id: string): Promise<User> {
-        const user = await this.entityManager.findOne(User, { where: { id } })
+    async findUserById(id: string, querryRunner?: any, lockOption?: any): Promise<User> {
+        const manager = querryRunner ? querryRunner.manager : this.entityManager
+
+        const user = await manager.findOne(User, { where: { id }, lock: lockOption })
 
         if (!user) throw new NotFoundUserError(`User id ${id} not found`)
 

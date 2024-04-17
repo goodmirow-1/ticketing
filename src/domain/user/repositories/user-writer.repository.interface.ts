@@ -5,5 +5,5 @@ export const IUserWriterRepositoryToken = Symbol.for('IUserWriterRepository')
 
 export interface IUserWriterRepository {
     createUser(name: string): Promise<IUser>
-    calculatePoint(user: IUser, point: number, reason: string, reservationId?: string): Promise<IPointHistory>
+    calculatePoint(user: IUser, point: number, reservationId?: string, querryRunner?: any): Promise<IPointHistory>
 }

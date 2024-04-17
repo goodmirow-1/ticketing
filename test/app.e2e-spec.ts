@@ -239,7 +239,7 @@ describe('AppController (e2e)', () => {
             const concertDateId = randomDate.id
 
             let attempt = 0
-            const maxAttempts = 1 // 최대 시도 횟수 설정
+            const maxAttempts = 5 // 최대 시도 횟수 설정
 
             while (attempt < maxAttempts) {
                 attempt++
@@ -252,14 +252,16 @@ describe('AppController (e2e)', () => {
 
                 // 4. 사용 가능한 좌석 찾기
                 const availableSeats = seatsResponse.body.filter(seat => seat.status === 'available')
-                for (const seat of availableSeats) {
+                if (availableSeats.length > 0) {
+                    const randomIndex = Math.floor(Math.random() * availableSeats.length)
+                    const selectedSeat = availableSeats[randomIndex]
+
                     try {
                         const reservationResponse = await request(app.getHttpServer())
-                            .post(`/concert/${seat.id}/reservation`)
+                            .post(`/concert/${selectedSeat.id}/reservation`)
                             .set('Authorization', `Bearer ${token}`)
 
                         if (reservationResponse.status === HttpStatus.CREATED) {
-                            console.log('Seat reserved successfully:', reservationResponse.body)
                             // 5. 예약 후 결제 시도
                             const reservationId = reservationResponse.body.id
                             const userId = reservationResponse.body.userId
@@ -273,18 +275,13 @@ describe('AppController (e2e)', () => {
                             }
                         }
                     } catch (error) {
-                        if (error.response?.status === HttpStatus.CONFLICT) {
-                            console.log('Conflict detected, trying next available seat.')
-                            continue // 다음 좌석에 대해 시도
-                        } else {
-                            console.error('Failed to reserve seat:', error.message)
-                            break
-                        }
+                        console.error('Failed to reserve seat:', error.message)
                     }
+                } else {
+                    console.error('No available seats found.')
+                    return
                 }
             }
-
-            console.error('Failed to reserve any seat after multiple attempts.')
         } catch (error) {
             console.error('Error during concert access handling:', error)
             throw error
