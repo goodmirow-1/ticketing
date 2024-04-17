@@ -8,6 +8,11 @@ import type { IWaitingReaderRepository } from '../../../domain/waiting/repositor
 export class WaitingReaderRepositoryTypeORM implements IWaitingReaderRepository {
     constructor(@Inject(EntityManager) private readonly entityManager: EntityManager) {}
 
+    /**
+     * Finds the queue position of a waiting user based on the creation date.
+     * @param userId The ID of the user whose position in the waiting list is to be determined.
+     * @returns The position of the user in the waiting queue or NaN if not found.
+     */
     async findWaitingUserPosition(userId: string): Promise<number> {
         const result = await this.entityManager
             .createQueryBuilder(WaitingUser, 'user')
@@ -21,12 +26,22 @@ export class WaitingReaderRepositoryTypeORM implements IWaitingReaderRepository 
         return userPosition ? userPosition : NaN
     }
 
+    /**
+     * Retrieves the status of a token for a user.
+     * @param userId The user's ID.
+     * @param token The token to check the status of.
+     * @returns The token status with waiting number.
+     */
     async getTokenStatus(userId: string, token: string) {
         if (token != '') return { token, waitingNumber: 0 }
 
         return await this.findWaitingUserPosition(userId)
     }
 
+    /**
+     * Finds the last waiting user based on their position in the queue.
+     * @returns An array containing the last user in the waiting list.
+     */
     async findLastWaitingUser(): Promise<WaitingUser[]> {
         return this.entityManager.find(WaitingUser, {
             order: {
@@ -36,12 +51,23 @@ export class WaitingReaderRepositoryTypeORM implements IWaitingReaderRepository 
         })
     }
 
+    /**
+     * Finds a valid token associated with a user ID.
+     * @param userId The user's ID for whom to find the valid token.
+     * @returns The valid token if found, otherwise an empty string.
+     */
     async findValidTokenByUserId(userId: string): Promise<string> {
         const validToken = await this.entityManager.findOne(ValidToken, { where: { userId } })
 
         return validToken ? validToken.token : ''
     }
 
+    /**
+     * Determines if the count of valid tokens is below a defined threshold.
+     * @param queryRunner Optional query runner for transaction management.
+     * @param lockOption Optional locking configuration for the query.
+     * @returns True if the count of valid tokens is below the threshold, otherwise false.
+     */
     async isValidTokenCountUnderThreshold(queryRunner?: any, lockOption?: any): Promise<boolean> {
         const manager = queryRunner ? queryRunner.manager : this.entityManager
 

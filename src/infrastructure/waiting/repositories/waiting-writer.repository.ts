@@ -17,12 +17,23 @@ export class WaitingWriterRepositoryTypeORM implements IWaitingWriterRepository 
         private readonly schedulerRegistry: SchedulerRegistry,
     ) {}
 
+    /**
+     * Deletes a waiting user from the database.
+     * @param id The ID of the waiting user to delete.
+     * @returns Boolean indicating whether the delete was successful.
+     */
     async deleteWaitingUser(id: string): Promise<boolean> {
         const result = await this.entityManager.delete(WaitingUser, { id })
 
         return result.affected !== 0
     }
 
+    /**
+     * Creates a valid token for the user with a set expiration time.
+     * @param userId The user's ID for whom the token is created.
+     * @param queryRunner Optional query runner for transaction management.
+     * @returns An object containing the token and a waiting number (always 0 for valid tokens).
+     */
     async createValidToken(userId: string, querryRunner?: any) {
         const manager = querryRunner ? querryRunner.manager : this.entityManager
 
@@ -42,6 +53,14 @@ export class WaitingWriterRepositoryTypeORM implements IWaitingWriterRepository 
         return { token: token, waitingNumber: 0 }
     }
 
+    /**
+     * Creates a waiting token for the user, optionally at a specific position.
+     * @param userId The user's ID for whom the waiting token is created.
+     * @param queryRunner Optional query runner for transaction management.
+     * @param lockOption Optional locking configuration for the query.
+     * @param position Optional position number in the waiting queue.
+     * @returns An object containing the token and the current waiting number.
+     */
     async createWaitingToken(userId: string, querryRunner?: any, lockOption?: any, position?: number) {
         const manager = querryRunner ? querryRunner.manager : this.entityManager
         const expiration = Math.floor(Date.now() / 1000) + parseInt(process.env.VALID_TOKEN_EXPIRATION_TIME, 10) + 6000 //대기 토큰은 폴링해야해서 1시간 추가
@@ -62,6 +81,14 @@ export class WaitingWriterRepositoryTypeORM implements IWaitingWriterRepository 
         }
     }
 
+    /**
+     * Decides whether to create a valid token or a waiting token based on the validity state.
+     * @param userId The user's ID.
+     * @param isValid Boolean indicating whether to create a valid token.
+     * @param queryRunner Optional query runner for transaction management.
+     * @param lockOption Optional locking configuration for the query.
+     * @returns Either a valid token or a waiting token, based on the validity state.
+     */
     async createValidTokenOrWaitingUser(userId: string, isValid: boolean, querryRunner?: any, lockOption?: any) {
         if (isValid) {
             return this.createValidToken(userId, querryRunner)
@@ -70,6 +97,10 @@ export class WaitingWriterRepositoryTypeORM implements IWaitingWriterRepository 
         }
     }
 
+    /**
+     * Marks a valid token as expired.
+     * @param token The token to mark as expired.
+     */
     async expiredValidToken(token?: string) {
         if (token == undefined || token == '') return
 

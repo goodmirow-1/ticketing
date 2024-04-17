@@ -20,26 +20,56 @@ export class ConcertWriterRepositoryTypeORM implements IConcertWriterRepository,
         private readonly schedulerRegistry: SchedulerRegistry,
     ) {}
 
+    /**
+     * Truncates relevant tables on module initialization.
+     * cause emtpy tables for waiting users and valid tokens.
+     */
     async onModuleInit(): Promise<void> {
         await this.entityManager.query('TRUNCATE TABLE valid_token')
         await this.entityManager.query('TRUNCATE TABLE waiting_user')
     }
 
+    /**
+     * Creates a new concert with a given singer name.
+     * @param singerName The name of the singer for the concert.
+     * @returns The created Concert entity.
+     */
     async createConcert(singerName: string): Promise<Concert> {
         const uuid = uuidv4()
         return await this.entityManager.save(Concert, { id: uuid, singerName })
     }
 
+    /**
+     * Creates a new concert date for a specific concert.
+     * @param concert The Concert entity for which to create the date.
+     * @param date The date of the concert.
+     * @returns The created ConcertDate entity.
+     */
     async createConcertDate(concert: Concert, date: Date): Promise<ConcertDate> {
         const uuid = uuidv4()
         return this.entityManager.save(ConcertDate, { id: uuid, availableSeats: parseInt(process.env.MAX_SEATS, 10), concert, date })
     }
 
+    /**
+     * Creates a new seat for a specific concert date.
+     * @param concertDate The ConcertDate entity for which to create the seat.
+     * @param seatNumber The number of the seat.
+     * @param price The price of the seat.
+     * @returns The created Seat entity.
+     */
     createSeat(concertDate: ConcertDate, seatNumber: number, price: number): Promise<Seat> {
         const uuid = uuidv4()
         return this.entityManager.save(Seat, { id: uuid, concertDate, seatNumber, price })
     }
 
+    /**
+     * Creates a new reservation for a specific seat by a user.
+     * @param seat The Seat entity for which to create the reservation.
+     * @param userId The ID of the user making the reservation.
+     * @returns The created Reservation entity.
+     * @throws DuplicateReservationError if the reservation already exists.
+     * @throws FailedCreateReservationError if there is an error creating the reservation.
+     */
     async createReservation(seat: Seat, userId: string): Promise<Reservation> {
         const uuid = uuidv4()
         let reservation
@@ -92,6 +122,11 @@ export class ConcertWriterRepositoryTypeORM implements IConcertWriterRepository,
         return reservation
     }
 
+    /**
+     * Finalizes the payment for a reservation, updating its status to paid.
+     * @param reservation The Reservation entity to update.
+     * @throws FailedUpdateReservationError if updating the reservation fails.
+     */
     async doneReservationPaid(reservation: Reservation) {
         const paymentUpdateResult = await this.entityManager
             .createQueryBuilder()
@@ -116,6 +151,12 @@ export class ConcertWriterRepositoryTypeORM implements IConcertWriterRepository,
         }
     }
 
+    /**
+     * Updates the status of a seat.
+     * @param id The ID of the seat to update.
+     * @param status The new status of the seat.
+     * @returns True if the update was successful, otherwise false.
+     */
     private async updateSeatStatus(id: string, status: string): Promise<boolean> {
         return await this.entityManager
             .createQueryBuilder()
@@ -126,6 +167,11 @@ export class ConcertWriterRepositoryTypeORM implements IConcertWriterRepository,
             .then(result => result.affected > 0)
     }
 
+    /**
+     * Updates the number of available seats for a concert date.
+     * @param concertDateId The ID of the concert date to update.
+     * @param amount The amount to adjust the available seats by.
+     */
     async updateConcertDateAvailableSeat(concertDateId: string, amount: number) {
         await this.entityManager
             .createQueryBuilder()
