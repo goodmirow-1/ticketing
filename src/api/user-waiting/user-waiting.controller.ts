@@ -1,9 +1,9 @@
 import { Controller, Param, Post, UseGuards } from '@nestjs/common'
 import { GenerateTokenUseCase } from '../../application/user-waiting/usecase/generate-token.usecase'
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger'
-import { GetUser, JwtAuthGuard } from '../../domain/common/jwt-token.util'
 import { GenerateWaitingTokenUseCase } from 'src/application/user-waiting/usecase/generate-waiting-token.usecase'
 import type { TokenResponseDto } from './dtos/token-reponse.dto'
+import { GetUser, JwtAuthGuard } from '../common/jwt-token-util'
 
 @ApiTags('유저 웨이팅 API')
 @Controller('user-waiting')

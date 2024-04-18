@@ -8,7 +8,7 @@ import type { IConcertDate } from 'src/domain/concert/models/concertDate.entity.
 import { CreateReservationUseCase } from '../../application/concert-waiting/usecase/create-reservation.usecase'
 import { ReadAllConcertsUseCase } from '../../application/concert-waiting/usecase/read-all-concerts.usecase'
 import { ReadAllSeatsByConcertDateIdUseCase } from '../../application/concert-waiting/usecase/read-all-seats-by-concert-date.usecase'
-import { GetUser, JwtAuthGuard } from '../../domain/common/jwt-token.util'
+import { GetUser, JwtAuthGuard } from '../common/jwt-token-util'
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger'
 import type { IReservation } from 'src/domain/concert/models/reservation.entity.interface'
 import { CustomException } from 'src/custom-exception'
