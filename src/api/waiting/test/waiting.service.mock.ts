@@ -14,7 +14,6 @@ export function initWaitingReaderMockRepo(): Record<keyof IWaitingReaderReposito
 export function initWaitingWriterMockRepo(): Record<keyof IWaitingWriterRepository, jest.Mock> {
     return {
         deleteWaitingUser: jest.fn(),
-        createValidToken: jest.fn(),
         createWaitingToken: jest.fn(),
         createValidTokenOrWaitingUser: jest.fn(),
         expiredValidToken: jest.fn(),

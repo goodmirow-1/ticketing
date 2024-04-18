@@ -27,7 +27,6 @@ export class GenerateTokenUseCase {
         if (this.schedulerState.check) {
             return await this.waitingWriterRepository.createWaitingToken(userId)
         } else {
-            // 허용 인원이 완벽하게 일치할 필요는 없다.
             const session = await this.dataAccessor.getSession('READ COMMITTED')
 
             try {
