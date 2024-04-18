@@ -36,7 +36,7 @@
 ## 시퀀스 다이어그램
 ### 유저 토큰 발급
    
-![image](https://github.com/goodmirow-1/ticketing/assets/57578975/d64c7fd0-7166-46c1-aa96-4cda020e01bc)
+![image](https://github.com/goodmirow-1/ticketing/assets/57578975/1d83edd8-213a-4e98-a59e-f292e208936c)
 
 ### 예약 가능 날짜 / 좌석 조회
    
