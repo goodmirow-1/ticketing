@@ -25,6 +25,7 @@
 | API | Method | URI | Req | Res
 |----------|----------|----------|----------|----------|
 | 유저 토큰 발급 | Get | /user |  | 'token' |
+| 토큰 상태 조회 | 
 | 예약 가능 날짜 | Get | /reservation/{concertId}/date |  | [{id,date,availableSeats,concert}] |
 | 예약 가능 좌석 | Get | /reservation/{concertDateId}/seat |  | [{id,seatNumber,concertDate,status,reservations}] |
 | 좌석 예약 요청 | Post | /seat/{seatId} |  | {id,seatNumber,concertDate,status,reservations} |

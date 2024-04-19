@@ -128,14 +128,14 @@ describe('AppController (e2e)', () => {
         'should handle the token issuance and concert access process for multiple users simultaneously',
         async () => {
             // 1. 동시에 여러 사용자에 대해 토큰 발급 요청
-            const tokenRequests = userIds.map(userId => request(app.getHttpServer()).post(`/user-waiting/${userId}/token/generate`))
+            const tokenRequests = userIds.map(userId => request(app.getHttpServer()).get(`/user-waiting/${userId}/token/generate`))
 
             const tokenResponses = await Promise.allSettled(tokenRequests)
             resultControl(tokenResponses)
 
             // 각 토큰 발급 응답을 처리하고, 필요한 경우 폴링을 시작
             const concertAccessRequests = tokenResponses.map(response => {
-                if (response.status === 'fulfilled' && response.value.status === HttpStatus.CREATED) {
+                if (response.status === 'fulfilled' && response.value.status === HttpStatus.OK) {
                     const { token, waitingNumber } = response.value.body
                     // 유효 토큰일 경우 즉시 콘서트 접근 시도
                     if (waitingNumber === 0) {
@@ -164,7 +164,7 @@ describe('AppController (e2e)', () => {
             await new Promise(resolve => setTimeout(resolve, delay))
 
             try {
-                const statusResponse = await request(app.getHttpServer()).post('/user-waiting/token/status').set('Authorization', `Bearer ${token}`)
+                const statusResponse = await request(app.getHttpServer()).get('/user-waiting/token/status').set('Authorization', `Bearer ${token}`)
                 if (statusResponse.body.token) {
                     return pollForTokenAvailability(statusResponse.body.token, statusResponse.body.waitingNumber)
                 } else {
