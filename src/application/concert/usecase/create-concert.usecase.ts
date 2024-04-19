@@ -10,6 +10,7 @@ export class CreateConcertUseCase {
     ) {}
 
     async excute(singerName: string): Promise<IConcert> {
+        //가수 이름으로 콘서트 저장
         return this.concertWriterRepository.createConcert(singerName)
     }
 }

@@ -13,9 +13,11 @@ export class CreateSeatUseCase {
     ) {}
 
     async excute(concertDateId: string, seatNumber: number, price: number): Promise<ISeat> {
+        //유효한 seatNumber인지
         await this.concertReaderRepository.checkValidSeatNumber(concertDateId, seatNumber)
+        //콘서트 날짜 조회
         const concertDate = await this.concertReaderRepository.findConcertDateById(concertDateId)
-
+        //좌석 저장
         return await this.concertWriterRepository.createSeat(concertDate, seatNumber, price)
     }
 }

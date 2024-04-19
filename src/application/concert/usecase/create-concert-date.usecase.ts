@@ -13,9 +13,11 @@ export class CreateConcertDateUseCase {
     ) {}
 
     async excute(concertId: string, date: Date): Promise<IConcertDate> {
+        //중복된 날짜가 있는지 확인
         await this.concertReaderRepository.checkValidConcertDateByDate(date)
+        //콘서트 조회
         const concert = await this.concertReaderRepository.findConcertById(concertId)
-
+        //콘서트 새로운 날짜 저장
         return await this.concertWriterRepository.createConcertDate(concert, date)
     }
 }

@@ -9,6 +9,7 @@ export class ReadUserPointUseCase {
     ) {}
 
     async excute(userId: string): Promise<number> {
+        //유저 포인트 조회
         return await this.userReaderRepository.findUserPointById(userId)
     }
 }

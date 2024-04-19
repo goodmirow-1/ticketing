@@ -10,6 +10,7 @@ export class ReadAllSeatsByConcertDateIdUseCase {
     ) {}
 
     async excute(concertDateId: string): Promise<ISeat[]> {
+        //콘서트 날짜 목록 조회
         return await this.concertReaderRepository.findSeatsByConcertDateId(concertDateId)
     }
 }

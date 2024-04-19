@@ -22,12 +22,17 @@ export class PaymentUserConcertUseCase {
     ) {}
 
     async excute(userId: string, reservationId: string, token?: string): Promise<IPointHistory> {
+        //예약 정보 조회
         const reservation = await this.concertReaderRepository.findReservationById(reservationId)
+        //사용자 조회
         const user = await this.userReaderRepository.findUserById(userId)
+        //예약 정보의 사용자와 사용자 정보가 일치하는지 확인
         this.concertReaderRepository.checkValidReservation(reservation, userId)
+        //결제 진행 및 예약정보에 따른 사용자의 포인트 차감
         const pointHistory = await this.userWriterRepository.calculatePoint(user, -reservation.seat.price, reservation.id)
-
+        //예약 정보 수정
         await this.concertWriterRepository.doneReservationPaid(reservation)
+        //유효토큰 만료로 변경 수정
         await this.waitingWriterRepository.expiredValidToken(token)
 
         return pointHistory

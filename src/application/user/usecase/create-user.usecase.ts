@@ -10,6 +10,7 @@ export class CreateUserUseCase {
     ) {}
 
     async excute(name: string): Promise<IUser> {
+        //이름을 토대로 유저 저장
         return await this.userWriterRepository.createUser(name)
     }
 }

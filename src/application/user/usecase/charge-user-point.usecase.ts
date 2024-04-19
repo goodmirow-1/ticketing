@@ -21,9 +21,11 @@ export class ChargeUserPointUseCase {
         const session = await this.dataAccessor.getSession('REPEATABLE READ')
 
         try {
+            //유저 정보 조회
             const user = await this.userReaderRepository.findUserById(userId, session, {
                 mode: 'pessimistic_write',
             })
+            //포인트 충전 및 포인트 로그 저장
             const chargePoint = await this.userWriterRepository.calculatePoint(user, point, null, session)
 
             await this.dataAccessor.commitTransaction(session)

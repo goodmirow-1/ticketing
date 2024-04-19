@@ -10,6 +10,7 @@ export class ReadAllConcertsUseCase {
     ) {}
 
     async excute(): Promise<IConcert[]> {
+        //콘서트 목록 조회
         return this.concertReaderRepository.findAllConcerts()
     }
 }

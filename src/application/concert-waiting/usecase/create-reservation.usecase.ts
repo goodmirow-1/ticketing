@@ -13,8 +13,11 @@ export class CreateReservationUseCase {
     ) {}
 
     async excute(seatId: string, userId: string): Promise<IReservation> {
+        //좌석 조회
         const seat = await this.concertReaderRepository.findSeatById(seatId)
+        //예약 저장
         const reservation = await this.concertWriterRepository.createReservation(seat, userId)
+        //좌석의 상태 값 수정
         await this.concertWriterRepository.updateConcertDateAvailableSeat(seat.concertDate.id, -1)
 
         return reservation
