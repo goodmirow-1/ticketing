@@ -6,6 +6,10 @@ import type { IUser } from 'src/domain/user/models/user.entity.interface'
 import { ApiParam, ApiBody, ApiTags, ApiOperation } from '@nestjs/swagger'
 import { ChargePointDto } from './dtos/charge-point.request.dto'
 import { CreateUserDto } from './dtos/create-user.request.dto'
+import type { ICommand } from 'src/application/common/command.interface'
+import { ReadUserPointCommand } from 'src/application/user/command/read-user-point.command'
+import { ChargeUserPointCommand } from 'src/application/user/command/charge-user-point.command'
+import { CreateUserCommand } from 'src/application/user/command/create-user.command'
 
 @ApiTags('유저 API')
 @Controller('user')
@@ -22,7 +26,8 @@ export class UserController {
     })
     @ApiParam({ name: 'userId', required: true, description: 'User ID', example: '' })
     async getPoint(@Param('userId') userId: string): Promise<number> {
-        return this.readUserPointUseCase.excute(userId)
+        const command: ICommand<number> = new ReadUserPointCommand(this.readUserPointUseCase, userId)
+        return command.execute()
     }
 
     @Patch('charge/:userId/point')
@@ -32,7 +37,8 @@ export class UserController {
     @ApiParam({ name: 'userId', required: true, description: 'User ID', example: '' })
     @ApiBody({ schema: { type: 'object', properties: { amount: { type: 'number', example: 100 } } } })
     async chargePoint(@Param('userId') userId: string, @Body() chargePointDto: ChargePointDto): Promise<number> {
-        return this.chargePointUseCase.excute(userId, chargePointDto.amount)
+        const command: ICommand<number> = new ChargeUserPointCommand(this.chargePointUseCase, userId, chargePointDto.amount)
+        return command.execute()
     }
 
     @Post()
@@ -41,6 +47,7 @@ export class UserController {
     })
     @ApiBody({ schema: { type: 'object', properties: { name: { type: 'string', example: 'John Doe' } } } })
     async createUser(@Body() createUserDto: CreateUserDto): Promise<IUser> {
-        return this.createUserUseCase.excute(createUserDto.name)
+        const command: ICommand<IUser> = new CreateUserCommand(this.createUserUseCase, createUserDto.name)
+        return command.execute()
     }
 }

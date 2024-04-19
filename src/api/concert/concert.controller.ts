@@ -5,9 +5,9 @@ import { CreateSeatUseCase } from '../../application/concert/usecase/create-seat
 import type { IConcert } from 'src/domain/concert/models/concert.entity.interface'
 import type { ISeat } from 'src/domain/concert/models/seat.entity.interface'
 import type { IConcertDate } from 'src/domain/concert/models/concertDate.entity.interface'
-import { CreateReservationUseCase } from '../../application/concert-waiting/usecase/create-reservation.usecase'
-import { ReadAllConcertsUseCase } from '../../application/concert-waiting/usecase/read-all-concerts.usecase'
-import { ReadAllSeatsByConcertDateIdUseCase } from '../../application/concert-waiting/usecase/read-all-seats-by-concert-date.usecase'
+import { CreateReservationUseCase } from '../../application/concert/usecase/create-reservation.usecase'
+import { ReadAllConcertsUseCase } from '../../application/concert/usecase/read-all-concerts.usecase'
+import { ReadAllSeatsByConcertDateIdUseCase } from '../../application/concert/usecase/read-all-seats-by-concert-date.usecase'
 import { GetUser, JwtAuthGuard } from '../common/jwt-token-util'
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger'
 import type { IReservation } from 'src/domain/concert/models/reservation.entity.interface'
@@ -15,6 +15,13 @@ import { CustomException } from 'src/custom-exception'
 import { CreateConcertDto } from './dtos/create-concert.request.dto'
 import { CreateConcertDateDto } from './dtos/create-concert-date.request.dto'
 import { CreateSeatDto } from './dtos/create-seat.request.dto'
+import { CreateConcertCommand } from '../../application/concert/command/create-concert.command'
+import type { ICommand } from '../../application/common/command.interface'
+import { ReadAllConcertsCommand } from 'src/application/concert/command/read-all-concerts.command'
+import { ReadAllSeatsByConcertDateIdCommand } from 'src/application/concert/command/read-all-seats-by-concert-date-id.command'
+import { CreateConcertDateCommand } from 'src/application/concert/command/create-concert-date.command'
+import { CreateSeatCommand } from 'src/application/concert/command/create-seat.command'
+import { CreateReservationCommand } from 'src/application/concert/command/create-reservation.command'
 
 @ApiTags('콘서트 API')
 @Controller('concert')
@@ -37,7 +44,8 @@ export class ConcertController {
     async readAllConcerts(@GetUser('waitingNumber') waitingNumber: number): Promise<IConcert[]> {
         this.checkWaiting(waitingNumber)
 
-        return this.readAllConcertsUseCase.excute()
+        const command: ICommand<IConcert[]> = new ReadAllConcertsCommand(this.readAllConcertsUseCase)
+        return command.execute()
     }
 
     @Get(':concertDateId/seats')
@@ -50,7 +58,8 @@ export class ConcertController {
     async readAllSeatsByConcertDateId(@GetUser('waitingNumber') waitingNumber: number, @Param('concertDateId') concertDateId: string): Promise<ISeat[]> {
         this.checkWaiting(waitingNumber)
 
-        return this.readAllSeatsByConcertDateIdUseCase.excute(concertDateId)
+        const command: ICommand<ISeat[]> = new ReadAllSeatsByConcertDateIdCommand(this.readAllSeatsByConcertDateIdUseCase, concertDateId)
+        return command.execute()
     }
 
     @Post()
@@ -59,7 +68,8 @@ export class ConcertController {
     })
     @ApiBody({ schema: { type: 'object', properties: { singerName: { type: 'string', example: '아이유' } } } })
     async createConcert(@Body() createConcertDto: CreateConcertDto): Promise<IConcert> {
-        return this.createConcertUseCase.excute(createConcertDto.singerName)
+        const command: ICommand<IConcert> = new CreateConcertCommand(this.createConcertUseCase, createConcertDto.singerName)
+        return command.execute()
     }
 
     @Post(':concertId/')
@@ -69,7 +79,8 @@ export class ConcertController {
     @ApiParam({ name: 'concertId', required: true, description: 'concertId ID', example: '' })
     @ApiBody({ schema: { type: 'object', properties: { concertDate: { type: 'date', example: '2024-12-10 11:34:00' } } } })
     async createConcertDate(@Param('concertId') concertId: string, @Body() createConcertDateDto: CreateConcertDateDto): Promise<IConcertDate> {
-        return this.createConcertDateUseCase.excute(concertId, createConcertDateDto.concertDate)
+        const command: ICommand<IConcertDate> = new CreateConcertDateCommand(this.createConcertDateUseCase, concertId, createConcertDateDto.concertDate)
+        return command.execute()
     }
 
     @Post(':concertDateId/seat')
@@ -80,7 +91,8 @@ export class ConcertController {
     @ApiBody({ schema: { type: 'object', properties: { seatNumber: { type: 'number', example: 1 } } } })
     @ApiBody({ schema: { type: 'object', properties: { price: { type: 'number', example: 1000 } } } })
     async createSeat(@Param('concertDateId') concertDateId: string, @Body() createSeatDto: CreateSeatDto): Promise<ISeat> {
-        return this.createSeatUseCase.excute(concertDateId, createSeatDto.seatNumber, createSeatDto.price)
+        const command: ICommand<ISeat> = new CreateSeatCommand(this.createSeatUseCase, concertDateId, createSeatDto.seatNumber, createSeatDto.price)
+        return command.execute()
     }
 
     @Post(':seatId/reservation')
@@ -97,7 +109,8 @@ export class ConcertController {
     ): Promise<IReservation> {
         this.checkWaiting(waitingNumber)
 
-        return this.createReservationUseCase.excute(seatId, userId)
+        const command: ICommand<IReservation> = new CreateReservationCommand(this.createReservationUseCase, seatId, userId)
+        return command.execute()
     }
 
     private checkWaiting(waitingNumber: number): void {

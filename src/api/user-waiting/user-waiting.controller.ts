@@ -4,6 +4,9 @@ import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@ne
 import { GenerateWaitingTokenUseCase } from 'src/application/user-waiting/usecase/generate-waiting-token.usecase'
 import type { TokenResponseDto } from './dtos/token-reponse.dto'
 import { GetUser, JwtAuthGuard } from '../common/jwt-token-util'
+import { GenerateTokenCommand } from 'src/application/user-waiting/command/generate-token.command'
+import type { ICommand } from 'src/application/common/command.interface'
+import { GenerateWaitingTokenCommand } from 'src/application/user-waiting/command/generate-waiting-token.command'
 
 @ApiTags('유저 웨이팅 API')
 @Controller('user-waiting')
@@ -20,7 +23,8 @@ export class UserWaitingController {
     @UseGuards(JwtAuthGuard)
     @ApiBearerAuth('access-token') // 인증 토큰을 위한 Swagger 데코레이터
     async checkTokenStatus(@GetUser('userId') userId: string) {
-        return await this.generateWaitingTokenUseCase.excute(userId)
+        const command: ICommand<TokenResponseDto | number> = new GenerateWaitingTokenCommand(this.generateWaitingTokenUseCase, userId)
+        return command.execute()
     }
 
     @Get(':userId/token/generate')
@@ -30,6 +34,7 @@ export class UserWaitingController {
     @ApiParam({ name: 'userId', required: true, description: 'User ID', example: '6b9d7e44-04bf-4487-9777-faf55fb87b49' })
     @ApiResponse({ status: 200, description: 'Returns a new token or waiting number for the user.' })
     async generateToken(@Param('userId') userId: string): Promise<TokenResponseDto> {
-        return this.generateTokenUseCase.excute(userId)
+        const command: ICommand<TokenResponseDto> = new GenerateTokenCommand(this.generateTokenUseCase, userId)
+        return command.execute()
     }
 }
