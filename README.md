@@ -129,4 +129,4 @@ DB의 격리 수준을 'REPEATABLE READ'로 Lock을 'pessimistic_write'로 사�
 
 **개선방안** :
 
-1. typeorm의 transaction lock의 종류에는 pessimistic_partial_write(비관적인 부분 쓰기 락)이 존재합니다. 이는 테이블의 특정 필드에만 Lock을 걸 수 있는 부분이며 상황에 따라 성능을 높일 수 있는 락이다. 현재 user의 point를 다른 테이블로 관리하는게 아니라 하나의 column으로 관리하고 있는데, 요구사항에 user의 필드들이 변할 수 있는 조건이 없었기 때문이다. 만약 다른 필드들이 수정되어야 하는 상황이 발생하여 최적화 하는 상황이 발생한다면, db의 정규화 없이도 pessimistic_partial_write을 사용해서 충분히 해결할 수 있을 것으로 보인다.
+1. typeorm의 transaction lock의 종류에는 pessimistic_partial_write(비관적인 부분 쓰기 락)이 존재합니다. 이는 테이블의 특정 필드에만 Lock을 걸 수 있는 부분이며 상황에 따라 성능을 높일 수 있는 락이다. 현재 user의 point를 다른 테이블로 관리하는게 아니라 하나의 column으로 관리하고 있는데, 요구사항에 user의 필드들이 변할 수 있는 조건이 없었기 때문이다. 만약 다른 필드들이 수정되어야 하는 상황이 발생하여 최적화 하는 상황이 발생한다면, db의 정규화 없이도 pessimistic_partial_write을 사용해서 충분히 해결할 수 있을 것으로 보인다. 하지만 이 부분은 table이 typeorm에 의존되게 되므로 있으므로 "db나 orm이 절대적으로 변하지 않는다" 라는 것이 가정되어야 할 것이다.
