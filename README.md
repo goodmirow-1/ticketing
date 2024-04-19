@@ -101,3 +101,12 @@
 2. 엔티티들을 도메인별로 어떻게 묶어야하며, 도메인 순수성은 어떻게 확보할 것인가 :  먼저 엔티티들을 도메인에 크게 비슷한 계열로 묶어야 한다고 판단했습니다. 그래서 Concert / User / Waiting 으로 묶었고 각 도메인별 포함 엔티티는 다음과 같습니다. Concert ( Concert, ConcertDate, Seat, Reservation ) / User ( User, PointHistory ) / Waiting ( ValidToken, WaitingUser ) 
 
 그리고 도메인의 순수성을 확보하기 위해서 서로 다른 도메인끼리는 joinColumn이 아닌 Application join을 사용하게끔 하였습니다.
+
+**개선방안** :
+
+1. 유닛, 통합 테스트가 아직 레이어드 별로 구성되어있지 않으므로 적절한 단계의 test들이 적용되어야 할 것 입니다.
+
+### 2. 동시성제어
+
+**접근** :
+
