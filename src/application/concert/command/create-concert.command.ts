@@ -1,5 +1,6 @@
 import type { ICommand } from 'src/application/common/command.interface'
 import type { CreateConcertUseCase } from 'src/application/concert/usecase/create-concert.usecase'
+import { ApplicationCreateConcertRequestDto } from '../dtos/application-create-concert.request.dto'
 
 export class CreateConcertCommand implements ICommand {
     constructor(
@@ -8,6 +9,8 @@ export class CreateConcertCommand implements ICommand {
     ) {}
 
     execute() {
-        return this.createConcertUseCase.excute(this.singerName)
+        const requestDto = new ApplicationCreateConcertRequestDto(this.singerName)
+
+        return this.createConcertUseCase.excute(requestDto)
     }
 }

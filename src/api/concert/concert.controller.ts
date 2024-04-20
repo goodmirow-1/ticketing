@@ -67,8 +67,8 @@ export class ConcertController {
         summary: '생성',
     })
     @ApiBody({ schema: { type: 'object', properties: { singerName: { type: 'string', example: '아이유' } } } })
-    async createConcert(@Body() createConcertDto: CreateConcertDto): Promise<IConcert> {
-        const command: ICommand<IConcert> = new CreateConcertCommand(this.createConcertUseCase, createConcertDto.singerName)
+    async createConcert(@Body() createConcertDto: CreateConcertDto) {
+        const command: ICommand<any> = new CreateConcertCommand(this.createConcertUseCase, createConcertDto.singerName)
         return command.execute()
     }
 
