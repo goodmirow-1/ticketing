@@ -32,7 +32,7 @@ jobs:
             password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
         - name: Build and Push Docker images
           run: |
-            docker build -t goodmirow/ticketing:latest ./src
+            docker build -t goodmirow/ticketing:latest .
             docker push goodmirow/ticketing:latest
 
   deploy:
