@@ -23,6 +23,7 @@ function setupSwagger(app: INestApplication): void {
 
     const document = SwaggerModule.createDocument(app, options)
     SwaggerModule.setup('api-docs', app, document)
+    
 }
 
 async function bootstrap() {
