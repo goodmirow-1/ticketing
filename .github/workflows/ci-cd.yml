@@ -21,19 +21,21 @@ jobs:
       run: npm test
 
   build-and-push:
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Log in to Docker Hub
-      uses: docker/login-action@v1
-      with:
-        username: ${{ secrets.DOCKER_HUB_USERNAME }}
-        password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-    - name: Build and Push Docker images
-      run: |
-        docker-compose build
-        docker-compose push
+        needs: test
+        runs-on: ubuntu-latest
+        steps:
+        - uses: actions/checkout@v2
+        - name: Log in to Docker Hub
+          uses: docker/login-action@v1
+          with:
+            username: ${{ secrets.DOCKER_HUB_USERNAME }}
+            password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+        - name: Build and Push Docker images
+          run: |
+            docker build -t goodmirow/user-service:latest ./user-service
+            #docker build -t order-service:latest ./order-service
+            docker push goodmirow/user-service:latest
+            #docker push goodmirow/order-service:latest
 
   deploy:
     needs: build-and-push
