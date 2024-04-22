@@ -19,6 +19,17 @@ jobs:
       run: npm install
     - name: Run Tests
       run: npm test
+  
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - shell: bash
+        env:
+          DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
+          DOCKER_HUB_ACCESS_TOKEN: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+        run: |
+          example-command "$DOCKER_HUB_USERNAME"
+          example-command "$DOCKER_HUB_ACCESS_TOKEN"
 
   build-and-push:
         needs: test
