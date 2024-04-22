@@ -32,10 +32,8 @@ jobs:
             password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
         - name: Build and Push Docker images
           run: |
-            docker build -t goodmirow/user-service:latest ./user-service
-            #docker build -t order-service:latest ./order-service
-            docker push goodmirow/user-service:latest
-            #docker push goodmirow/order-service:latest
+            docker build -t goodmirow/ticketing:latest ./src
+            docker push goodmirow/ticketing:latest
 
   deploy:
     needs: build-and-push
