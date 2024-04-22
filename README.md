@@ -1,13 +1,17 @@
 # 14조 김국현 - 티케팅
 
 ## 브랜치 전략
-dev, test, prod의 단계에서의 각기 다른 Action들에 대한 연구와 경험을 위해 Git-flow 전략을 선택했습니다.
+각 phase(dev, cbt, prod)에 맞는 github actions workflow 에 대한 연구와 경험을 위해 Git-flow 전략을 선택했습니다.
 Git-flow에는 5가지 종류의 브랜치가 존재합니다. 항상 유지되는 메인 브랜치들(master, develop)과 일정 기간 동안만 유지되는 보조 브랜치들(feature, release, hotfix)이 있습니다.
 
 master : 제품으로 출시될 수 있는 브랜치
+
 develop : 개발 브랜치로 개발자들이 이 브랜치를 기준으로 각자 작업한 기능들을 Merge
+
 feature : 단위 기능을 개발하는 브랜치로 기능 개발이 완료되면 develop 브랜치에 Merge
+
 release : 배포를 위해 master 브랜치로 보내기 전에 먼저 QA(품질검사)를 하기위한 브랜치
+
 hotfix : master 브랜치로 배포를 했는데 버그가 생겼을 떄 긴급 수정하는 브랜치
 
 
