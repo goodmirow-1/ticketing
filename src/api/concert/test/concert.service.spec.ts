@@ -13,6 +13,7 @@ import { NotAvailableSeatError } from '../../../domain/concert/exceptions/not-av
 import { NotFoundSeatError } from '../../../domain/concert/exceptions/not-found-seat.exception'
 import { FailedCreateReservationError } from '../../../domain/concert/exceptions/failed-create-reservation.exception'
 import { FailedUpdateSeatStatusError } from '../../../domain/concert/exceptions/failed-update-seat-status.exception'
+import { ApplicationCreateConcertRequestDto } from 'src/application/concert/dtos/application-create-concert.request.dto'
 
 describe('콘서트 서비스 유닛 테스트', () => {
     let mockReaderRepo: ReturnType<typeof initConcertReaderMockRepo>
@@ -39,12 +40,14 @@ describe('콘서트 서비스 유닛 테스트', () => {
     describe('콘서트 생성 API', () => {
         it('Concert create is success', async () => {
             const concertId = uuidv4()
+            const singerName = 'test'
 
-            mockWriterRepo.createConcert.mockResolvedValue({ id: concertId, singerName: 'test', concertDates: [] })
+            mockWriterRepo.createConcert.mockResolvedValue({ id: concertId, singerName: singerName, concertDates: [] })
 
-            const result = await createConcertUseCase.excute('test')
+            const requestDto = new ApplicationCreateConcertRequestDto(singerName)
+            const result = await createConcertUseCase.excute(requestDto)
 
-            expect(result.singerName).toBe('test')
+            expect(result.data.singerName).toBe('test')
         })
     })
 
