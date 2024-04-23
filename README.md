@@ -1,5 +1,6 @@
 # 14조 김국현 - 티케팅
 
+
 ## 브랜치 전략
 각 phase(dev, cbt, prod)에 맞는 github actions workflow 에 대한 연구와 경험을 위해 Git-flow 전략을 선택했습니다.
 Git-flow에는 5가지 종류의 브랜치가 존재합니다. 항상 유지되는 메인 브랜치들(master, develop)과 일정 기간 동안만 유지되는 보조 브랜치들(feature, release, hotfix)이 있습니다.
