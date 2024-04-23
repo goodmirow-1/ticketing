@@ -47,16 +47,16 @@ jobs:
               
             - name: Create prod environments
               run: |
-                echo "DB_TYPE=${{ env.DB_TYPE }}" >> .env
-                echo "DB_HOST=${{ env.DB_HOST }}" >> .env
-                echo "DB_PORT=${{ env.DB_PORT }}" >> .env
-                echo "DB_USER_NAME=${{ env.DB_USER_NAME }}" >> .env
-                echo "DB_PASSWORD=${{ env.DB_PASSWORD }}" >> .env
-                echo "DATABASE=${{ env.DATABASE }}" >> .env
-                echo "MAX_SEATS=${{ env.MAX_SEATS }}" >> .env
-                echo "VALID_TOKEN_EXPIRATION_TIME=${{ env.VALID_TOKEN_EXPIRATION_TIME }}" >> .env
-                echo "SEAT_HOLD_EXPIRATION_TIME=${{ env.SEAT_HOLD_EXPIRATION_TIME }}" >> .env
-                echo "JWT_SECRET_KEY=${{ env.JWT_SECRET_KEY }}" >> .env
+                echo "DB_TYPE=${{ secrets.DB_TYPE }}" >> .env
+                echo "DB_HOST=${{ secrets.DB_HOST }}" >> .env
+                echo "DB_PORT=${{ secrets.DB_PORT }}" >> .env
+                echo "DB_USER_NAME=${{ secrets.DB_USER_NAME }}" >> .env
+                echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
+                echo "DATABASE=${{ secrets.DATABASE }}" >> .env
+                echo "MAX_SEATS=${{ secrets.MAX_SEATS }}" >> .env
+                echo "VALID_TOKEN_EXPIRATION_TIME=${{ secrets.VALID_TOKEN_EXPIRATION_TIME }}" >> .env
+                echo "SEAT_HOLD_EXPIRATION_TIME=${{ secrets.SEAT_HOLD_EXPIRATION_TIME }}" >> .env
+                echo "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}" >> .env
             
             - name: Configure AWS credentials
               uses: aws-actions/configure-aws-credentials@v1
