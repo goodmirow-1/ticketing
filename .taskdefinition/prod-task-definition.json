@@ -1,9 +1,9 @@
 {
-    "taskDefinitionArn": "arn:aws:ecs:ap-northeast-2:533267347071:task-definition/task-definition-ticketing-nets-prod:1",
+    "taskDefinitionArn": "arn:aws:ecs:ap-northeast-2:533267347071:task-definition/task-definition-ticketing-nets-prod:8",
     "containerDefinitions": [
         {
             "name": "service-prod",
-            "image": "533267347071.dkr.ecr.ap-northeast-2.amazonaws.com/ticketing-dev",
+            "image": "533267347071.dkr.ecr.ap-northeast-2.amazonaws.com/ticketing-prod:prod-420e1b3594ad34712db5834c2432bdde7da99a9e",
             "cpu": 0,
             "portMappings": [
                 {
@@ -24,7 +24,6 @@
             ],
             "mountPoints": [],
             "volumesFrom": [],
-            "ulimits": [],
             "logConfiguration": {
                 "logDriver": "awslogs",
                 "options": {
@@ -32,8 +31,7 @@
                     "awslogs-group": "/ecs/task-definition-ticketing-nets-prod",
                     "awslogs-region": "ap-northeast-2",
                     "awslogs-stream-prefix": "ecs"
-                },
-                "secretOptions": []
+                }
             },
             "systemControls": []
         }
@@ -42,7 +40,7 @@
     "taskRoleArn": "arn:aws:iam::533267347071:role/role-ecs-tasks",
     "executionRoleArn": "arn:aws:iam::533267347071:role/role-ecs-tasks",
     "networkMode": "awsvpc",
-    "revision": 1,
+    "revision": 8,
     "volumes": [],
     "status": "ACTIVE",
     "requiresAttributes": [
@@ -57,6 +55,9 @@
         },
         {
             "name": "com.amazonaws.ecs.capability.docker-remote-api.1.19"
+        },
+        {
+            "name": "ecs.capability.env-files.s3"
         },
         {
             "name": "com.amazonaws.ecs.capability.task-iam-role"
@@ -88,7 +89,7 @@
         "cpuArchitecture": "X86_64",
         "operatingSystemFamily": "LINUX"
     },
-    "registeredAt": "2024-04-23T05:59:17.651Z",
+    "registeredAt": "2024-04-23T15:11:36.498Z",
     "registeredBy": "arn:aws:iam::533267347071:root",
     "tags": []
 }
