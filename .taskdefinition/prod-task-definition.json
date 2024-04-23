@@ -16,7 +16,12 @@
             ],
             "essential": true,
             "environment": [],
-            "environmentFiles": [],
+            "environmentFiles": [
+                {
+                    "value": "arn:aws:s3:::concert-ticketing/.env",
+                    "type": "s3"
+                }
+            ],
             "mountPoints": [],
             "volumesFrom": [],
             "ulimits": [],
