@@ -1,37 +1,42 @@
 version: '3.8'
 services:
-  nest:
+  api:
+    container_name: nestjs
+    image: nestjs-dev
+    restart: unless-stopped
     build:
       context: .
       dockerfile: Dockerfile
-    environment:
-      DB_TYPE: mariadb
-      DB_HOST: db
-      DB_PORT: 3306
-      DB_USER_NAME: root
-      DB_PASSWORD: 1krnrgus
-      DATABASE: ticketing
-      MAX_CONNECTIONS: 100
-      MAX_SEATS: 50
-      VALID_TOKEN_EXPIRATION_TIME: 300
-      SEAT_HOLD_EXPIRATION_TIME: 300
-      JWT_SECRET_KEY: TICKETINGTICKETING
-      NODE_ENV: development
-    depends_on:
-      - db
+      target: dev
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+      - /app/node_modules
     ports:
       - "3000:3000"
+    networks:
+      - ticketing-net
+    command: pnpm run start
 
   db:
-    image: mariadb
-    restart: always
+    container_name: mariadb
+    image: mariadb:10.6
+    restart: unless-stopped
+    volumes:
+      - mariadb-data:/var/lib/mysql
     environment:
-      MYSQL_ROOT_PASSWORD: 1krnrgus
-      MYSQL_DATABASE: ticketing
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DATABASE}
+    networks:
+      - ticketing-net
     ports:
       - "3306:3306"
-    volumes:
-      - dbdata:/var/lib/mysql
+
+networks:
+  ticketing-net:
+    driver: bridge
 
 volumes:
-  dbdata:
+  mariadb-data:
+    driver: local
