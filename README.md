@@ -48,7 +48,6 @@ hotfix : master 브랜치로 배포를 했는데 버그가 생겼을 떄 긴급 
 | 잔액 조회 | Get |/user/:userId/point |  | 0 |
 | 결제 | Post |/user-concert/payment/:userId/:reservationId |  | {id,amount,reason,user,reservation,paymentDate} |
 
-
 ## 시퀀스 다이어그램
 ### 유저 토큰 발급
    
