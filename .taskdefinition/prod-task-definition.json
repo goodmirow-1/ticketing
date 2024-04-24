@@ -11,6 +11,13 @@
                     "hostPort": 3000,
                     "protocol": "tcp",
                     "appProtocol": "http"
+                },
+                {
+                    "name": "mariadb-port-protocol",
+                    "containerPort": 3306,
+                    "hostPort": 3306,
+                    "protocol": "tcp",
+                    "appProtocol": "http"
                 }
             ],
             "essential": true,
