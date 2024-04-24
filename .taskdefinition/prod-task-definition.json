@@ -21,7 +21,7 @@
                 },
                 {
                     "name" : "DB_HOST",
-                    "value" : "db"
+                    "value" : "database"
                 },
                 {
                     "name" : "DB_PORT",
