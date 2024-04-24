@@ -8,8 +8,20 @@ services:
       context: .
       dockerfile: Dockerfile
       target: dev
-    env_file:
-      - .env
+    environment:
+      DB_TYPE: ${DB_TYPE}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_USER_NAME: ${DB_USER_NAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DATABASE: ${DATABASE}
+      MAX_CONNECTIONS: ${MAX_CONNECTIONS}
+      MAX_SEATS: ${MAX_SEATS}
+      VALID_TOKEN_EXPIRATION_TIME=: ${VALID_TOKEN_EXPIRATION_TIME}
+      SEAT_HOLD_EXPIRATION_TIME: ${SEAT_HOLD_EXPIRATION_TIME}
+      JWT_SECRET_KEY: TICKETINGTICKETING
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DATABASE}
     volumes:
       - .:/app
       - /app/node_modules

@@ -4,7 +4,6 @@
         {
             "name": "service-prod",
             "image": "533267347071.dkr.ecr.ap-northeast-2.amazonaws.com/ticketing-prod:prod-420e1b3594ad34712db5834c2432bdde7da99a9e",
-            "cpu": 0,
             "portMappings": [
                 {
                     "name": "container-port-protocol",
