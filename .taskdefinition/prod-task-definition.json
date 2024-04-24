@@ -28,7 +28,7 @@
                 },
                 {
                     "name" : "DB_HOST",
-                    "value" : "database"
+                    "value" : "ticketing.c72y2e8oapsn.ap-northeast-2.rds.amazonaws.com"
                 },
                 {
                     "name" : "DB_PORT",
