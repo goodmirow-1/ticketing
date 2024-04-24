@@ -35,14 +35,6 @@
                     "value" : "3306"
                 },
                 {
-                    "name" : "DB_USER_NAME",
-                    "value" : "arn:aws:secretsmanager:ap-northeast-2:533267347071:secret:DB_USER_NAME-yIMMFS"
-                },
-                {
-                    "name" : "DB_PASSWORD",
-                    "value" : "arn:aws:secretsmanager:ap-northeast-2:533267347071:secret:DB_PASSWORD-EHYl4E"
-                },
-                {
                     "name" : "DATABASE",
                     "value" : "ticketing"
                 },
@@ -79,7 +71,17 @@
                     "awslogs-stream-prefix": "ecs"
                 }
             },
-            "systemControls": []
+            "systemControls": [],
+            "secrets": [
+                {
+                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-2:533267347071:secret:DB_USER_NAME-yIMMFS",
+                    "name": "DB_USER_NAME"
+                },
+                {
+                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-2:533267347071:secret:DB_PASSWORD-EHYl4E",
+                    "name": "DB_PASSWORD"
+                }
+            ]
         }
     ],
     "family": "task-definition-ticketing-nets-prod",
