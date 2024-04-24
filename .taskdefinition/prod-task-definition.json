@@ -36,11 +36,11 @@
                 },
                 {
                     "name" : "DB_USER_NAME",
-                    "value" : "arn:aws:secretsmanager:ap-northeast-2:533267347071:secret:ticketing/prod-fkgVS7"
+                    "value" : "arn:aws:secretsmanager:ap-northeast-2:533267347071:secret:DB_USER_NAME-yIMMFS"
                 },
                 {
                     "name" : "DB_PASSWORD",
-                    "value" : "arn:aws:secretsmanager:ap-northeast-2:533267347071:secret:ticketing/prod-fkgVS7"
+                    "value" : "arn:aws:secretsmanager:ap-northeast-2:533267347071:secret:DB_PASSWORD-EHYl4E"
                 },
                 {
                     "name" : "DATABASE",
