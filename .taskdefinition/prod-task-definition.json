@@ -1,9 +1,10 @@
 {
-    "taskDefinitionArn": "arn:aws:ecs:ap-northeast-2:533267347071:task-definition/task-definition-ticketing-nets-prod:8",
+    "taskDefinitionArn": "arn:aws:ecs:ap-northeast-2:533267347071:task-definition/task-definition-ticketing-nets-prod:29",
     "containerDefinitions": [
         {
             "name": "service-prod",
-            "image": "533267347071.dkr.ecr.ap-northeast-2.amazonaws.com/ticketing-prod:prod-420e1b3594ad34712db5834c2432bdde7da99a9e",
+            "image": "533267347071.dkr.ecr.ap-northeast-2.amazonaws.com/ticketing-prod:prod-e38c2dc00a2df0610fb30e39c3e98a380016b958",
+            "cpu": 0,
             "portMappings": [
                 {
                     "name": "container-port-protocol",
@@ -23,45 +24,54 @@
             "essential": true,
             "environment": [
                 {
-                    "name" : "DB_TYPE",
-                    "value" : "mariadb"
+                    "name": "VALID_TOKEN_EXPIRATION_TIME",
+                    "value": "300"
                 },
                 {
-                    "name" : "DB_HOST",
-                    "value" : "ticketing.c72y2e8oapsn.ap-northeast-2.rds.amazonaws.com"
+                    "name": "DB_TYPE",
+                    "value": "mariadb"
                 },
                 {
-                    "name" : "DB_PORT",
-                    "value" : "3306"
+                    "name": "DATABASE",
+                    "value": "ticketing"
                 },
                 {
-                    "name" : "DATABASE",
-                    "value" : "ticketing"
+                    "name": "DB_PORT",
+                    "value": "3306"
                 },
                 {
-                    "name" : "MAX_CONNECTIONS",
-                    "value" : "100"
+                    "name": "MAX_SEATS",
+                    "value": "50"
                 },
                 {
-                    "name" : "MAX_SEATS",
-                    "value" : "50"
+                    "name": "SEAT_HOLD_EXPIRATION_TIME",
+                    "value": "300"
                 },
                 {
-                    "name" : "VALID_TOKEN_EXPIRATION_TIME",
-                    "value" : "300"
+                    "name": "DB_HOST",
+                    "value": "ticketing.c72y2e8oapsn.ap-northeast-2.rds.amazonaws.com"
                 },
                 {
-                    "name" : "SEAT_HOLD_EXPIRATION_TIME",
-                    "value" : "300"
+                    "name": "JWT_SECRET_KEY",
+                    "value": "TICKETINGTICKETING"
                 },
                 {
-                    "name" : "JWT_SECRET_KEY",
-                    "value" : "TICKETINGTICKETING"
+                    "name": "MAX_CONNECTIONS",
+                    "value": "100"
                 }
             ],
-            "environmentFiles": [],
             "mountPoints": [],
             "volumesFrom": [],
+            "secrets": [
+                {
+                    "name": "DB_USER_NAME",
+                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-2:533267347071:secret:DB_USER_NAME-yIMMFS"
+                },
+                {
+                    "name": "DB_PASSWORD",
+                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-2:533267347071:secret:DB_PASSWORD-EHYl4E"
+                }
+            ],
             "logConfiguration": {
                 "logDriver": "awslogs",
                 "options": {
@@ -71,24 +81,14 @@
                     "awslogs-stream-prefix": "ecs"
                 }
             },
-            "systemControls": [],
-            "secrets": [
-                {
-                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-2:533267347071:secret:DB_USER_NAME-yIMMFS",
-                    "name": "DB_USER_NAME"
-                },
-                {
-                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-2:533267347071:secret:DB_PASSWORD-EHYl4E",
-                    "name": "DB_PASSWORD"
-                }
-            ]
+            "systemControls": []
         }
     ],
     "family": "task-definition-ticketing-nets-prod",
     "taskRoleArn": "arn:aws:iam::533267347071:role/role-ecs-tasks",
     "executionRoleArn": "arn:aws:iam::533267347071:role/role-ecs-tasks",
     "networkMode": "awsvpc",
-    "revision": 8,
+    "revision": 29,
     "volumes": [],
     "status": "ACTIVE",
     "requiresAttributes": [
@@ -105,7 +105,7 @@
             "name": "com.amazonaws.ecs.capability.docker-remote-api.1.19"
         },
         {
-            "name": "ecs.capability.env-files.s3"
+            "name": "ecs.capability.secrets.asm.environment-variables"
         },
         {
             "name": "com.amazonaws.ecs.capability.task-iam-role"
@@ -137,7 +137,7 @@
         "cpuArchitecture": "X86_64",
         "operatingSystemFamily": "LINUX"
     },
-    "registeredAt": "2024-04-23T15:11:36.498Z",
+    "registeredAt": "2024-04-24T15:48:39.402Z",
     "registeredBy": "arn:aws:iam::533267347071:root",
     "tags": []
 }
