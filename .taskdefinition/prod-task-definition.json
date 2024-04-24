@@ -1,10 +1,9 @@
 {
-    "taskDefinitionArn": "arn:aws:ecs:ap-northeast-2:533267347071:task-definition/task-definition-ticketing-nets-prod:1",
+    "taskDefinitionArn": "arn:aws:ecs:ap-northeast-2:533267347071:task-definition/task-definition-ticketing-nets-prod:8",
     "containerDefinitions": [
         {
             "name": "service-prod",
-            "image": "533267347071.dkr.ecr.ap-northeast-2.amazonaws.com/ticketing-dev",
-            "cpu": 0,
+            "image": "533267347071.dkr.ecr.ap-northeast-2.amazonaws.com/ticketing-prod:prod-420e1b3594ad34712db5834c2432bdde7da99a9e",
             "portMappings": [
                 {
                     "name": "container-port-protocol",
@@ -12,14 +11,66 @@
                     "hostPort": 3000,
                     "protocol": "tcp",
                     "appProtocol": "http"
+                },
+                {
+                    "name": "mariadb-port-protocol",
+                    "containerPort": 3306,
+                    "hostPort": 3306,
+                    "protocol": "tcp",
+                    "appProtocol": "http"
                 }
             ],
             "essential": true,
-            "environment": [],
-            "environmentFiles": [],
+            "environment": [
+                {
+                    "name" : "DB_TYPE",
+                    "value" : "mariadb"
+                },
+                {
+                    "name" : "DB_HOST",
+                    "value" : "ticketing.c72y2e8oapsn.ap-northeast-2.rds.amazonaws.com"
+                },
+                {
+                    "name" : "DB_PORT",
+                    "value" : "3306"
+                },
+                {
+                    "name" : "DB_USER_NAME",
+                    "value" : "admin"
+                },
+                {
+                    "name" : "DB_PASSWORD",
+                    "value" : "1krnrgus"
+                },
+                {
+                    "name" : "DATABASE",
+                    "value" : "ticketing"
+                },
+                {
+                    "name" : "MAX_CONNECTIONS",
+                    "value" : "100"
+                },
+                {
+                    "name" : "MAX_SEATS",
+                    "value" : "50"
+                },
+                {
+                    "name" : "VALID_TOKEN_EXPIRATION_TIME",
+                    "value" : "300"
+                },
+                {
+                    "name" : "SEAT_HOLD_EXPIRATION_TIME",
+                    "value" : "300"
+                },
+                {
+                    "name" : "JWT_SECRET_KEY",
+                    "value" : "TICKETINGTICKETING"
+                }
+            ],
+            "environmentFiles": [
+            ],
             "mountPoints": [],
             "volumesFrom": [],
-            "ulimits": [],
             "logConfiguration": {
                 "logDriver": "awslogs",
                 "options": {
@@ -27,8 +78,7 @@
                     "awslogs-group": "/ecs/task-definition-ticketing-nets-prod",
                     "awslogs-region": "ap-northeast-2",
                     "awslogs-stream-prefix": "ecs"
-                },
-                "secretOptions": []
+                }
             },
             "systemControls": []
         }
@@ -37,7 +87,7 @@
     "taskRoleArn": "arn:aws:iam::533267347071:role/role-ecs-tasks",
     "executionRoleArn": "arn:aws:iam::533267347071:role/role-ecs-tasks",
     "networkMode": "awsvpc",
-    "revision": 1,
+    "revision": 8,
     "volumes": [],
     "status": "ACTIVE",
     "requiresAttributes": [
@@ -52,6 +102,9 @@
         },
         {
             "name": "com.amazonaws.ecs.capability.docker-remote-api.1.19"
+        },
+        {
+            "name": "ecs.capability.env-files.s3"
         },
         {
             "name": "com.amazonaws.ecs.capability.task-iam-role"
@@ -83,7 +136,7 @@
         "cpuArchitecture": "X86_64",
         "operatingSystemFamily": "LINUX"
     },
-    "registeredAt": "2024-04-23T05:59:17.651Z",
+    "registeredAt": "2024-04-23T15:11:36.498Z",
     "registeredBy": "arn:aws:iam::533267347071:root",
     "tags": []
 }

@@ -10,6 +10,8 @@ import { UserWaitingModule } from './api/user-waiting/user-waiting.module'
 import { WaitingModule } from './api/waiting/waiting.module'
 import { APP_FILTER } from '@nestjs/core'
 import { GlobalExceptionFilter } from './custom-exception'
+import { AppController } from './app.controller'
+import { AppService } from './app.service'
 @Module({
     imports: [
         ScheduleModule.forRoot(),
@@ -39,8 +41,9 @@ import { GlobalExceptionFilter } from './custom-exception'
         UserConcertWaitingModule,
         UserWaitingModule,
     ],
-    controllers: [],
+    controllers: [AppController],
     providers: [
+        AppService,
         {
             provide: APP_FILTER,
             useClass: GlobalExceptionFilter,
