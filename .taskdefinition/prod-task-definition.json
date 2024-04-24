@@ -67,8 +67,7 @@
                     "value" : "TICKETINGTICKETING"
                 }
             ],
-            "environmentFiles": [
-            ],
+            "environmentFiles": [],
             "mountPoints": [],
             "volumesFrom": [],
             "logConfiguration": {
