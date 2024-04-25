@@ -1,8 +1,9 @@
 import type { ICommand } from 'src/application/common/command.interface'
 import type { CreateSeatUseCase } from 'src/application/concert/usecase/create-seat.usecase'
-import type { ISeat } from 'src/domain/concert/models/seat.entity.interface'
+import type { CreateSeatResponseDto } from '../dtos/create-seat.dto'
+import { CreateSeatRequestDto } from '../dtos/create-seat.dto'
 
-export class CreateSeatCommand implements ICommand<ISeat> {
+export class CreateSeatCommand implements ICommand<CreateSeatResponseDto> {
     constructor(
         private readonly createSeatUseCase: CreateSeatUseCase,
         private readonly concertDateId: string,
@@ -10,7 +11,9 @@ export class CreateSeatCommand implements ICommand<ISeat> {
         private readonly price: number,
     ) {}
 
-    execute(): Promise<ISeat> {
-        return this.createSeatUseCase.excute(this.concertDateId, this.seatNumber, this.price)
+    execute(): Promise<CreateSeatResponseDto> {
+        const requestDto = new CreateSeatRequestDto(this.concertDateId, this.seatNumber, this.price)
+
+        return this.createSeatUseCase.execute(requestDto)
     }
 }

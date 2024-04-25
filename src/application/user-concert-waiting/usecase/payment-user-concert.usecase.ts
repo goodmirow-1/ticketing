@@ -1,10 +1,12 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { IConcertReaderRepository, IConcertReaderRepositoryToken } from '../../../domain/concert/repositories/concert-reader.repository.interface'
 import { IConcertWriterRepository, IConcertWriterRepositoryToken } from '../../../domain/concert/repositories/concert-writer.repository.interface'
-import type { IPointHistory } from '../../../domain/user/models/point-history.entity.interface'
 import { IUserWriterRepository, IUserWriterRepositoryToken } from '../../../domain/user/repositories/user-writer.repository.interface'
 import { IWaitingWriterRepository, IWaitingWriterRepositoryToken } from '../../../domain/waiting/repositories/waiting-writer.repository.interface'
 import { IUserReaderRepository, IUserReaderRepositoryToken } from 'src/domain/user/repositories/user-reader.repository.interface'
+import type { IRequestDTO } from 'src/application/common/request.interface'
+import type { PaymentUserConcertRequestType } from '../dtos/payment-user-concert.dto'
+import { PaymentUserConcertResponseDto } from '../dtos/payment-user-concert.dto'
 
 @Injectable()
 export class PaymentUserConcertUseCase {
@@ -21,7 +23,11 @@ export class PaymentUserConcertUseCase {
         private readonly waitingWriterRepository: IWaitingWriterRepository,
     ) {}
 
-    async excute(userId: string, reservationId: string, token?: string): Promise<IPointHistory> {
+    async execute(requestDto: IRequestDTO<PaymentUserConcertRequestType>): Promise<PaymentUserConcertResponseDto> {
+        requestDto.validate()
+
+        const { userId, reservationId, token } = requestDto.toUseCaseInput()
+
         //예약 정보 조회
         const reservation = await this.concertReaderRepository.findReservationById(reservationId)
         //사용자 조회
@@ -35,6 +41,6 @@ export class PaymentUserConcertUseCase {
         //유효토큰 만료로 변경 수정
         await this.waitingWriterRepository.expiredValidToken(token)
 
-        return pointHistory
+        return new PaymentUserConcertResponseDto(pointHistory.user.id, pointHistory.reservationId, pointHistory.amount, pointHistory.created_at)
     }
 }

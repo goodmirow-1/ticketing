@@ -13,7 +13,11 @@ import { NotAvailableSeatError } from '../../../domain/concert/exceptions/not-av
 import { NotFoundSeatError } from '../../../domain/concert/exceptions/not-found-seat.exception'
 import { FailedCreateReservationError } from '../../../domain/concert/exceptions/failed-create-reservation.exception'
 import { FailedUpdateSeatStatusError } from '../../../domain/concert/exceptions/failed-update-seat-status.exception'
-import { ApplicationCreateConcertRequestDto } from 'src/application/concert/dtos/application-create-concert.request.dto'
+import { CreateConcertRequestDto } from 'src/application/concert/dtos/create-concert.dto'
+import { CreateConcertDateRequestDto } from 'src/application/concert/dtos/create-concert-date.dto'
+import { CreateSeatRequestDto } from 'src/application/concert/dtos/create-seat.dto'
+import { ReadAllSeatsByConcertRequestDto } from 'src/application/concert/dtos/read-all-seats-by-concert-date.dto'
+import { CreateReservationRequestDto } from 'src/application/concert/dtos/create-reservation.dto'
 
 describe('콘서트 서비스 유닛 테스트', () => {
     let mockReaderRepo: ReturnType<typeof initConcertReaderMockRepo>
@@ -44,10 +48,10 @@ describe('콘서트 서비스 유닛 테스트', () => {
 
             mockWriterRepo.createConcert.mockResolvedValue({ id: concertId, singerName: singerName, concertDates: [] })
 
-            const requestDto = new ApplicationCreateConcertRequestDto(singerName)
-            const result = await createConcertUseCase.excute(requestDto)
+            const requestDto = new CreateConcertRequestDto(singerName)
+            const result = await createConcertUseCase.execute(requestDto)
 
-            expect(result.data.singerName).toBe('test')
+            expect(result.singerName).toBe('test')
         })
     })
 
@@ -55,7 +59,8 @@ describe('콘서트 서비스 유닛 테스트', () => {
         it('ConcertDate create is failed cause concertId is NotFound', async () => {
             mockReaderRepo.findConcertById.mockRejectedValue(new NotFoundConcertError())
 
-            await expect(createConcertDateUseCase.excute('1', new Date())).rejects.toThrow(NotFoundConcertError)
+            const reqeustDto = new CreateConcertDateRequestDto('1', new Date())
+            await expect(createConcertDateUseCase.execute(reqeustDto)).rejects.toThrow(NotFoundConcertError)
         })
 
         it('ConcertDate create is failed cause date is duplicate', async () => {
@@ -63,9 +68,8 @@ describe('콘서트 서비스 유닛 테스트', () => {
 
             mockReaderRepo.checkValidConcertDateByDate.mockRejectedValue(new CustomException(`Concert date is duplicate`, HttpStatus.CONFLICT))
 
-            await expect(createConcertDateUseCase.excute(concertId, new Date())).rejects.toThrow(
-                new CustomException('Concert date is duplicate', HttpStatus.CONFLICT),
-            )
+            const reqeustDto = new CreateConcertDateRequestDto(concertId, new Date())
+            await expect(createConcertDateUseCase.execute(reqeustDto)).rejects.toThrow(new CustomException('Concert date is duplicate', HttpStatus.CONFLICT))
         })
 
         it('ConcertDate create is success', async () => {
@@ -75,7 +79,8 @@ describe('콘서트 서비스 유닛 테스트', () => {
             mockReaderRepo.findConcertById.mockResolvedValue({ id: concertId, singerName: 'test', concertDates: [] })
             mockWriterRepo.createConcertDate.mockResolvedValue({ id: concertDateId, concert: { id: concertId }, date: new Date() })
 
-            const result = await createConcertDateUseCase.excute(concertId, new Date())
+            const reqeustDto = new CreateConcertDateRequestDto(concertId, new Date())
+            const result = await createConcertDateUseCase.execute(reqeustDto)
 
             expect(result.concert.id).toBe(concertId)
         })
@@ -85,7 +90,8 @@ describe('콘서트 서비스 유닛 테스트', () => {
         it('Seat create is failed cause concertDateId is NotFound', async () => {
             mockReaderRepo.findConcertDateById.mockRejectedValue(new NotFoundConcertError())
 
-            await expect(createSeatUseCase.excute('1', 1, 1000)).rejects.toThrow(NotFoundConcertError)
+            const reqeustDto = new CreateSeatRequestDto('1', 1, 1000)
+            await expect(createSeatUseCase.execute(reqeustDto)).rejects.toThrow(NotFoundConcertError)
         })
 
         it('Seat create is success', async () => {
@@ -95,7 +101,8 @@ describe('콘서트 서비스 유닛 테스트', () => {
             mockReaderRepo.findConcertDateById.mockResolvedValue({ id: concertDateId })
             mockWriterRepo.createSeat.mockResolvedValue({ id: seatId, concertDate: { id: concertDateId }, seatNumber: 1 })
 
-            const result = await createSeatUseCase.excute(concertDateId, 1, 1000)
+            const reqeustDto = new CreateSeatRequestDto('1', 1, 1000)
+            const result = await createSeatUseCase.execute(reqeustDto)
 
             expect(result.concertDate.id).toBe(concertDateId)
         })
@@ -107,21 +114,23 @@ describe('콘서트 서비스 유닛 테스트', () => {
 
             mockReaderRepo.findAllConcerts.mockResolvedValue([{ id: concertDateId, singerName: 'test', concertDates: [] }])
 
-            const result = await readAllConcertsUseCase.excute()
+            const result = await readAllConcertsUseCase.execute()
 
-            expect(result[0].singerName).toBe('test')
+            expect(result.concerts[0].singerName).toBe('test')
         })
 
         it('ConcertDate findSeatsByConcertDate is failed cause concertDateId is NotFound', async () => {
             mockReaderRepo.findSeatsByConcertDateId.mockRejectedValue(new NotFoundConcertError())
 
-            await expect(readAllSeatsByConcertDateIdUseCase.excute('1')).rejects.toThrow(NotFoundConcertError)
+            const reqeustDto = new ReadAllSeatsByConcertRequestDto('1')
+            await expect(readAllSeatsByConcertDateIdUseCase.execute(reqeustDto)).rejects.toThrow(NotFoundConcertError)
         })
 
         it('ConcertDate findSeatsByConcertDate is faile cause availableSeats is 0', async () => {
             mockReaderRepo.findSeatsByConcertDateId.mockRejectedValue(new NotAvailableSeatError())
 
-            await expect(readAllSeatsByConcertDateIdUseCase.excute('1')).rejects.toThrow(NotAvailableSeatError)
+            const reqeustDto = new ReadAllSeatsByConcertRequestDto('1')
+            await expect(readAllSeatsByConcertDateIdUseCase.execute(reqeustDto)).rejects.toThrow(NotAvailableSeatError)
         })
 
         it('ConcertDate findSeatsByConcertDate is success', async () => {
@@ -130,9 +139,10 @@ describe('콘서트 서비스 유닛 테스트', () => {
 
             mockReaderRepo.findSeatsByConcertDateId.mockResolvedValue([{ id: seatId, concertDate: { id: concertDateId }, seatNumber: 1 }])
 
-            const result = await readAllSeatsByConcertDateIdUseCase.excute(concertDateId)
+            const reqeustDto = new ReadAllSeatsByConcertRequestDto(concertDateId)
+            const result = await readAllSeatsByConcertDateIdUseCase.execute(reqeustDto)
 
-            expect(result[0].concertDate.id).toBe(concertDateId)
+            expect(result.seats[0].concertDate.id).toBe(concertDateId)
         })
     })
 
@@ -140,21 +150,24 @@ describe('콘서트 서비스 유닛 테스트', () => {
         it('Reservation create is failed cause concertDateId is NotFound', async () => {
             mockReaderRepo.findSeatById.mockRejectedValue(new NotFoundSeatError())
 
-            await expect(createReservationUseCase.excute('1', '1')).rejects.toThrow(NotFoundSeatError)
+            const reqeustDto = new CreateReservationRequestDto('1', '1')
+            await expect(createReservationUseCase.execute(reqeustDto)).rejects.toThrow(NotFoundSeatError)
         })
 
         it('Reservation create is failed cause createReservation is FailedCreateReservation', async () => {
             mockReaderRepo.findSeatById.mockResolvedValue({ id: '1', concertDate: { concert: { id: '1' } } })
             mockWriterRepo.createReservation.mockRejectedValue(new FailedCreateReservationError())
 
-            await expect(createReservationUseCase.excute('1', '1')).rejects.toThrow(FailedCreateReservationError)
+            const reqeustDto = new CreateReservationRequestDto('1', '1')
+            await expect(createReservationUseCase.execute(reqeustDto)).rejects.toThrow(FailedCreateReservationError)
         })
 
         it('Reservation create is failed cause createReservation is FailedUpdateSeatStatus', async () => {
             mockReaderRepo.findSeatById.mockResolvedValue({ id: '1', concertDate: { concert: { id: '1' } } })
             mockWriterRepo.createReservation.mockRejectedValue(new FailedUpdateSeatStatusError())
 
-            await expect(createReservationUseCase.excute('1', '1')).rejects.toThrow(FailedUpdateSeatStatusError)
+            const reqeustDto = new CreateReservationRequestDto('1', '1')
+            await expect(createReservationUseCase.execute(reqeustDto)).rejects.toThrow(FailedUpdateSeatStatusError)
         })
 
         it('Reservation create is success', async () => {
@@ -165,7 +178,8 @@ describe('콘서트 서비스 유닛 테스트', () => {
             mockReaderRepo.findSeatById.mockResolvedValue({ id: seatId, concertDate: { concert: { id: '1' } } })
             mockWriterRepo.createReservation.mockResolvedValue({ id: reservationId, seat: { id: seatId }, user: { id: userId } })
 
-            const result = await createReservationUseCase.excute(seatId, userId)
+            const reqeustDto = new CreateReservationRequestDto(seatId, userId)
+            const result = await createReservationUseCase.execute(reqeustDto)
 
             expect(result.seat.id).toBe(seatId)
         })

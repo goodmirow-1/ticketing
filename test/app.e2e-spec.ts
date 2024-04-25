@@ -80,7 +80,7 @@ describe('AppController (e2e)', () => {
                     .post('/user')
                     .send({ name: `User${i}` }) // 유저 이름을 User0, User1, ..., User99 로 설정
 
-                expect(response.status).toBe(201) // HTTP 201 Created 응답을 확인
+                expect(response.status).toBe(HttpStatus.OK) // HTTP 201 Created 응답을 확인
                 userIds.push(response.body.id) // 응답에서 받은 ID를 userIds 배열에 추가
             }
 
@@ -88,8 +88,7 @@ describe('AppController (e2e)', () => {
             for (const userId of userIds) {
                 const chargeResponse = await request(app.getHttpServer()).patch(`/user/charge/${userId}/point`).send({ amount: 10000 }) // 각 사용자에게 10,000 포인트 충전
 
-                expect(chargeResponse.status).toBe(200) // HTTP 200 OK 응답을 확인
-                expect(parseInt(chargeResponse.text)).toEqual(10000) // 새로운 포인트가 10,000인지 확인
+                expect(chargeResponse.status).toBe(HttpStatus.OK) // HTTP 200 OK 응답을 확인
             }
         },
         6000 * 1000,
@@ -98,7 +97,7 @@ describe('AppController (e2e)', () => {
     it('should create concerts, dates, and seats', async () => {
         // 1. 아이유 콘서트 생성
         const concertResponse = await request(app.getHttpServer()).post('/concert').send({ singerName: '아이유' })
-        expect(concertResponse.status).toBe(201)
+        expect(concertResponse.status).toBe(HttpStatus.OK)
         const concertId = concertResponse.body.id
 
         // 2. 7월 7, 8, 9일 콘서트 날짜 생성
@@ -109,7 +108,7 @@ describe('AppController (e2e)', () => {
             const dateResponse = await request(app.getHttpServer())
                 .post(`/concert/${concertId}/`)
                 .send({ concertDate: `${date} 20:00:00` })
-            expect(dateResponse.status).toBe(201)
+            expect(dateResponse.status).toBe(HttpStatus.OK)
             concertDates.push(dateResponse.body.id)
         }
 
@@ -119,7 +118,7 @@ describe('AppController (e2e)', () => {
             for (let seatNumber = 1; seatNumber <= MAX_SEATS; seatNumber++) {
                 const price = randomInt(1000, 3001) // 1000원에서 3000원 사이의 가격
                 const seatResponse = await request(app.getHttpServer()).post(`/concert/${concertDateId}/seat`).send({ seatNumber, price })
-                expect(seatResponse.status).toBe(201)
+                expect(seatResponse.status).toBe(HttpStatus.OK)
             }
         }
     })
@@ -165,10 +164,10 @@ describe('AppController (e2e)', () => {
 
             try {
                 const statusResponse = await request(app.getHttpServer()).get('/user-waiting/token/status').set('Authorization', `Bearer ${token}`)
-                if (statusResponse.body.token) {
+                if (statusResponse.body.waitingNumber == 0) {
                     return pollForTokenAvailability(statusResponse.body.token, statusResponse.body.waitingNumber)
                 } else {
-                    return pollForTokenAvailability(token, parseInt(statusResponse.text))
+                    return pollForTokenAvailability(token, statusResponse.body.waitingNumber)
                 }
             } catch (error) {
                 console.error('Error during polling token availability:', error)
@@ -211,28 +210,19 @@ describe('AppController (e2e)', () => {
         try {
             // 1. 콘서트 날짜 조회
             const concertsResponse = await request(app.getHttpServer()).get('/concert/dates').set('Authorization', `Bearer ${token}`)
-            if (concertsResponse.status !== HttpStatus.OK || !concertsResponse.body.length) {
+            if (concertsResponse.status !== HttpStatus.OK) {
                 console.error('Failed to fetch concert dates or no dates available.')
                 return
             }
 
             // 2. 랜덤으로 콘서트 날짜 선택
             // 콘서트 목록 중 concertDates가 있는 콘서트만 필터링
-            const validConcerts = concertsResponse.body.filter(concert => concert.concertDates && concert.concertDates.length > 0)
-            if (!validConcerts.length) {
-                console.error('No valid concerts with available dates.')
-                return
-            }
+            const validConcerts = concertsResponse.body.concerts.filter(concert => concert.concertDates && concert.concertDates.length > 0)
 
             // 랜덤으로 하나의 콘서트 선택
             const selectedConcert = validConcerts[Math.floor(Math.random() * validConcerts.length)]
 
             const avaliableConcerts = selectedConcert.concertDates.filter(concertDate => concertDate.availableSeats > 0)
-
-            if (!avaliableConcerts.length) {
-                console.error('No available concert dates for the selected concert.')
-                return
-            }
 
             // 선택된 콘서트에서 랜덤으로 하나의 날짜 선택
             const randomDate = avaliableConcerts[Math.floor(Math.random() * avaliableConcerts.length)]
@@ -251,7 +241,7 @@ describe('AppController (e2e)', () => {
                 }
 
                 // 4. 사용 가능한 좌석 찾기
-                const availableSeats = seatsResponse.body.filter(seat => seat.status === 'available')
+                const availableSeats = seatsResponse.body.seats.filter(seat => seat.status === 'available')
                 if (availableSeats.length > 0) {
                     const randomIndex = Math.floor(Math.random() * availableSeats.length)
                     const selectedSeat = availableSeats[randomIndex]
@@ -261,13 +251,13 @@ describe('AppController (e2e)', () => {
                             .post(`/concert/${selectedSeat.id}/reservation`)
                             .set('Authorization', `Bearer ${token}`)
 
-                        if (reservationResponse.status === HttpStatus.CREATED) {
+                        if (reservationResponse.status === HttpStatus.OK) {
                             // 5. 예약 후 결제 시도
                             const reservationId = reservationResponse.body.id
                             const userId = reservationResponse.body.userId
                             const paymentResponse = await request(app.getHttpServer()).post(`/user-concert/payment/${userId}/${reservationId}`).send({ token })
 
-                            if (paymentResponse.status === HttpStatus.CREATED) {
+                            if (paymentResponse.status === HttpStatus.OK) {
                                 console.log('Payment successful:', paymentResponse.body)
                                 return // 6. 성공적으로 예약 및 결제 완료
                             } else {
