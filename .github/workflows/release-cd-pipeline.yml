@@ -3,12 +3,12 @@ name: Development CD Pipeline
 on:
     push:
       branches:
-        - develop
+        - 'release-*'
 
 env:
     AWS_REGION: ap-northeast-2
-    ECR_REGISTRY: 533267347071.dkr.ecr.ap-northeast-2.amazonaws.com/ticketing-dev
-    ECR_REPOSITORY: ticketing-dev
+    ECR_REGISTRY: 533267347071.dkr.ecr.ap-northeast-2.amazonaws.com/ticketing-test
+    ECR_REPOSITORY: ticketing-test
 
 jobs:
   test: 
