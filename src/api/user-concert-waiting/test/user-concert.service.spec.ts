@@ -5,6 +5,7 @@ import { InValidPointError } from '../../../domain/user/exceptions/invalid-point
 import { PaymentUserConcertUseCase } from '../../../application/user-concert-waiting/usecase/payment-user-concert.usecase'
 import { initWaitingWriterMockRepo } from '../../../api/waiting/test/waiting.service.mock'
 import { v4 as uuidv4 } from 'uuid'
+import { PaymentUserConcertRequestDto } from 'src/application/user-concert-waiting/dtos/payment-user-concert.dto'
 
 describe('유닛 콘서트 서비스 유닛 테스트', () => {
     let mockConcertReaderRepo: ReturnType<typeof initConcertReaderMockRepo>
@@ -37,7 +38,8 @@ describe('유닛 콘서트 서비스 유닛 테스트', () => {
 
             mockConcertReaderRepo.findReservationById.mockRejectedValue(new NotFoundReservationError())
 
-            await expect(paymentUserConcertUseCase.excute(userId, reservationId)).rejects.toThrow(NotFoundReservationError)
+            const requestDto = new PaymentUserConcertRequestDto(userId, reservationId)
+            await expect(paymentUserConcertUseCase.execute(requestDto)).rejects.toThrow(NotFoundReservationError)
         })
 
         it('payment is faild cause user point is not enough', async () => {
@@ -48,7 +50,8 @@ describe('유닛 콘서트 서비스 유닛 테스트', () => {
             mockUserReaderRepo.findUserById.mockResolvedValue({ id: '1', name: 'test', point: 0, reservations: [] })
             mockUserWriterRepo.calculatePoint.mockRejectedValue(new InValidPointError())
 
-            await expect(paymentUserConcertUseCase.excute(userId, reservationId)).rejects.toThrow(InValidPointError)
+            const requestDto = new PaymentUserConcertRequestDto(userId, reservationId)
+            await expect(paymentUserConcertUseCase.execute(requestDto)).rejects.toThrow(InValidPointError)
         })
 
         it('Payment is success', async () => {
@@ -59,7 +62,8 @@ describe('유닛 콘서트 서비스 유닛 테스트', () => {
             mockUserReaderRepo.findUserById.mockResolvedValue({ id: '1', name: 'test', point: 100, reservations: [] })
             mockUserWriterRepo.calculatePoint.mockResolvedValue({ id: '1', user: { id: '1' }, amount: 1, reason: 'payment' })
 
-            const result = await paymentUserConcertUseCase.excute(userId, reservationId)
+            const requestDto = new PaymentUserConcertRequestDto(userId, reservationId)
+            const result = await paymentUserConcertUseCase.execute(requestDto)
 
             expect(result.amount).toBe(1)
         })

@@ -1,10 +1,12 @@
 import { initDataAccesorMock } from '../../../infrastructure/db/data-accesor.interface'
 import { initUserReaderMockRepo, initUserWriterMockRepo } from './user.service.mock'
 import { v4 as uuidv4 } from 'uuid'
-import { InValidPointError } from '../../../domain/user/exceptions/invalid-point.exception'
 import { ChargeUserPointUseCase } from '../../../application/user/usecase/charge-user-point.usecase'
 import { CreateUserUseCase } from '../../../application/user/usecase/create-user.usecase'
 import { ReadUserPointUseCase } from '../../../application/user/usecase/read-user-point.usecase'
+import { CreateUserRequestDto } from 'src/application/user/dtos/create-user.dto'
+import { ChargeUserPointRequestDto } from 'src/application/user/dtos/charge-user-point.dto'
+import { ReadUserPointRequestDto } from 'src/application/user/dtos/read-user-point.dto'
 
 describe('유저 서비스 유닛 테스트', () => {
     let mockReaderRepo: ReturnType<typeof initUserReaderMockRepo>
@@ -29,7 +31,8 @@ describe('유저 서비스 유닛 테스트', () => {
 
             mockWriterRepo.createUser.mockResolvedValue({ id: uuid, name: 'test', point: 0, reservations: [] })
 
-            const result = await createUserUseCase.excute('test')
+            const requestDto = new CreateUserRequestDto('test')
+            const result = await createUserUseCase.execute(requestDto)
 
             expect(result.name).toBe('test')
         })
@@ -39,17 +42,10 @@ describe('유저 서비스 유닛 테스트', () => {
 
             mockReaderRepo.findUserPointById.mockResolvedValue(100)
 
-            const result = await readUserPointUseCase.excute(uuid)
+            const requestDto = new ReadUserPointRequestDto(uuid)
+            const result = await readUserPointUseCase.execute(requestDto)
 
-            expect(result).toBe(100)
-        })
-
-        it('chargePoint is failed cause point is invalid', async () => {
-            mockReaderRepo.checkValidPoint.mockImplementation(() => {
-                throw new InValidPointError()
-            })
-
-            await expect(chargeUserPointUseCase.excute('1', 100)).rejects.toThrow(InValidPointError)
+            expect(result.point).toBe(100)
         })
 
         it('chargePoint is success', async () => {
@@ -58,9 +54,10 @@ describe('유저 서비스 유닛 테스트', () => {
             mockReaderRepo.findUserById.mockResolvedValue({ id: uuid, name: 'test', point: 0, reservations: [] })
             mockWriterRepo.calculatePoint.mockResolvedValue({ id: '1', user: { id: uuid }, amount: 1, reason: 'charge' })
 
-            const result = await chargeUserPointUseCase.excute('1', 100)
+            const requestDto = new ChargeUserPointRequestDto('1', 100)
+            const result = await chargeUserPointUseCase.execute(requestDto)
 
-            expect(result).toBe(1)
+            expect(result.amount).toBe(1)
         })
     })
 })

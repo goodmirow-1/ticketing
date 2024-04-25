@@ -1,5 +1,5 @@
 // common/interfaces/request-dto.interface.ts
 export interface IRequestDTO<T> {
-    validate(): boolean
+    validate()
     toUseCaseInput(): T
 }

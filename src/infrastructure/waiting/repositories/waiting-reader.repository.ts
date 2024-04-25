@@ -35,7 +35,9 @@ export class WaitingReaderRepositoryTypeORM implements IWaitingReaderRepository 
     async getTokenStatus(userId: string, token: string) {
         if (token != '') return { token, waitingNumber: 0 }
 
-        return await this.findWaitingUserPosition(userId)
+        const position = await this.findWaitingUserPosition(userId)
+
+        return { token: null, waitingNumber: position }
     }
 
     /**

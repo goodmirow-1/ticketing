@@ -2,6 +2,9 @@ import { Inject, Injectable } from '@nestjs/common'
 import { IUserReaderRepository, IUserReaderRepositoryToken } from '../../../domain/user/repositories/user-reader.repository.interface'
 import { IUserWriterRepository, IUserWriterRepositoryToken } from '../../../domain/user/repositories/user-writer.repository.interface'
 import { DataAccessor, DataAccessorToken } from '../../../infrastructure/db/data-accesor.interface'
+import type { ChargeUserPointRequestType } from '../dtos/charge-user-point.dto'
+import { ChargeUserPointResponseDto } from '../dtos/charge-user-point.dto'
+import type { IRequestDTO } from 'src/application/common/request.interface'
 
 @Injectable()
 export class ChargeUserPointUseCase {
@@ -14,8 +17,10 @@ export class ChargeUserPointUseCase {
         private readonly dataAccessor: DataAccessor,
     ) {}
 
-    async excute(userId: string, point: number): Promise<number> {
-        this.userReaderRepository.checkValidPoint(point)
+    async execute(requestDto: IRequestDTO<ChargeUserPointRequestType>): Promise<ChargeUserPointResponseDto> {
+        requestDto.validate()
+
+        const { userId, amount } = requestDto.toUseCaseInput()
 
         //포인트는 읽는 동안 변할 수 없다.
         const session = await this.dataAccessor.getSession('REPEATABLE READ')
@@ -26,10 +31,10 @@ export class ChargeUserPointUseCase {
                 mode: 'pessimistic_write',
             })
             //포인트 충전 및 포인트 로그 저장
-            const chargePoint = await this.userWriterRepository.calculatePoint(user, point, null, session)
+            const chargePoint = await this.userWriterRepository.calculatePoint(user, amount, null, session)
 
             await this.dataAccessor.commitTransaction(session)
-            return chargePoint.amount
+            return new ChargeUserPointResponseDto(chargePoint.amount)
         } catch (error) {
             await this.dataAccessor.rollbackTransaction(session)
             throw error
