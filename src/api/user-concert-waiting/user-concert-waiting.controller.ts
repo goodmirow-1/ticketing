@@ -11,7 +11,6 @@ import { PaymentUserConcertCommand } from 'src/application/user-concert-waiting/
 export class UserConcertWaitingController {
     constructor(private readonly paymentUserConcertUseCase: PaymentUserConcertUseCase) {}
 
-    
     @Post('payment/:userId/:reservationId')
     @ApiOperation({
         summary: '결제',
