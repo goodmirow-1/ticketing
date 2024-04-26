@@ -13,6 +13,21 @@ env:
 jobs:
   test: 
     runs-on: ubuntu-latest
+    services:
+      mariadb:
+        image: mariadb
+        env:
+          MYSQL_ROOT_PASSWORD: password
+          MYSQL_DATABASE: testdb
+          MYSQL_USER: user
+          MYSQL_PASSWORD: password
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -21,6 +36,13 @@ jobs:
         uses: pnpm/action-setup@v2
         with:
           version: 8
+
+      - name: Wait for MariaDB
+        run: |
+          until mysql -h 127.0.0.1 -u user -ppassword -e "SELECT 1"; do
+            echo "Waiting for MariaDB to be ready..."
+            sleep 5
+          done
 
       - name: Restore dependencies from Cache
         id: cache
@@ -37,6 +59,15 @@ jobs:
 
       - name: Run test
         run: pnpm run test
+        env:
+          DB_TYPE: mariadb
+          DB_HOST: localhost
+          DB_PORT: 3306
+          DB_USER_NAME: user
+          DB_PASSWORD: password
+          DATABASE: testdb
+          MAX_CONNECTIONS: 100
+          MAX_SEATS: 50
 
   dev-cd:
     runs-on: ubuntu-latest
