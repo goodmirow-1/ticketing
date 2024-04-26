@@ -1,5 +1,5 @@
-import type { IConcertReaderRepository } from '../../../domain/concert/repositories/concert-reader.repository.interface'
-import type { IConcertWriterRepository } from '../../../domain/concert/repositories/concert-writer.repository.interface'
+import type { IConcertReaderRepository } from '../repositories/concert-reader.repository.interface'
+import type { IConcertWriterRepository } from '../repositories/concert-writer.repository.interface'
 
 export function initConcertReaderMockRepo(): Record<keyof IConcertReaderRepository, jest.Mock> {
     return {

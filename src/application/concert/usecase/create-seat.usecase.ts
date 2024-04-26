@@ -19,10 +19,12 @@ export class CreateSeatUseCase {
 
         const { concertDateId, seatNumber, price } = requestDto.toUseCaseInput()
 
-        //유효한 seatNumber인지
-        await this.concertReaderRepository.checkValidSeatNumber(concertDateId, seatNumber)
         //콘서트 날짜 조회
         const concertDate = await this.concertReaderRepository.findConcertDateById(concertDateId)
+
+        //유효한 seatNumber인지
+        await this.concertReaderRepository.checkValidSeatNumber(concertDateId, seatNumber)
+
         //좌석 저장
         const seat = await this.concertWriterRepository.createSeat(concertDate, seatNumber, price)
         return new CreateSeatResponseDto(seat.id, seat.seatNumber, seat.price, seat.concertDate, seat.status)

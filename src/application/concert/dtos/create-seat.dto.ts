@@ -1,6 +1,8 @@
 // dtos/application-create-concert.request.dto.ts
 
 import type { IRequestDTO } from 'src/application/common/request.interface'
+import { InValidPriceError } from 'src/domain/concert/exceptions/invalid-price.exception'
+import { InValidSeatNumberError } from 'src/domain/concert/exceptions/invalid-seat-number.exception'
 import type { IConcertDate } from 'src/domain/concert/models/concertDate.entity.interface'
 
 // Define the type for the Create Concert request data
@@ -17,7 +19,15 @@ export class CreateSeatRequestDto implements IRequestDTO<CreateSeatRequestType> 
         private readonly price: number,
     ) {}
 
-    validate() {}
+    validate() {
+        if (this.seatNumber < 1 || this.seatNumber > parseInt(process.env.MAX_SEATS, 10)) {
+            throw new InValidSeatNumberError(`Seat number must be between 1 and max seats`)
+        }
+
+        if (this.price <= 0) {
+            throw new InValidPriceError()
+        }
+    }
 
     toUseCaseInput(): CreateSeatRequestType {
         // Returns the data in the format expected by the use case
