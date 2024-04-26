@@ -83,7 +83,8 @@
     "testResultsProcessor": "jest-sonar-reporter",
     "moduleNameMapper": {
       "^src/(.*)$": "<rootDir>/$1"
-    }
+    },
+    "maxWorkers": 1
   },
   "jestSonar": {
     "reportPath": "../coverage",

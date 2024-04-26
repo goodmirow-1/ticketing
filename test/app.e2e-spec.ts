@@ -4,13 +4,6 @@ import { HttpStatus, type INestApplication } from '@nestjs/common'
 import * as request from 'supertest'
 import { AppModule } from './../src/app.module'
 import { EntityManager } from 'typeorm'
-import { TypeOrmModule, type TypeOrmModuleOptions } from '@nestjs/typeorm'
-import { ConcertModule } from '../src/api/concert/concert.module'
-import { WaitingModule } from '../src/api/waiting/waiting.module'
-import { UserConcertWaitingModule } from '../src/api/user-concert-waiting/user-concert-waiting.module'
-import { UserModule } from '../src/api/user/user.module'
-import { UserWaitingModule } from '../src/api/user-waiting/user-waiting.module'
-import { ConfigModule } from '@nestjs/config'
 import { randomInt } from 'crypto'
 
 describe('AppController (e2e)', () => {
@@ -20,35 +13,7 @@ describe('AppController (e2e)', () => {
 
     beforeEach(async () => {
         const moduleFixture: TestingModule = await Test.createTestingModule({
-            imports: [
-                AppModule,
-                UserModule,
-                ConcertModule,
-                WaitingModule,
-                UserConcertWaitingModule,
-                UserWaitingModule,
-
-                ConfigModule.forRoot({
-                    envFilePath: '.env',
-                    isGlobal: true,
-                }),
-
-                TypeOrmModule.forRootAsync({
-                    useFactory: async () => {
-                        return {
-                            type: process.env.DB_TYPE,
-                            host: process.env.DB_HOST,
-                            port: process.env.DB_PORT,
-                            username: process.env.DB_USER_NAME,
-                            password: process.env.DB_PASSWORD,
-                            database: process.env.DATABASE,
-                            entities: [__dirname + '/**/*.entity{.ts,.js}'],
-                            synchronize: false,
-                            logging: false,
-                        } as TypeOrmModuleOptions
-                    },
-                }),
-            ],
+            imports: [AppModule],
         }).compile()
 
         app = moduleFixture.createNestApplication()

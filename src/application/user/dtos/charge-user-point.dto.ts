@@ -1,8 +1,7 @@
 // dtos/application-create-concert.request.dto.ts
 
-import { HttpStatus } from '@nestjs/common'
 import type { IRequestDTO } from 'src/application/common/request.interface'
-import { CustomException } from 'src/custom-exception'
+import { InValidPointError } from 'src/domain/user/exceptions/invalid-point.exception'
 
 // Define the type for the Create Concert request data
 export type ChargeUserPointRequestType = {
@@ -18,7 +17,7 @@ export class ChargeUserPointRequestDto implements IRequestDTO<ChargeUserPointReq
 
     validate() {
         if (this.amount <= 0) {
-            throw new CustomException('invalid amount value', HttpStatus.BAD_REQUEST)
+            throw new InValidPointError('invalid amount value')
         }
     }
 

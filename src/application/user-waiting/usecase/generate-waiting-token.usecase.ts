@@ -19,6 +19,6 @@ export class GenerateWaitingTokenUseCase {
         const isValidToken = await this.waitingReaderRepository.findValidTokenByUserId(userId)
         //유효토큰에 있으면 발급된 유효토큰 반환, 대기토큰에 있으면 대기순서 반환
         const { token, waitingNumber } = await this.waitingReaderRepository.getTokenStatus(userId, isValidToken)
-        return new GenerateWaitingTokenResponseDto(token, waitingNumber)
+        return new GenerateWaitingTokenResponseDto(token, waitingNumber * 1)
     }
 }
