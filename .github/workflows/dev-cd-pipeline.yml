@@ -1,4 +1,4 @@
-name: PullRequest CI
+name: Development CD Pipeline
 
 on:
   pull_request:
@@ -110,3 +110,45 @@ jobs:
 
       - name: Run build
         run: pnpm run build
+
+  dev-cd:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v1
+      with:
+        username: ${{ secrets.DOCKER_HUB_USERNAME }}
+        password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+    - name: Build and Push Docker images
+      run: |
+        docker build -t goodmirow/ticketing:latest
+        docker push goodmirow/ticketing:latest
+  # dev-cd:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v3
+      
+  #     - name: Configure AWS credentials
+  #       uses: aws-actions/configure-aws-credentials@v1
+  #       with:
+  #           aws-region: ${{ env.AWS_REGION }}
+  #           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+  #           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    
+  #     - name: Login AWS ECR service
+  #       id: ecr-login
+  #       uses: aws-actions/amazon-ecr-login@v2
+        
+  #     - name: Build, tag, and push dev-image to Amazon ECR
+  #       id: build-image
+  #       env:
+  #           ECR_REGISTRY: ${{ steps.ecr-login.outputs.registry }}
+  #           IMAGE_TAG: dev-${{ github.sha }}
+  #       run: |
+  #           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG . --target=dev
+  #           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+  #           echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+        # if you want to deploy development application, specify the steps
