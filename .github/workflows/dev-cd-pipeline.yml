@@ -115,12 +115,14 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
     - name: Create prod environments
       run: |
         echo "DOCKER_HUB_USERNAME=${{ secrets.DOCKER_HUB_USERNAME }}" >> .env.production
         echo "DOCKER_HUB_ACCESS_TOKEN=${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}" >> .env.production
       
-    - uses: actions/checkout@v2
     - name: Log in to Docker Hub
       uses: docker/login-action@v1
       with:
@@ -130,6 +132,19 @@ jobs:
       run: |
         docker build -t goodmirow/ticketing:latest .
         docker push goodmirow/ticketing:latest
+
+    - name: Close PR on failure
+      if: ${{ failure() }}
+      uses: actions/github-script@v6
+      with:
+        script: |
+          github.rest.pulls.update({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            pull_number: context.issue.number,
+            state: 'closed'
+          })
+    
   # dev-cd:
   #   runs-on: ubuntu-latest
   #   steps:
