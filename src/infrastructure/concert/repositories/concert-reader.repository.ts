@@ -10,7 +10,9 @@ import { NotAvailableSeatError } from '../../../domain/concert/exceptions/not-av
 import { Reservation } from '../models/reservation.entity'
 import { InValidSeatNumberError } from '../../../domain/concert/exceptions/invalid-seat-number.exception'
 import { DuplicateConcertDateError } from '../../../domain/concert/exceptions/duplicate-concert-date.exception'
-import { NotFoundReservationError } from 'src/domain/user/exceptions/not-found-reservation.exception'
+import { NotFoundReservationError } from 'src/domain/concert/exceptions/not-found-reservation.exception'
+import { NotFoundConcertDateError } from 'src/domain/concert/exceptions/not-found-concert-date.exception'
+import { NotAuthReservationError } from 'src/domain/concert/exceptions/not-auth-reservation.exception'
 
 @Injectable()
 export class ConcertReaderRepositoryTypeORM implements IConcertReaderRepository {
@@ -36,10 +38,6 @@ export class ConcertReaderRepositoryTypeORM implements IConcertReaderRepository 
      * @throws InValidSeatNumberError if the seat number is invalid or already exists
      */
     async checkValidSeatNumber(concertDateId: string, seatNumber: number) {
-        if (seatNumber < 1 || seatNumber > parseInt(process.env.MAX_SEATS, 10)) {
-            throw new InValidSeatNumberError(`Seat number must be between 1 and max seats`)
-        }
-
         const seat = await this.entityManager.findOne(Seat, { where: { id: concertDateId, seatNumber } })
 
         if (seat) throw new InValidSeatNumberError(`Seat number ${seatNumber} already exists`)
@@ -71,10 +69,14 @@ export class ConcertReaderRepositoryTypeORM implements IConcertReaderRepository 
      * Finds a concert date by its ID.
      * @param id ID of the concert date to find
      * @returns The found concert date entity
-     * @throws NotFoundConcertError if the concert date is not found
+     * @throws NotFoundConcertDateError if the concert date is not found
      */
     async findConcertDateById(id: string): Promise<ConcertDate> {
-        return this.entityManager.findOne(ConcertDate, { where: { id } })
+        const concertDate = await this.entityManager.findOne(ConcertDate, { where: { id } })
+
+        if (!concertDate) throw new NotFoundConcertDateError(`Concert date id ${id} not found`)
+
+        return concertDate
     }
 
     /**
@@ -100,7 +102,7 @@ export class ConcertReaderRepositoryTypeORM implements IConcertReaderRepository 
     async findSeatsByConcertDateId(id: string): Promise<Seat[]> {
         const concertDate = await this.entityManager.findOne(ConcertDate, { where: { id }, relations: ['seats'] })
 
-        if (!concertDate) throw new NotFoundConcertError(`Concert date id ${id} not found`)
+        if (!concertDate) throw new NotFoundConcertDateError(`Concert date id ${id} not found`)
         if (concertDate.availableSeats === 0) throw new NotAvailableSeatError(`No seats available for concert date id ${id}`)
 
         return this.entityManager.find(Seat, { where: { concertDate } })
@@ -128,7 +130,7 @@ export class ConcertReaderRepositoryTypeORM implements IConcertReaderRepository 
      */
     checkValidReservation(reservation: Reservation, userId: string) {
         if (reservation.userId != userId) {
-            throw new NotFoundReservationError(`Invalid reservation id ${reservation.id} for user id ${userId}`)
+            throw new NotAuthReservationError()
         }
     }
 }

@@ -1,5 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { IUserReaderRepository, IUserReaderRepositoryToken } from '../../../domain/user/repositories/user-reader.repository.interface'
+import type { ReadUserPointRequestType } from '../dtos/read-user-point.dto'
+import { ReadUserPointResponseDto } from '../dtos/read-user-point.dto'
+import type { IRequestDTO } from 'src/application/common/request.interface'
 
 @Injectable()
 export class ReadUserPointUseCase {
@@ -8,8 +11,14 @@ export class ReadUserPointUseCase {
         private readonly userReaderRepository: IUserReaderRepository,
     ) {}
 
-    async excute(userId: string): Promise<number> {
+    async execute(requestDto: IRequestDTO<ReadUserPointRequestType>): Promise<ReadUserPointResponseDto> {
+        requestDto.validate()
+
+        const { userId } = requestDto.toUseCaseInput()
+
+        await this.userReaderRepository.findUserById(userId)
+
         //유저 포인트 조회
-        return await this.userReaderRepository.findUserPointById(userId)
+        return new ReadUserPointResponseDto(await this.userReaderRepository.findUserPointById(userId))
     }
 }

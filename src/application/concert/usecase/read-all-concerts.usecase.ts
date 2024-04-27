@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { IConcertReaderRepository, IConcertReaderRepositoryToken } from '../../../domain/concert/repositories/concert-reader.repository.interface'
-import type { IConcert } from '../../../domain/concert/models/concert.entity.interface'
+import { ReadAllConcertsResponseDto } from '../dtos/read-all-concerts.dto'
 
 @Injectable()
 export class ReadAllConcertsUseCase {
@@ -9,8 +9,9 @@ export class ReadAllConcertsUseCase {
         private readonly concertReaderRepository: IConcertReaderRepository,
     ) {}
 
-    async excute(): Promise<IConcert[]> {
+    async execute(): Promise<ReadAllConcertsResponseDto> {
         //콘서트 목록 조회
-        return this.concertReaderRepository.findAllConcerts()
+        const concerts = await this.concertReaderRepository.findAllConcerts()
+        return new ReadAllConcertsResponseDto(concerts)
     }
 }

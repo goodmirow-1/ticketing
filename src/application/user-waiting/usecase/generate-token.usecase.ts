@@ -4,6 +4,9 @@ import { IWaitingReaderRepository, IWaitingReaderRepositoryToken } from '../../.
 import { IWaitingWriterRepository, IWaitingWriterRepositoryToken } from '../../../domain/waiting/repositories/waiting-writer.repository.interface'
 import { DataAccessor, DataAccessorToken } from '../../../infrastructure/db/data-accesor.interface'
 import { SchedulerState } from 'src/domain/common/schedule-state.instance'
+import type { GenerateTokenRequestType } from '../dtos/generate-token.dto'
+import { GenerateTokenResponseDto } from '../dtos/generate-token.dto'
+import type { IRequestDTO } from 'src/application/common/request.interface'
 
 @Injectable()
 export class GenerateTokenUseCase {
@@ -20,7 +23,11 @@ export class GenerateTokenUseCase {
         private readonly dataAccessor: DataAccessor,
     ) {}
 
-    async excute(userId: string) {
+    async execute(requestDto: IRequestDTO<GenerateTokenRequestType>): Promise<GenerateTokenResponseDto> {
+        requestDto.validate()
+
+        const { userId } = requestDto.toUseCaseInput()
+
         await this.userReaderRepository.findUserById(userId)
 
         //대기열이 활성화되어 있으면
@@ -40,7 +47,7 @@ export class GenerateTokenUseCase {
                 })
 
                 await this.dataAccessor.commitTransaction(session)
-                return { token, waitingNumber }
+                return new GenerateTokenResponseDto(token, waitingNumber)
             } catch (error) {
                 await this.dataAccessor.rollbackTransaction(session)
                 throw error
