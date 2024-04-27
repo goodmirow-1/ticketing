@@ -55,7 +55,7 @@ jobs:
 
       - name: Run test
         run: |
-          pnpm run test -- --host=localhost --user=${{ secrets.DB_USER_NAME }} --password=${{ secrets.DB_PASSWORD }} --database=${{ secrets.DATABASE }}
+          pnpm run test
 
   lint:
     runs-on: ubuntu-latest
