@@ -12,16 +12,38 @@ env:
 
 jobs:
     test: 
-        runs-on: ubuntu-latest
-        steps:
+      runs-on: ubuntu-latest
+      services:
+        mariadb:
+          image: mariadb:latest
+          env:
+            MYSQL_ROOT_PASSWORD: ${{ secrets.DB_PASSWORD }}
+            MYSQL_DATABASE: ${{ secrets.DATABASE }}
+          ports:
+            - 3306:3306
+      steps:
         - name: Checkout
           uses: actions/checkout@v3
-    
+
         - name: Setup pnpm
           uses: pnpm/action-setup@v2
           with:
             version: 8
-    
+        
+        - name: Set Environment Variables
+          run: |
+            echo "DB_TYPE=${{ secrets.DB_TYPE }}" >> $GITHUB_ENV
+            echo "DB_HOST=localhost" >> $GITHUB_ENV
+            echo "DB_PORT=${{ secrets.DB_PORT }}" >> $GITHUB_ENV
+            echo "DB_USER_NAME=${{ secrets.DB_USER_NAME }}" >> $GITHUB_ENV
+            echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> $GITHUB_ENV
+            echo "DATABASE=${{ secrets.DATABASE }}" >> $GITHUB_ENV
+            echo "MAX_CONNECTIONS=${{ secrets.MAX_CONNECTIONS }}" >> $GITHUB_ENV
+            echo "MAX_SEATS=${{ secrets.MAX_SEATS }}" >> $GITHUB_ENV
+            echo "SEAT_HOLD_EXPIRATION_TIME=${{ secrets.SEAT_HOLD_EXPIRATION_TIME }}" >> $GITHUB_ENV
+            echo "VALID_TOKEN_EXPIRATION_TIME=${{ secrets.VALID_TOKEN_EXPIRATION_TIME }}" >> $GITHUB_ENV
+            echo "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}" >> $GITHUB_ENV
+
         - name: Restore dependencies from Cache
           id: cache
           uses: actions/cache@v3
@@ -29,14 +51,15 @@ jobs:
             path: '**/node_modules'
             key: ${{ runner.os }}-node-modules-${{ hashFiles('**/pnpm-lock.yaml') }}
             restore-keys: |
-                ${{ runner.os }}-node-modules-
+              ${{ runner.os }}-node-modules-
         
         - name: Install dependencies
           if: steps.cache.outputs.cache-hit != 'true'
           run: pnpm install --no-frozen-lockfile
-    
+
         - name: Run test
-          run: pnpm run test
+          run: |
+            pnpm run test
     
     prod-cd:
         needs: test
@@ -90,3 +113,15 @@ jobs:
                 service: service-ticketing-nest-prod
                 cluster: cluster-ticketing-nest-product
                 wait-for-service-stability: true
+            
+            - name: Close PR on failure
+              if: ${{ failure() }}
+              uses: actions/github-script@v6
+              with:
+                script: |
+                  github.rest.pulls.update({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    pull_number: context.issue.number,
+                    state: 'closed'
+                  })
