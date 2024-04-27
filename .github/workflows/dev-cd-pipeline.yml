@@ -29,7 +29,7 @@ jobs:
       - name: Set Environment Variables
         run: |
           echo "DB_TYPE=${{ secrets.DB_TYPE }}" >> $GITHUB_ENV
-          echo "DB_HOST=${{ secrets.DB_HOST }}" >> $GITHUB_ENV
+          echo "DB_HOST=localhost" >> $GITHUB_ENV
           echo "DB_PORT=${{ secrets.DB_PORT }}" >> $GITHUB_ENV
           echo "DB_USER_NAME=${{ secrets.DB_USER_NAME }}" >> $GITHUB_ENV
           echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> $GITHUB_ENV
