@@ -1,0 +1,23 @@
+name: 'Restore and Install Dependencies'
+description: 'Restore dependencies from cache and install if not hit'
+runs:
+    using: 'composite'
+    steps:
+    - name: Restore dependencies from Cache
+        uses: actions/cache@v3
+        with:
+        path: '**/node_modules'
+        key: ${{ runner.os }}-node-modules-${{ hashFiles('**/pnpm-lock.yaml') }}
+        restore-keys: ${{ runner.os }}-node-modules-
+
+    - name: Install dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: pnpm install --no-frozen-lockfile
+
+    - name: Cache pnpm store
+        uses: actions/cache@v3
+        with:
+        path: '~/.pnpm-store'
+        key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+        restore-keys: |
+            ${{ runner.os }}-pnpm-store-
