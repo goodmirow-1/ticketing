@@ -127,8 +127,10 @@ export class ConcertWriterRepositoryTypeORM implements IConcertWriterRepository,
      * @param reservation The Reservation entity to update.
      * @throws FailedUpdateReservationError if updating the reservation fails.
      */
-    async doneReservationPaid(reservation: Reservation) {
-        const paymentUpdateResult = await this.entityManager
+    async doneReservationPaid(reservation: Reservation, querryRunner?: any) {
+        const manager = querryRunner ? querryRunner.manager : this.entityManager
+
+        const paymentUpdateResult = await manager
             .createQueryBuilder()
             .update(Reservation)
             .set({ paymentCompleted: true })
@@ -139,7 +141,7 @@ export class ConcertWriterRepositoryTypeORM implements IConcertWriterRepository,
             throw new FailedUpdateReservationError('Failed to update reservation payment status.')
         }
 
-        const result = await this.updateSeatStatus(reservation.seat.id, 'held')
+        const result = await this.updateSeatStatus(reservation.seat.id, 'held', querryRunner)
 
         if (result === false) {
             throw new FailedUpdateSeatStatusError('Failed to update seat status')
@@ -157,8 +159,10 @@ export class ConcertWriterRepositoryTypeORM implements IConcertWriterRepository,
      * @param status The new status of the seat.
      * @returns True if the update was successful, otherwise false.
      */
-    private async updateSeatStatus(id: string, status: string): Promise<boolean> {
-        return await this.entityManager
+    private async updateSeatStatus(id: string, status: string, querryRunner?: any): Promise<boolean> {
+        const manager = querryRunner ? querryRunner.manager : this.entityManager
+
+        return await manager
             .createQueryBuilder()
             .update(Seat)
             .set({ status })

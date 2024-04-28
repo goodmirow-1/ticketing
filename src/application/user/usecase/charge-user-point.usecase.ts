@@ -23,7 +23,7 @@ export class ChargeUserPointUseCase {
         const { userId, amount } = requestDto.toUseCaseInput()
 
         //포인트는 읽는 동안 변할 수 없다.
-        const session = await this.dataAccessor.getSession('REPEATABLE READ')
+        const session = await this.dataAccessor.getSession()
 
         try {
             //유저 정보 조회

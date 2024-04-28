@@ -15,6 +15,8 @@ import { IUserWriterRepositoryToken } from '../../domain/user/repositories/user-
 import { IWaitingWriterRepositoryToken } from '../../domain/waiting/repositories/waiting-writer.repository.interface'
 import { IUserReaderRepositoryToken } from 'src/domain/user/repositories/user-reader.repository.interface'
 import { UserReaderRepositoryTypeORM } from 'src/infrastructure/user/repositories/user-reader.repository'
+import { DataAccessorToken } from 'src/infrastructure/db/data-accesor.interface'
+import { TypeORMDataAccessor } from 'src/infrastructure/db/typeorm/typeorm-data-accesor'
 
 @Module({
     imports: [TypeOrmModule.forFeature([User, Reservation, PointHistory])],
@@ -40,6 +42,10 @@ import { UserReaderRepositoryTypeORM } from 'src/infrastructure/user/repositorie
         {
             provide: IWaitingWriterRepositoryToken,
             useClass: WaitingWriterRepositoryTypeORM,
+        },
+        {
+            provide: DataAccessorToken,
+            useClass: TypeORMDataAccessor,
         },
     ],
     exports: [],

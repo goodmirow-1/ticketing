@@ -101,9 +101,10 @@ export class WaitingWriterRepositoryTypeORM implements IWaitingWriterRepository 
      * Marks a valid token as expired.
      * @param token The token to mark as expired.
      */
-    async expiredValidToken(token?: string) {
+    async expiredValidToken(token?: string, querryRunner?: any) {
+        const manager = querryRunner ? querryRunner.manager : this.entityManager
         if (token == undefined || token == '') return
 
-        await this.entityManager.createQueryBuilder().update(ValidToken).set({ status: false }).where('token = :token', { token }).execute()
+        await manager.createQueryBuilder().update(ValidToken).set({ status: false }).where('token = :token', { token }).execute()
     }
 }

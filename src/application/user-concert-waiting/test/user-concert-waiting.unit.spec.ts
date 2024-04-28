@@ -6,6 +6,7 @@ import { PaymentUserConcertUseCase } from '../usecase/payment-user-concert.useca
 import { initWaitingWriterMockRepo } from '../../../domain/waiting/test/waiting.mock'
 import { v4 as uuidv4 } from 'uuid'
 import { PaymentUserConcertRequestDto } from 'src/application/user-concert-waiting/dtos/payment-user-concert.dto'
+import { initDataAccesorMock } from 'src/infrastructure/db/data-accesor.interface'
 
 describe('유닛 콘서트 서비스 유닛 테스트', () => {
     let mockConcertReaderRepo: ReturnType<typeof initConcertReaderMockRepo>
@@ -13,6 +14,7 @@ describe('유닛 콘서트 서비스 유닛 테스트', () => {
     let mockUserReaderRepo: ReturnType<typeof initUserReaderMockRepo>
     let mockUserWriterRepo: ReturnType<typeof initUserWriterMockRepo>
     let mockWaitingWriterRepo: ReturnType<typeof initWaitingWriterMockRepo>
+    let mockDataAccessor: ReturnType<typeof initDataAccesorMock>
     let paymentUserConcertUseCase: PaymentUserConcertUseCase
 
     beforeEach(() => {
@@ -21,6 +23,7 @@ describe('유닛 콘서트 서비스 유닛 테스트', () => {
         mockUserReaderRepo = initUserReaderMockRepo()
         mockUserWriterRepo = initUserWriterMockRepo()
         mockWaitingWriterRepo = initWaitingWriterMockRepo()
+        mockDataAccessor = initDataAccesorMock()
 
         paymentUserConcertUseCase = new PaymentUserConcertUseCase(
             mockConcertReaderRepo,
@@ -28,6 +31,7 @@ describe('유닛 콘서트 서비스 유닛 테스트', () => {
             mockUserReaderRepo,
             mockUserWriterRepo,
             mockWaitingWriterRepo,
+            mockDataAccessor,
         )
     })
 
