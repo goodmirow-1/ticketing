@@ -1,10 +1,11 @@
-name: Development CD Pipeline
+name: PullRequest CI Pipeline
 
 on:
-  push:
-    branches:
+  pull_request:
+      branches:
       - develop
-    paths:
+      - release-*
+      paths:
       - 'src/**'
 
 jobs:
@@ -147,64 +148,3 @@ jobs:
               pull_number: context.issue.number,
               state: 'closed'
             })
-  dev-cd:
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v3
-
-    - name: Create prod environments
-      run: |
-        echo "DOCKER_HUB_USERNAME=${{ secrets.DOCKER_HUB_USERNAME }}" >> .env.production
-        echo "DOCKER_HUB_ACCESS_TOKEN=${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}" >> .env.production
-      
-    - name: Log in to Docker Hub
-      uses: docker/login-action@v1
-      with:
-        username: ${{ secrets.DOCKER_HUB_USERNAME }}
-        password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-    - name: Build and Push Docker images
-      run: |
-        docker build -t goodmirow/ticketing:latest .
-        docker push goodmirow/ticketing:latest
-
-    - name: Close PR on failure
-      if: ${{ failure() }}
-      uses: actions/github-script@v6
-      with:
-        script: |
-          github.rest.pulls.update({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            pull_number: context.issue.number,
-            state: 'closed'
-          })
-    
-  # dev-cd:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v3
-      
-  #     - name: Configure AWS credentials
-  #       uses: aws-actions/configure-aws-credentials@v1
-  #       with:
-  #           aws-region: ${{ env.AWS_REGION }}
-  #           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
-  #           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-    
-  #     - name: Login AWS ECR service
-  #       id: ecr-login
-  #       uses: aws-actions/amazon-ecr-login@v2
-        
-  #     - name: Build, tag, and push dev-image to Amazon ECR
-  #       id: build-image
-  #       env:
-  #           ECR_REGISTRY: ${{ steps.ecr-login.outputs.registry }}
-  #           IMAGE_TAG: dev-${{ github.sha }}
-  #       run: |
-  #           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG . --target=dev
-  #           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-  #           echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
-        # if you want to deploy development application, specify the steps
