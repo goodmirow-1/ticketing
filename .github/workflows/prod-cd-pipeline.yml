@@ -92,6 +92,9 @@ jobs:
               run: |
                 echo "AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }}" >> .env.production
                 echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> .env.production
+
+            - name: Extract version
+              run: echo "VERSION=$(cat package.json | jq -r .version)" >> $GITHUB_ENV
             
             - name: Configure AWS credentials
               uses: aws-actions/configure-aws-credentials@v1
@@ -108,7 +111,7 @@ jobs:
               id: build-image
               env:
                 ECR_REGISTRY: ${{ steps.ecr-login.outputs.registry }}
-                IMAGE_TAG: prod-${{ github.sha }}
+                IMAGE_TAG: ${{ env.VERSION }}
               run: |
                 docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG . --target=prod
                 docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG

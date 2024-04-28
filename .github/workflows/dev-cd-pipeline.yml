@@ -1,10 +1,11 @@
 name: Development CD Pipeline
 
 on:
-  pull_request:
+  push:
     branches:
       - develop
-      - 'release-*'
+    paths:
+      - 'src/**'
 
 jobs:
   test: 
