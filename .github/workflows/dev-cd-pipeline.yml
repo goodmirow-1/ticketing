@@ -27,35 +27,20 @@ jobs:
           version: 8
       
       - name: Set Environment Variables
-        run: |
-          echo "DB_TYPE=${{ secrets.DB_TYPE }}" >> $GITHUB_ENV
-          echo "DB_HOST=localhost" >> $GITHUB_ENV
-          echo "DB_PORT=${{ secrets.DB_PORT }}" >> $GITHUB_ENV
-          echo "DB_USER_NAME=${{ secrets.DB_USER_NAME }}" >> $GITHUB_ENV
-          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> $GITHUB_ENV
-          echo "DATABASE=${{ secrets.DATABASE }}" >> $GITHUB_ENV
-          echo "MAX_CONNECTIONS=${{ secrets.MAX_CONNECTIONS }}" >> $GITHUB_ENV
-          echo "MAX_SEATS=${{ secrets.MAX_SEATS }}" >> $GITHUB_ENV
-          echo "SEAT_HOLD_EXPIRATION_TIME=${{ secrets.SEAT_HOLD_EXPIRATION_TIME }}" >> $GITHUB_ENV
-          echo "VALID_TOKEN_EXPIRATION_TIME=${{ secrets.VALID_TOKEN_EXPIRATION_TIME }}" >> $GITHUB_ENV
-          echo "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}" >> $GITHUB_ENV
+        uses: ./.github/workflows/actions/set-env.yaml
 
-      - name: Restore dependencies from Cache
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: '**/node_modules'
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-node-modules-
-      
-      - name: Install dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: pnpm install --no-frozen-lockfile
+      - name: Restore and Install Dependencies
+        uses: ./.github/workflows/actions/dependent.yaml
 
       - name: Run test
         run: |
           pnpm run test
+
+      - name: Close PR on failure
+        if: ${{ failure() }}
+        uses: ./.github/workflows/actions/failure.yaml
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
   lint:
     runs-on: ubuntu-latest
@@ -68,18 +53,8 @@ jobs:
         with:
           version: 8
 
-      - name: Restore dependencies from Cache
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: '**/node_modules'
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-node-modules-
-      
-      - name: Install dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: pnpm install --no-frozen-lockfile
+      - name: Restore and Install Dependencies
+        uses: ./.github/workflows/actions/dependent.yaml
         
       - name: Run lint
         run: pnpm run lint
@@ -95,33 +70,18 @@ jobs:
         with:
           version: 8
 
-      - name: Restore dependencies from Cache
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: '**/node_modules'
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-node-modules-
-      
-      - name: Install dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: pnpm install --no-frozen-lockfile
+      - name: Restore and Install Dependencies
+        uses: ./.github/workflows/actions/dependent.yaml
 
       - name: Run build
         run: pnpm run build
 
       - name: Close PR on failure
         if: ${{ failure() }}
-        uses: actions/github-script@v6
+        uses: ./.github/workflows/actions/failure.yaml
         with:
-          script: |
-            github.rest.pulls.update({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: context.issue.number,
-              state: 'closed'
-            })
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
   dev-cd:
     needs: test
     runs-on: ubuntu-latest
@@ -146,15 +106,9 @@ jobs:
 
     - name: Close PR on failure
       if: ${{ failure() }}
-      uses: actions/github-script@v6
+      uses: ./.github/workflows/actions/failure.yaml
       with:
-        script: |
-          github.rest.pulls.update({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            pull_number: context.issue.number,
-            state: 'closed'
-          })
+        github-token: ${{ secrets.GITHUB_TOKEN }}
     
   # dev-cd:
   #   runs-on: ubuntu-latest
