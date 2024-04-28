@@ -1,5 +1,5 @@
 import type { IUser } from '../../../domain/user/models/user.entity.interface'
-import { Entity, Column, PrimaryColumn, BeforeInsert } from 'typeorm'
+import { Entity, Column, PrimaryColumn, BeforeInsert, VersionColumn } from 'typeorm'
 import { v4 as uuidv4 } from 'uuid'
 
 @Entity()
@@ -12,6 +12,9 @@ export class User implements IUser {
 
     @Column({ default: 0 })
     point: number
+
+    @VersionColumn()
+    version: number
 
     @BeforeInsert()
     generateId() {

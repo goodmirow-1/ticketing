@@ -11,5 +11,5 @@ export interface IConcertWriterRepository {
     createReservation(seat: ISeat, userId: string): Promise<IReservation>
 
     updateConcertDateAvailableSeat(concertDateId: string, amount: number)
-    doneReservationPaid(reservation: IReservation)
+    doneReservationPaid(reservation: IReservation, querryRunner?: any)
 }
