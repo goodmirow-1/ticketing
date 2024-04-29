@@ -8,6 +8,7 @@ export function initWaitingReaderMockRepo(): Record<keyof IWaitingReaderReposito
         findLastWaitingUser: jest.fn(),
         findValidTokenByUserId: jest.fn(),
         isValidTokenCountUnderThreshold: jest.fn(),
+        checkWaitingScheduler: jest.fn(),
     }
 }
 
@@ -17,5 +18,6 @@ export function initWaitingWriterMockRepo(): Record<keyof IWaitingWriterReposito
         createWaitingToken: jest.fn(),
         createValidTokenOrWaitingUser: jest.fn(),
         expiredValidToken: jest.fn(),
+        setWaitingScheduler: jest.fn(),
     }
 }

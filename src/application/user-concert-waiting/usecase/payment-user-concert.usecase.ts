@@ -36,27 +36,26 @@ export class PaymentUserConcertUseCase {
 
         const session = await this.dataAccessor.getSession()
 
+        let pointHistory = null
         try {
             //사용자 조회
-            const user = await this.userReaderRepository.findUserById(userId, session, {
-                mode: 'pessimistic_write',
-            })
-
+            const user = await this.userReaderRepository.findUserById(userId, session)
             //예약 정보의 사용자와 사용자 정보가 일치하는지 확인
             this.concertReaderRepository.checkValidReservation(reservation, userId)
             //결제 진행 및 예약정보에 따른 사용자의 포인트 차감
-            const pointHistory = await this.userWriterRepository.calculatePoint(user, -reservation.seat.price, reservation.id, session)
-            //예약 정보 수정
-            await this.concertWriterRepository.doneReservationPaid(reservation, session)
-            //유효토큰 만료로 변경 수정
-            await this.waitingWriterRepository.expiredValidToken(token, session)
-
-            return new PaymentUserConcertResponseDto(pointHistory.user.id, pointHistory.reservationId, pointHistory.amount, pointHistory.created_at)
+            pointHistory = await this.userWriterRepository.calculatePoint(user, -reservation.seat.price, reservation.id, session)
         } catch (error) {
             await this.dataAccessor.rollbackTransaction(session)
             throw error
         } finally {
             await this.dataAccessor.releaseQueryRunner(session)
         }
+
+        //예약 정보 수정
+        await this.concertWriterRepository.doneReservationPaid(reservation)
+        //유효토큰 만료로 변경 수정
+        await this.waitingWriterRepository.expiredValidToken(token)
+
+        return new PaymentUserConcertResponseDto(pointHistory.user.id, pointHistory.reservationId, pointHistory.amount, pointHistory.created_at)
     }
 }

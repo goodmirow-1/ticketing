@@ -3,10 +3,22 @@ import { EntityManager } from 'typeorm'
 import { WaitingUser } from '../../waiting/models/waiting-user.entity'
 import { ValidToken } from '../../waiting/models/valid-token.entity'
 import type { IWaitingReaderRepository } from '../../../domain/waiting/repositories/waiting-reader.repository.interface'
+import { WaitingScheduler } from '../models/waiting-scheduler.entity'
 
 @Injectable()
 export class WaitingReaderRepositoryTypeORM implements IWaitingReaderRepository {
     constructor(@Inject(EntityManager) private readonly entityManager: EntityManager) {}
+
+    async onModuleInit(): Promise<void> {
+        const existingScheduler = await this.entityManager.findOne(WaitingScheduler, { where: { id: 1 } })
+        if (!existingScheduler) {
+            const newScheduler = this.entityManager.create(WaitingScheduler, {
+                id: 1, // Set the ID and other default values as needed
+                check: false, // Example property, set the initial value as needed
+            })
+            await this.entityManager.save(newScheduler)
+        }
+    }
 
     /**
      * Finds the queue position of a waiting user based on the creation date.
@@ -33,7 +45,7 @@ export class WaitingReaderRepositoryTypeORM implements IWaitingReaderRepository 
      * @returns The token status with waiting number.
      */
     async getTokenStatus(userId: string, token: string) {
-        if (token != '') return { token, waitingNumber: 0 }
+        if (token != undefined) return { token, waitingNumber: 0 }
 
         const position = await this.findWaitingUserPosition(userId)
 
@@ -61,7 +73,7 @@ export class WaitingReaderRepositoryTypeORM implements IWaitingReaderRepository 
     async findValidTokenByUserId(userId: string): Promise<string> {
         const validToken = await this.entityManager.findOne(ValidToken, { where: { userId } })
 
-        return validToken ? validToken.token : ''
+        return validToken ? validToken.token : undefined
     }
 
     /**
@@ -79,5 +91,9 @@ export class WaitingReaderRepositoryTypeORM implements IWaitingReaderRepository 
         const maxConnections = parseInt(process.env.MAX_CONNECTIONS, 10)
 
         return count < maxConnections
+    }
+
+    async checkWaitingScheduler(): Promise<boolean> {
+        return (await this.entityManager.findOne(WaitingScheduler, { where: { id: 1 } })).check
     }
 }
