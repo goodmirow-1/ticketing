@@ -6,9 +6,12 @@ import { DataAccessor, DataAccessorToken } from '../../../infrastructure/db/data
 import type { GenerateTokenRequestType } from '../dtos/generate-token.dto'
 import { GenerateTokenResponseDto } from '../dtos/generate-token.dto'
 import type { IRequestDTO } from 'src/application/common/request.interface'
+import { SchedulerState } from 'src/domain/common/schedule-state.instance'
 
 @Injectable()
 export class GenerateTokenUseCase {
+    private schedulerState = SchedulerState.getInstance()
+
     constructor(
         @Inject(IUserReaderRepositoryToken)
         private readonly userReaderRepository: IUserReaderRepository,
@@ -28,7 +31,7 @@ export class GenerateTokenUseCase {
         await this.userReaderRepository.findUserById(userId)
 
         //대기열이 활성화되어 있으면
-        if (await this.waitingReaderRepository.checkWaitingScheduler()) {
+        if (await this.schedulerState.check) {
             //대기열 토큰을 발행
             return await this.waitingWriterRepository.createWaitingToken(userId)
         } else {

@@ -7,10 +7,9 @@ import { WaitingWriterRepositoryTypeORM } from '../../infrastructure/waiting/rep
 import { WaitingSchedulerUseCase } from '../../application/waiting/usecase/waiting-scheduler.usecase'
 import { IWaitingReaderRepositoryToken } from '../../domain/waiting/repositories/waiting-reader.repository.interface'
 import { IWaitingWriterRepositoryToken } from '../../domain/waiting/repositories/waiting-writer.repository.interface'
-import { WaitingScheduler } from '../../infrastructure/waiting/models/waiting-scheduler.entity'
 
 @Module({
-    imports: [TypeOrmModule.forFeature([WaitingUser, ValidToken, WaitingScheduler])],
+    imports: [TypeOrmModule.forFeature([WaitingUser, ValidToken])],
     controllers: [],
     providers: [
         WaitingSchedulerUseCase,

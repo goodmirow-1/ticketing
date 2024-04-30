@@ -8,6 +8,4 @@ export interface IWaitingReaderRepository {
 
     findValidTokenByUserId(userId: string): Promise<string>
     isValidTokenCountUnderThreshold(queryRunner?: any, lockOption?: any): Promise<boolean>
-
-    checkWaitingScheduler(): Promise<boolean>
 }

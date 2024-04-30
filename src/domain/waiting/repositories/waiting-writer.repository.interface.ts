@@ -6,6 +6,4 @@ export interface IWaitingWriterRepository {
     createValidTokenOrWaitingUser(userId: string, isValid: boolean, querryRunner?: any, lockOption?: any)
 
     expiredValidToken(token?: string, querryRunner?: any)
-
-    setWaitingScheduler(check: boolean)
 }

@@ -1,11 +1,12 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { Cron, CronExpression } from '@nestjs/schedule'
+import { SchedulerState } from 'src/domain/common/schedule-state.instance'
 import { IWaitingReaderRepository, IWaitingReaderRepositoryToken } from 'src/domain/waiting/repositories/waiting-reader.repository.interface'
 import { IWaitingWriterRepository, IWaitingWriterRepositoryToken } from 'src/domain/waiting/repositories/waiting-writer.repository.interface'
 
 @Injectable()
 export class WaitingSchedulerUseCase {
-    number = 0
+    private schedulerState = SchedulerState.getInstance()
 
     constructor(
         @Inject(IWaitingReaderRepositoryToken)
@@ -16,7 +17,7 @@ export class WaitingSchedulerUseCase {
 
     @Cron(CronExpression.EVERY_SECOND)
     async handleCron() {
-        if (await this.waitingReaderRepository.checkWaitingScheduler()) {
+        if (this.schedulerState.check) {
             if (await this.waitingReaderRepository.isValidTokenCountUnderThreshold()) {
                 // WaitingUser 테이블에서 가장 오래된 사용자를 조회합니다.
                 const oldestWaitingUsers = await this.waitingReaderRepository.findLastWaitingUser()
@@ -28,7 +29,7 @@ export class WaitingSchedulerUseCase {
                     // 처리된 WaitingUser 항목을 삭제합니다.
                     await this.waitingWriterRepository.deleteWaitingUser(oldestWaitingUsers[0].id)
                 } else {
-                    this.waitingWriterRepository.setWaitingScheduler(false)
+                    this.schedulerState.check = false
                 }
             }
         }

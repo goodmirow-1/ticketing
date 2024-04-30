@@ -5,11 +5,13 @@ import { ValidToken } from '../../waiting/models/valid-token.entity'
 import { generateAccessToken } from '../../../domain/common/jwt-token.util'
 import type { IWaitingWriterRepository } from '../../../domain/waiting/repositories/waiting-writer.repository.interface'
 import { v4 as uuidv4 } from 'uuid'
-import { WaitingScheduler } from '../models/waiting-scheduler.entity'
 import { SchedulerRegistry } from '@nestjs/schedule'
+import { SchedulerState } from 'src/domain/common/schedule-state.instance'
 
 @Injectable()
 export class WaitingWriterRepositoryTypeORM implements IWaitingWriterRepository {
+    private schedulerState = SchedulerState.getInstance()
+
     constructor(
         @Inject(EntityManager) private readonly entityManager: EntityManager,
         private readonly schedulerRegistry: SchedulerRegistry,
@@ -73,7 +75,8 @@ export class WaitingWriterRepositoryTypeORM implements IWaitingWriterRepository 
             const count: number = await manager.count(WaitingUser, { lock: lockOption })
 
             const token = generateAccessToken(userId, expiration, count)
-            this.setWaitingScheduler(true)
+            this.schedulerState.check = true
+            //this.setWaitingScheduler(true)
 
             return { token, waitingNumber: count }
         }
@@ -104,13 +107,5 @@ export class WaitingWriterRepositoryTypeORM implements IWaitingWriterRepository 
         if (token == undefined || token == '') return
 
         await manager.createQueryBuilder().update(ValidToken).set({ status: false }).where('token = :token', { token }).execute()
-    }
-
-    /**
-     * Marks a valid token as expired.
-     * @param check scheduler checker
-     */
-    async setWaitingScheduler(check: boolean) {
-        await this.entityManager.createQueryBuilder().update(WaitingScheduler).set({ check }).where('id = :id', { id: 1 }).execute()
     }
 }
