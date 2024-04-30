@@ -173,31 +173,31 @@ describe('AppController (e2e)', () => {
 
     async function handleConcertAccess(token: string): Promise<void> {
         try {
-            // 1. 콘서트 날짜 조회
-            const concertsResponse = await request(app.getHttpServer()).get('/concert/dates').set('Authorization', `Bearer ${token}`)
-            if (concertsResponse.status !== HttpStatus.OK) {
-                console.error('Failed to fetch concert dates or no dates available.')
-                return
-            }
-
-            // 2. 랜덤으로 콘서트 날짜 선택
-            // 콘서트 목록 중 concertDates가 있는 콘서트만 필터링
-            const validConcerts = concertsResponse.body.concerts.filter(concert => concert.concertDates && concert.concertDates.length > 0)
-
-            // 랜덤으로 하나의 콘서트 선택
-            const selectedConcert = validConcerts[Math.floor(Math.random() * validConcerts.length)]
-
-            const avaliableConcerts = selectedConcert.concertDates.filter(concertDate => concertDate.availableSeats > 0)
-
-            // 선택된 콘서트에서 랜덤으로 하나의 날짜 선택
-            const randomDate = avaliableConcerts[Math.floor(Math.random() * avaliableConcerts.length)]
-            const concertDateId = randomDate.id
-
             let attempt = 0
-            const maxAttempts = 5 // 최대 시도 횟수 설정
+            const maxAttempts = 3 // 최대 시도 횟수 설정
 
             while (attempt < maxAttempts) {
                 attempt++
+
+                // 1. 콘서트 날짜 조회
+                const concertsResponse = await request(app.getHttpServer()).get('/concert/dates').set('Authorization', `Bearer ${token}`)
+                if (concertsResponse.status !== HttpStatus.OK) {
+                    console.error('Failed to fetch concert dates or no dates available.')
+                    return
+                }
+
+                // 2. 랜덤으로 콘서트 날짜 선택
+                // 콘서트 목록 중 concertDates가 있는 콘서트만 필터링
+                const validConcerts = concertsResponse.body.concerts.filter(concert => concert.concertDates && concert.concertDates.length > 0)
+
+                // 랜덤으로 하나의 콘서트 선택
+                const selectedConcert = validConcerts[Math.floor(Math.random() * validConcerts.length)]
+
+                const avaliableConcerts = selectedConcert.concertDates.filter(concertDate => concertDate.availableSeats > 0)
+
+                // 선택된 콘서트에서 랜덤으로 하나의 날짜 선택
+                const randomDate = avaliableConcerts[Math.floor(Math.random() * avaliableConcerts.length)]
+                const concertDateId = randomDate.id
                 // 3. 선택된 콘서트 날짜의 좌석 조회
                 const seatsResponse = await request(app.getHttpServer()).get(`/concert/${concertDateId}/seats`).set('Authorization', `Bearer ${token}`)
                 if (seatsResponse.status !== HttpStatus.OK) {

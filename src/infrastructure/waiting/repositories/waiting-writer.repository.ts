@@ -3,10 +3,10 @@ import { EntityManager } from 'typeorm'
 import { WaitingUser } from '../../waiting/models/waiting-user.entity'
 import { ValidToken } from '../../waiting/models/valid-token.entity'
 import { generateAccessToken } from '../../../domain/common/jwt-token.util'
-import { SchedulerRegistry } from '@nestjs/schedule'
 import type { IWaitingWriterRepository } from '../../../domain/waiting/repositories/waiting-writer.repository.interface'
-import { SchedulerState } from '../../../domain/common/schedule-state.instance'
 import { v4 as uuidv4 } from 'uuid'
+import { SchedulerRegistry } from '@nestjs/schedule'
+import { SchedulerState } from 'src/domain/common/schedule-state.instance'
 
 @Injectable()
 export class WaitingWriterRepositoryTypeORM implements IWaitingWriterRepository {
@@ -76,6 +76,7 @@ export class WaitingWriterRepositoryTypeORM implements IWaitingWriterRepository 
 
             const token = generateAccessToken(userId, expiration, count)
             this.schedulerState.check = true
+            //this.setWaitingScheduler(true)
 
             return { token, waitingNumber: count }
         }

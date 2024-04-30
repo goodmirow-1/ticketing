@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { Cron, CronExpression } from '@nestjs/schedule'
-import { SchedulerState } from '../../../domain/common/schedule-state.instance'
+import { SchedulerState } from 'src/domain/common/schedule-state.instance'
 import { IWaitingReaderRepository, IWaitingReaderRepositoryToken } from 'src/domain/waiting/repositories/waiting-reader.repository.interface'
 import { IWaitingWriterRepository, IWaitingWriterRepositoryToken } from 'src/domain/waiting/repositories/waiting-writer.repository.interface'
 

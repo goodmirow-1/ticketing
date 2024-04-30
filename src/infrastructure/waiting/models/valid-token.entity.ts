@@ -1,8 +1,9 @@
 import type { IValidToken } from '../../../domain/waiting/models/valid-token.entity.interface'
-import { Entity, Column, BeforeInsert, PrimaryColumn } from 'typeorm'
+import { Entity, Column, BeforeInsert, PrimaryColumn, Unique } from 'typeorm'
 import { v4 as uuidv4 } from 'uuid'
 
 @Entity()
+@Unique(['userId']) // Composite unique constraint
 export class ValidToken implements IValidToken {
     @PrimaryColumn({ type: 'char', length: 36 })
     id: string
@@ -10,7 +11,7 @@ export class ValidToken implements IValidToken {
     @Column()
     userId: string
 
-    @Column({ unique: true })
+    @Column()
     token: string
 
     @Column()

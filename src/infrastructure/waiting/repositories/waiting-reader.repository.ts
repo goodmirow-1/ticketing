@@ -33,7 +33,7 @@ export class WaitingReaderRepositoryTypeORM implements IWaitingReaderRepository 
      * @returns The token status with waiting number.
      */
     async getTokenStatus(userId: string, token: string) {
-        if (token != '') return { token, waitingNumber: 0 }
+        if (token != undefined) return { token, waitingNumber: 0 }
 
         const position = await this.findWaitingUserPosition(userId)
 
@@ -61,7 +61,7 @@ export class WaitingReaderRepositoryTypeORM implements IWaitingReaderRepository 
     async findValidTokenByUserId(userId: string): Promise<string> {
         const validToken = await this.entityManager.findOne(ValidToken, { where: { userId } })
 
-        return validToken ? validToken.token : ''
+        return validToken ? validToken.token : undefined
     }
 
     /**
