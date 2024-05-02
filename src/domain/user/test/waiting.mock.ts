@@ -7,6 +7,8 @@ export function initWaitingReaderRedisMockRepo(): Record<keyof IWaitingReaderRed
         getValidTokenByUserId: jest.fn(),
         isValidTokenCountUnderThreshold: jest.fn(),
         isWaitingQueueEmpty: jest.fn(),
+        acquireLock: jest.fn(),
+        releaseLock: jest.fn(),
     }
 }
 
