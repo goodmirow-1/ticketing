@@ -77,13 +77,13 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
     async subscribeToExpiredTokens(handler: () => void) {
         await this.subscriberClient.subscribe('__keyevent@0__:expired', (error, count) => {
             if (error) {
+                console.log(count)
                 console.error('Failed to subscribe:', error)
                 return
             }
         })
 
         this.subscriberClient.on('message', (channel, message) => {
-            console.log(message)
             if (message.startsWith('token:')) {
                 handler()
             }

@@ -35,8 +35,6 @@ describe('Integration Tests for User Use Cases', () => {
 
     afterEach(async () => {
         await entityManager.delete('point_history', {})
-        await entityManager.delete('waiting_user', {})
-        await entityManager.delete('valid_token', {})
         await entityManager.delete('user', {})
     })
 

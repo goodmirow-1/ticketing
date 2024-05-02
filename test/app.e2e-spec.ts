@@ -23,26 +23,17 @@ describe('AppController (e2e)', () => {
     })
 
     afterAll(async () => {
-        // await entityManager.delete('valid_token', {})
-        // await entityManager.delete('point_history', {})
-        // await entityManager.delete('reservation', {})
-        // await entityManager.delete('seat', {})
-        // await entityManager.delete('concert_date', {})
-        // await entityManager.delete('concert', {})
-        // await entityManager.delete('waiting_user', {})
-        // await entityManager.delete('user', {})
+        await emptydb()
 
         await app.close()
     })
 
     const emptydb = async () => {
-        await entityManager.delete('valid_token', {})
         await entityManager.delete('point_history', {})
         await entityManager.delete('reservation', {})
         await entityManager.delete('seat', {})
         await entityManager.delete('concert_date', {})
         await entityManager.delete('concert', {})
-        await entityManager.delete('waiting_user', {})
         await entityManager.delete('user', {})
     }
 

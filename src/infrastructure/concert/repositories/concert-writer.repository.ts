@@ -1,4 +1,3 @@
-import type { OnModuleInit } from '@nestjs/common'
 import { Inject, Injectable } from '@nestjs/common'
 import type { IConcertWriterRepository } from '../../../domain/concert/repositories/concert-writer.repository.interface'
 import { EntityManager } from 'typeorm'
@@ -14,20 +13,11 @@ import { v4 as uuidv4 } from 'uuid'
 import { DuplicateReservationError } from 'src/domain/concert/exceptions/duplicate-reservation.exception'
 
 @Injectable()
-export class ConcertWriterRepositoryTypeORM implements IConcertWriterRepository, OnModuleInit {
+export class ConcertWriterRepositoryTypeORM implements IConcertWriterRepository {
     constructor(
         @Inject(EntityManager) private readonly entityManager: EntityManager,
         private readonly schedulerRegistry: SchedulerRegistry,
     ) {}
-
-    /**
-     * Truncates relevant tables on module initialization.
-     * cause emtpy tables for waiting users and valid tokens.
-     */
-    async onModuleInit(): Promise<void> {
-        await this.entityManager.query('TRUNCATE TABLE valid_token')
-        await this.entityManager.query('TRUNCATE TABLE waiting_user')
-    }
 
     /**
      * Creates a new concert with a given singer name.

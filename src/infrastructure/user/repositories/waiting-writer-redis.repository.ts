@@ -14,6 +14,7 @@ export class WaitingWriterRepositoryRedis implements IWaitingWriterRedisReposito
 
         await subscribeClient.subscribe('__keyevent@0__:expired', (error, count) => {
             if (error) {
+                console.log(count)
                 console.error('Failed to subscribe:', error)
                 return
             }
