@@ -6,12 +6,10 @@ import { UserModule } from './api/user/user.module'
 import { UserConcertWaitingModule } from './api/user-concert-waiting/user-concert-waiting.module'
 import { ConcertModule } from './api/concert/concert.module'
 import { ScheduleModule } from '@nestjs/schedule'
-import { UserWaitingModule } from './api/user-waiting/user-waiting.module'
-import { WaitingModule } from './api/waiting/waiting.module'
 import { APP_FILTER } from '@nestjs/core'
 import { GlobalExceptionFilter } from './custom-exception'
-import { AppController } from './app.controller'
 import { AppService } from './app.service'
+import { AppController } from './app.controller'
 @Module({
     imports: [
         ScheduleModule.forRoot(),
@@ -19,7 +17,6 @@ import { AppService } from './app.service'
             envFilePath: '.env',
             isGlobal: true,
         }),
-
         TypeOrmModule.forRootAsync({
             useFactory: async () => {
                 return {
@@ -37,9 +34,7 @@ import { AppService } from './app.service'
         }),
         UserModule,
         ConcertModule,
-        WaitingModule,
         UserConcertWaitingModule,
-        UserWaitingModule,
     ],
     controllers: [AppController],
     providers: [

@@ -88,6 +88,8 @@ export class ConcertWriterRepositoryTypeORM implements IConcertWriterRepository,
             if (error.code === 'ER_DUP_ENTRY' || error.code === '23505') {
                 throw new DuplicateReservationError('Reservation already exists for the given seat and concert date.')
             } else {
+                console.log(userId, seat)
+
                 throw new FailedCreateReservationError(error.message)
             }
         }

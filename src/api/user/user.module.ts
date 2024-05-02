@@ -12,6 +12,12 @@ import { TypeORMDataAccessor } from '../../infrastructure/db/typeorm/typeorm-dat
 import { IUserReaderRepositoryToken } from '../../domain/user/repositories/user-reader.repository.interface'
 import { IUserWriterRepositoryToken } from '../../domain/user/repositories/user-writer.repository.interface'
 import { DataAccessorToken } from '../../infrastructure/db/data-accesor.interface'
+import { GenerateTokenUseCase } from 'src/application/user/usecase/generate-token.usecase'
+import { RedisService } from 'src/infrastructure/db/redis/redis-service'
+import { IWaitingReaderRepositoryRedisToken } from 'src/domain/user/repositories/waiting-reader-redis.repository.interface'
+import { WaitingReaderRepositoryRedis } from 'src/infrastructure/user/repositories/waiting-reader-redis.repository'
+import { IWaitingWriterRepositoryRedisToken } from 'src/domain/user/repositories/waiting-writer-redis.repository.interface'
+import { WaitingWriterRepositoryRedis } from 'src/infrastructure/user/repositories/waiting-writer-redis.repository'
 
 @Module({
     imports: [TypeOrmModule.forFeature([User, PointHistory])],
@@ -20,6 +26,8 @@ import { DataAccessorToken } from '../../infrastructure/db/data-accesor.interfac
         ChargeUserPointUseCase,
         CreateUserUseCase,
         ReadUserPointUseCase,
+        GenerateTokenUseCase,
+        RedisService,
         {
             provide: IUserReaderRepositoryToken,
             useClass: UserReaderRepositoryTypeORM,
@@ -27,6 +35,14 @@ import { DataAccessorToken } from '../../infrastructure/db/data-accesor.interfac
         {
             provide: IUserWriterRepositoryToken,
             useClass: UserWriterRepositoryTypeORM,
+        },
+        {
+            provide: IWaitingReaderRepositoryRedisToken,
+            useClass: WaitingReaderRepositoryRedis,
+        },
+        {
+            provide: IWaitingWriterRepositoryRedisToken,
+            useClass: WaitingWriterRepositoryRedis,
         },
         {
             provide: DataAccessorToken,

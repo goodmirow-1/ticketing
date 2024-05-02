@@ -172,7 +172,7 @@ describe('Integration Tests for User Use Cases', () => {
 
             const resultReservation = await createReservationUseCase.execute(requestReservationDto)
 
-            const requestDto = new PaymentUserConcertRequestDto(userId, resultReservation.id, null)
+            const requestDto = new PaymentUserConcertRequestDto(userId, resultReservation.id)
             const result = await paymentUserConcertUseCase.execute(requestDto)
 
             expect(result.userId).toBe(userId)
