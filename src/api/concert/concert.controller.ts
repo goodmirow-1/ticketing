@@ -5,7 +5,7 @@ import { CreateSeatUseCase } from '../../application/concert/usecase/create-seat
 import { CreateReservationUseCase } from '../../application/concert/usecase/create-reservation.usecase'
 import { ReadAllConcertsUseCase } from '../../application/concert/usecase/read-all-concerts.usecase'
 import { ReadAllSeatsByConcertDateIdUseCase } from '../../application/concert/usecase/read-all-seats-by-concert-date.usecase'
-import { GetUser, JwtAuthGuard } from '../common/jwt-token-util'
+import { GetUser, JwtAuthGuard } from '../common/jwt-token.util'
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger'
 import { CustomException } from 'src/custom-exception'
 import { CreateConcertDto } from './dtos/create-concert.request.dto'

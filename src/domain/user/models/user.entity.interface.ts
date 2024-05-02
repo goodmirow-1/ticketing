@@ -4,6 +4,4 @@ export interface IUser {
     name: string
 
     point: number
-
-    version: number
 }

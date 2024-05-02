@@ -3,7 +3,7 @@ import { initUserReaderMockRepo, initUserWriterMockRepo } from '../../../domain/
 import { NotFoundReservationError } from '../../../domain/concert/exceptions/not-found-reservation.exception'
 import { InValidPointError } from '../../../domain/user/exceptions/invalid-point.exception'
 import { PaymentUserConcertUseCase } from '../usecase/payment-user-concert.usecase'
-import { initWaitingWriterMockRepo } from '../../../domain/waiting/test/waiting.mock'
+import { initWaitingWriterRedisMockRepo } from '../../../domain/user/test/waiting.mock'
 import { v4 as uuidv4 } from 'uuid'
 import { PaymentUserConcertRequestDto } from 'src/application/user-concert-waiting/dtos/payment-user-concert.dto'
 import { initDataAccesorMock } from 'src/infrastructure/db/data-accesor.interface'
@@ -13,7 +13,7 @@ describe('유닛 콘서트 서비스 유닛 테스트', () => {
     let mockConcertWriterRepo: ReturnType<typeof initConcertWriterMockRepo>
     let mockUserReaderRepo: ReturnType<typeof initUserReaderMockRepo>
     let mockUserWriterRepo: ReturnType<typeof initUserWriterMockRepo>
-    let mockWaitingWriterRepo: ReturnType<typeof initWaitingWriterMockRepo>
+    let mockWaitingWriterRedisRepo: ReturnType<typeof initWaitingWriterRedisMockRepo>
     let mockDataAccessor: ReturnType<typeof initDataAccesorMock>
     let paymentUserConcertUseCase: PaymentUserConcertUseCase
 
@@ -22,7 +22,7 @@ describe('유닛 콘서트 서비스 유닛 테스트', () => {
         mockConcertWriterRepo = initConcertWriterMockRepo()
         mockUserReaderRepo = initUserReaderMockRepo()
         mockUserWriterRepo = initUserWriterMockRepo()
-        mockWaitingWriterRepo = initWaitingWriterMockRepo()
+        mockWaitingWriterRedisRepo = initWaitingWriterRedisMockRepo()
         mockDataAccessor = initDataAccesorMock()
 
         paymentUserConcertUseCase = new PaymentUserConcertUseCase(
@@ -30,7 +30,7 @@ describe('유닛 콘서트 서비스 유닛 테스트', () => {
             mockConcertWriterRepo,
             mockUserReaderRepo,
             mockUserWriterRepo,
-            mockWaitingWriterRepo,
+            mockWaitingWriterRedisRepo,
             mockDataAccessor,
         )
     })

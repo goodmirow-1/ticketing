@@ -114,8 +114,10 @@ export class ConcertReaderRepositoryTypeORM implements IConcertReaderRepository 
      * @returns The found reservation entity
      * @throws NotFoundReservationError if the reservation is not found
      */
-    async findReservationById(id: string): Promise<Reservation> {
-        const reservation = await this.entityManager.findOne(Reservation, { where: { id }, relations: ['seat'] })
+    async findReservationById(id: string, querryRunner?: any, lockOption?: any): Promise<Reservation> {
+        const manager = querryRunner ? querryRunner.manager : this.entityManager
+
+        const reservation = await manager.findOne(Reservation, { where: { id }, relations: ['seat'], lock: lockOption })
 
         if (!reservation) throw new NotFoundReservationError(`Reservation id ${id} not found`)
 
