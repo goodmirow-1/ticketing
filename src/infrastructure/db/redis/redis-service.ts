@@ -89,4 +89,21 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
             }
         })
     }
+
+    // Utility methods could be part of your RedisService or a separate LockService
+    async acquireLock(lockKey: string, lockValue: string, ttl: number): Promise<boolean> {
+        const result = await this.redisClient.set(lockKey, lockValue, 'PX', ttl, 'NX')
+        return result === 'OK'
+    }
+
+    async releaseLock(lockKey: string, lockValue: string): Promise<void> {
+        const script = `
+            if redis.call("get", KEYS[1]) == ARGV[1] then
+                return redis.call("del", KEYS[1])
+            else
+                return 0
+            end
+        `
+        await this.redisClient.eval(script, 1, lockKey, lockValue)
+    }
 }

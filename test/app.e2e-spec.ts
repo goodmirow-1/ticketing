@@ -23,7 +23,7 @@ describe('AppController (e2e)', () => {
     })
 
     afterAll(async () => {
-        await emptydb()
+        //await emptydb()
 
         await app.close()
     })

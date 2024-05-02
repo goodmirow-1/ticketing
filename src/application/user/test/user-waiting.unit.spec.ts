@@ -23,6 +23,7 @@ describe('유닛 콘서트 서비스 유닛 테스트', () => {
             const uuid = uuidv4()
 
             mockUserReaderRepo.findUserById.mockResolvedValue({ id: uuid, name: 'name' })
+            mockWaitingReaderRedisRepo.acquireLock.mockResolvedValue('OK')
             mockWaitingReaderRedisRepo.getValidTokenByUserId.mockResolvedValue('token')
             mockWaitingReaderRedisRepo.getWaitingNumber.mockResolvedValue(0)
             mockWaitingReaderRedisRepo.isValidTokenCountUnderThreshold.mockResolvedValue(true)
@@ -41,6 +42,7 @@ describe('유닛 콘서트 서비스 유닛 테스트', () => {
             const uuid = uuidv4()
 
             mockUserReaderRepo.findUserById.mockResolvedValue({ id: uuid, name: 'name' })
+            mockWaitingReaderRedisRepo.acquireLock.mockResolvedValue('OK')
             mockWaitingReaderRedisRepo.getValidTokenByUserId.mockResolvedValue(null)
             mockWaitingReaderRedisRepo.getWaitingNumber.mockResolvedValue(1)
             mockWaitingReaderRedisRepo.isValidTokenCountUnderThreshold.mockResolvedValue(true)

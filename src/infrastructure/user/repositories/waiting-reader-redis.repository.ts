@@ -36,4 +36,12 @@ export class WaitingReaderRepositoryRedis implements IWaitingReaderRedisReposito
         const length = await this.redisService.llen('waitingQueue')
         return length == 0 ? true : false
     }
+
+    async acquireLock(lockKey: string, lockValue: string, ttl: number): Promise<boolean> {
+        return await this.redisService.acquireLock(lockKey, lockValue, ttl)
+    }
+
+    async releaseLock(lockKey: string, lockValue: string): Promise<void> {
+        return await this.redisService.releaseLock(lockKey, lockValue)
+    }
 }

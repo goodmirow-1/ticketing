@@ -24,22 +24,37 @@ export class GenerateTokenUseCase {
 
         //사용자 조회
         await this.userReaderRepository.findUserById(userId)
-        //유효 토큰에 있는지 확인
-        const validToken = await this.waitingReaderRedisRepository.getValidTokenByUserId(userId)
-        if (validToken) return new GenerateTokenResponseDto(userId, validToken, 0)
-        //대기열에 사용자가 있는지 확인
-        const position = await this.waitingReaderRedisRepository.getWaitingNumber(userId)
-        //유효 토큰에 등록할 수 있는지 확인
-        const isValidToken = await this.waitingReaderRedisRepository.isValidTokenCountUnderThreshold()
-        //대기열이 없는지 확인
-        const isWaitingQueueEmpty = await this.waitingReaderRedisRepository.isWaitingQueueEmpty()
-        //대기열 등록 or 토큰 발급
-        const { token, waitingNumber } = await this.waitingWriterRedisRepository.createValidTokenOrWaitingUser(
-            userId,
-            isWaitingQueueEmpty && isValidToken,
-            position,
-        )
 
-        return new GenerateTokenResponseDto(userId, token, waitingNumber)
+        const lockKey = `user:${userId}:lock`
+        const ttl = 30000 // Lock TTL in milliseconds
+        const lockValue = (Date.now() + ttl + 1).toString()
+
+        try {
+            const isAcquiredLock = await this.waitingReaderRedisRepository.acquireLock(lockKey, lockValue, ttl)
+            if (!isAcquiredLock) {
+                throw new Error('Unable to acquire lock, operation is currently being processed by another instance.')
+            }
+
+            //유효 토큰에 있는지 확인
+            const validToken = await this.waitingReaderRedisRepository.getValidTokenByUserId(userId)
+            if (validToken) return new GenerateTokenResponseDto(userId, validToken, 0)
+            //대기열에 사용자가 있는지 확인
+            const position = await this.waitingReaderRedisRepository.getWaitingNumber(userId)
+            //유효 토큰에 등록할 수 있는지 확인
+            const isValidToken = await this.waitingReaderRedisRepository.isValidTokenCountUnderThreshold()
+            //대기열이 없는지 확인
+            const isWaitingQueueEmpty = await this.waitingReaderRedisRepository.isWaitingQueueEmpty()
+            //대기열 등록 or 토큰 발급
+            const { token, waitingNumber } = await this.waitingWriterRedisRepository.createValidTokenOrWaitingUser(
+                userId,
+                isWaitingQueueEmpty && isValidToken,
+                position,
+            )
+
+            return new GenerateTokenResponseDto(userId, token, waitingNumber)
+        } finally {
+            // Always release the lock
+            await this.waitingReaderRedisRepository.releaseLock(lockKey, lockValue)
+        }
     }
 }
