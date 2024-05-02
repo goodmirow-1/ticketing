@@ -9,8 +9,6 @@ env:
     AWS_REGION: ap-northeast-2
     ECR_REGISTRY: 533267347071.dkr.ecr.ap-northeast-2.amazonaws.com/ticketing-prod
     ECR_REPOSITORY: ticketing-prod
-    ECR_REDIS_REGISTRY: 533267347071.dkr.ecr.ap-northeast-2.amazonaws.com/ticketing-redis
-    ECR_REDIS_REPOSITORY: ticketing-redis
 
 jobs:
     test: 
@@ -140,66 +138,3 @@ jobs:
                     pull_number: context.issue.number,
                     state: 'closed'
                   })
-    prod-redis-cd:
-      needs: test
-      runs-on: ubuntu-latest
-      steps:
-          - name: Checkout
-            uses: actions/checkout@v3
-            
-          - name: Create prod environments
-            run: |
-              echo "AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }}" >> .env.production
-              echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> .env.production
-
-          - name: Extract version
-            run: echo "VERSION=$(cat package.json | jq -r .version)" >> $GITHUB_ENV
-          
-          - name: Configure AWS credentials
-            uses: aws-actions/configure-aws-credentials@v1
-            with:
-              aws-region: ${{ env.AWS_REGION }}
-              aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
-              aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      
-          - name: Login AWS ECR service
-            id: ecr-login
-            uses: aws-actions/amazon-ecr-login@v2
-          
-          - name: Build and push redis-image to Amazon ECR
-            id: build-redis-image
-            env:
-              ECR_REDIS_REGISTRY: ${{ steps.ecr-login.outputs.registry }}
-              IMAGE_TAG: ${{ env.VERSION }}
-            run: |
-              docker build -t $ECR_REDIS_REGISTRY/$ECR_REDIS_REPOSITORY:$IMAGE_TAG . --target=redis
-              docker push $ECR_REDIS_REGISTRY/$ECR_REDIS_REPOSITORY:$IMAGE_TAG
-              echo "image=$ECR_REDIS_REGISTRY/$ECR_REDIS_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
-          
-          - name: Render ECS task-definition
-            id: render-task-definition
-            uses: aws-actions/amazon-ecs-render-task-definition@v1
-            with:
-              task-definition: .taskdefinition/prod-task-redis-definition.json
-              container-name: redis-prod
-              image: ${{ steps.build-redis-image.outputs.image }}
-          
-          - name: Deploy Amazon ECS task-definition
-            uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-            with:
-              task-definition: ${{ steps.render-task-definition.outputs.task-definition }}
-              service: service-ticketing-redis-prod
-              cluster: cluster-ticketing-nest-product
-              wait-for-service-stability: false
-          
-          - name: Close PR on failure
-            if: ${{ failure() }}
-            uses: actions/github-script@v6
-            with:
-              script: |
-                github.rest.pulls.update({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  pull_number: context.issue.number,
-                  state: 'closed'
-                })
