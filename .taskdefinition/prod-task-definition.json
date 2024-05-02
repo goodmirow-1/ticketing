@@ -64,7 +64,7 @@
                 },
                 {
                     "name": "REDIS_HOST",
-                    "value": "redis-ticketing-p89qsd.serverless.apn2.cache.amazonaws.com:6379"
+                    "value": "redis-ticketing-p89qsd.serverless.apn2.cache.amazonaws.com"
                 },
                 {
                     "name": "REDIS_PORT",
