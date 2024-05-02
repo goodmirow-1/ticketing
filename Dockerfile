@@ -65,3 +65,9 @@ COPY --chown=node:node --from=build /app/node_modules ./node_modules
 USER node
 
 CMD ["node", "dist/main"]
+
+#
+# 🟥 Redis phase
+#
+FROM redis:alpine as redis
+CMD ["redis-server", "--notify-keyspace-events", "Ex"]
