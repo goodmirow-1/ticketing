@@ -61,6 +61,14 @@
                 {
                     "name": "MAX_CONNECTIONS",
                     "value": "100"
+                },
+                {
+                    "name": "REDIS_HOST",
+                    "value": "arn:aws:ecs:ap-northeast-2:533267347071:service/cluster-ticketing-nest-product/service-ticketing-redis-prod"
+                },
+                {
+                    "name": "REDIS_PORT",
+                    "value": "6379"
                 }
             ],
             "mountPoints": [],
