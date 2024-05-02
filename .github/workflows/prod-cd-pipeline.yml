@@ -21,6 +21,10 @@ jobs:
             MYSQL_DATABASE: ${{ secrets.DATABASE }}
           ports:
             - 3306:3306
+        redis:
+          image: redis:latest
+          ports:
+            - 6379:6379 # Expose Redis on port 6379
       steps:
         - name: Checkout
           uses: actions/checkout@v3
@@ -43,6 +47,8 @@ jobs:
             echo "SEAT_HOLD_EXPIRATION_TIME=${{ secrets.SEAT_HOLD_EXPIRATION_TIME }}" >> $GITHUB_ENV
             echo "VALID_TOKEN_EXPIRATION_TIME=${{ secrets.VALID_TOKEN_EXPIRATION_TIME }}" >> $GITHUB_ENV
             echo "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}" >> $GITHUB_ENV
+            echo "REDIS_HOST=localhost" >> $GITHUB_ENV # Set Redis host
+            echo "REDIS_PORT=6379" >> $GITHUB_ENV # Set Redis port
 
         - name: Restore dependencies from Cache
           id: cache
