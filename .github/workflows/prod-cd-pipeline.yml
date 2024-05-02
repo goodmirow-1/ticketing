@@ -140,16 +140,6 @@ jobs:
                 service: service-ticketing-nest-prod
                 cluster: cluster-ticketing-nest-product
                 wait-for-service-stability: false
-
-            - name: Build and push redis-image to Amazon ECR
-              id: build-redis-image
-              env:
-                ECR_REGISTRY: ${{ steps.ecr-login.outputs.registry }}
-                IMAGE_TAG: ${{ env.VERSION }}
-              run: |
-                docker build -t $ECR_REDIS_REGISTRY/$ECR_REDIS_REPOSITORY:$IMAGE_TAG . --target=redis
-                docker push $ECR_REDIS_REGISTRY/$ECR_REDIS_REPOSITORY:$IMAGE_TAG
-                echo "image=$ECR_REDIS_REGISTRY/$ECR_REDIS_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
             
             - name: Close PR on failure
               if: ${{ failure() }}
