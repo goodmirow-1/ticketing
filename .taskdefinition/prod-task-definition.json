@@ -64,7 +64,7 @@
                 },
                 {
                     "name": "REDIS_HOST",
-                    "value": "533267347071.dkr.ecr.ap-northeast-2.amazonaws.com/ticketing-redis:latest"
+                    "value": "arn:aws:elasticache:ap-northeast-2:533267347071:serverlesscache:redis-ticketing"
                 },
                 {
                     "name": "REDIS_PORT",
