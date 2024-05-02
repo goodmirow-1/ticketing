@@ -17,7 +17,7 @@ services:
       DATABASE: ${DATABASE}
       MAX_CONNECTIONS: ${MAX_CONNECTIONS}
       MAX_SEATS: ${MAX_SEATS}
-      VALID_TOKEN_EXPIRATION_TIME=: ${VALID_TOKEN_EXPIRATION_TIME}
+      VALID_TOKEN_EXPIRATION_TIME: ${VALID_TOKEN_EXPIRATION_TIME}
       SEAT_HOLD_EXPIRATION_TIME: ${SEAT_HOLD_EXPIRATION_TIME}
       JWT_SECRET_KEY: ${JWT_SECRET_KEY}
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
@@ -52,7 +52,7 @@ services:
     image: redis:latest
     restart: unless-stopped
     ports:
-      - "${REDIS_HOST}:${REDIS_PORT}"
+      - "${REDIS_PORT}:${REDIS_PORT}"
     networks:
       - ticketing-net
     volumes:
@@ -64,4 +64,6 @@ networks:
 
 volumes:
   mariadb-data:
+    driver: local
+  redis-data:
     driver: local
