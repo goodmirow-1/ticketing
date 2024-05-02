@@ -9,7 +9,7 @@ env:
     AWS_REGION: ap-northeast-2
     ECR_REGISTRY: 533267347071.dkr.ecr.ap-northeast-2.amazonaws.com/ticketing-prod
     ECR_REPOSITORY: ticketing-prod
-    ECR_REDIS_REGISTRY: 533267347071.dkr.ecr.ap-northeast-2.amazonaws.com
+    ECR_REDIS_REGISTRY: 533267347071.dkr.ecr.ap-northeast-2.amazonaws.com/ticketing-redis
     ECR_REDIS_REPOSITORY: ticketing-redis
 
 jobs:
