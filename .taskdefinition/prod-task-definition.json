@@ -64,7 +64,7 @@
                 },
                 {
                     "name": "REDIS_HOST",
-                    "value": "arn:aws:ecs:ap-northeast-2:533267347071:service/cluster-ticketing-nest-product/service-ticketing-redis-prod"
+                    "value": "533267347071.dkr.ecr.ap-northeast-2.amazonaws.com/ticketing-redis:latest"
                 },
                 {
                     "name": "REDIS_PORT",
