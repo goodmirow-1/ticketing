@@ -181,8 +181,8 @@ jobs:
             uses: aws-actions/amazon-ecs-render-task-definition@v1
             with:
               task-definition: .taskdefinition/prod-task-redis-definition.json
-              container-name: service-prod
-              image: ${{ steps.build-image.outputs.image }}
+              container-name: redis-prod
+              image: ${{ steps.build-redis-image.outputs.image }}
           
           - name: Deploy Amazon ECS task-definition
             uses: aws-actions/amazon-ecs-deploy-task-definition@v1
