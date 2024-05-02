@@ -77,18 +77,6 @@ jobs:
           run: |
             pnpm run test
 
-        - name: Close PR on failure
-          if: ${{ failure() }}
-          uses: actions/github-script@v6
-          with:
-            script: |
-              github.rest.pulls.update({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                pull_number: context.issue.number,
-                state: 'closed'
-              })
-    
     # prod-cd:
     #     needs: test
     #     runs-on: ubuntu-latest
