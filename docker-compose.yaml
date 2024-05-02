@@ -19,9 +19,11 @@ services:
       MAX_SEATS: ${MAX_SEATS}
       VALID_TOKEN_EXPIRATION_TIME=: ${VALID_TOKEN_EXPIRATION_TIME}
       SEAT_HOLD_EXPIRATION_TIME: ${SEAT_HOLD_EXPIRATION_TIME}
-      JWT_SECRET_KEY: TICKETINGTICKETING
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
       MYSQL_DATABASE: ${DATABASE}
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
     volumes:
       - .:/app
       - /app/node_modules
@@ -45,6 +47,17 @@ services:
     ports:
       - "3306:3306"
 
+  redis:
+    container_name: redis
+    image: redis:latest
+    restart: unless-stopped
+    ports:
+      - "${REDIS_HOST}:${REDIS_PORT}"
+    networks:
+      - ticketing-net
+    volumes:
+      - redis-data:/data
+    
 networks:
   ticketing-net:
     driver: bridge

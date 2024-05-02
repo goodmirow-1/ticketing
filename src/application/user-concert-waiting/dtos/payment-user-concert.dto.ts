@@ -6,21 +6,19 @@ import type { IRequestDTO } from 'src/application/common/request.interface'
 export type PaymentUserConcertRequestType = {
     userId: string
     reservationId: string
-    token?: string
 }
 
 export class PaymentUserConcertRequestDto implements IRequestDTO<PaymentUserConcertRequestType> {
     constructor(
         private readonly userId: string,
         private readonly reservationId: string,
-        private readonly token?: string,
     ) {}
 
     validate() {}
 
     toUseCaseInput(): PaymentUserConcertRequestType {
         // Returns the data in the format expected by the use case
-        return { userId: this.userId, reservationId: this.reservationId, token: this.token }
+        return { userId: this.userId, reservationId: this.reservationId }
     }
 }
 

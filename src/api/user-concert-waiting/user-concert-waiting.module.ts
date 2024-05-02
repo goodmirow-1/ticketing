@@ -8,21 +8,23 @@ import { ConcertReaderRepositoryTypeORM } from '../../infrastructure/concert/rep
 import { UserWriterRepositoryTypeORM } from '../../infrastructure/user/repositories/user-writer.repository'
 import { ConcertWriterRepositoryTypeORM } from '../../infrastructure/concert/repositories/concert-writer.repository'
 import { UserConcertWaitingController } from './user-concert-waiting.controller'
-import { WaitingWriterRepositoryTypeORM } from '../../infrastructure/waiting/repositories/waiting-writer.repository'
 import { IConcertReaderRepositoryToken } from '../../domain/concert/repositories/concert-reader.repository.interface'
 import { IConcertWriterRepositoryToken } from '../../domain/concert/repositories/concert-writer.repository.interface'
 import { IUserWriterRepositoryToken } from '../../domain/user/repositories/user-writer.repository.interface'
-import { IWaitingWriterRepositoryToken } from '../../domain/waiting/repositories/waiting-writer.repository.interface'
 import { IUserReaderRepositoryToken } from 'src/domain/user/repositories/user-reader.repository.interface'
 import { UserReaderRepositoryTypeORM } from 'src/infrastructure/user/repositories/user-reader.repository'
 import { DataAccessorToken } from 'src/infrastructure/db/data-accesor.interface'
 import { TypeORMDataAccessor } from 'src/infrastructure/db/typeorm/typeorm-data-accesor'
+import { IWaitingWriterRepositoryRedisToken } from 'src/domain/user/repositories/waiting-writer-redis.repository.interface'
+import { WaitingWriterRepositoryRedis } from 'src/infrastructure/user/repositories/waiting-writer-redis.repository'
+import { RedisService } from 'src/infrastructure/db/redis/redis-service'
 
 @Module({
     imports: [TypeOrmModule.forFeature([User, Reservation, PointHistory])],
     controllers: [UserConcertWaitingController],
     providers: [
         PaymentUserConcertUseCase,
+        RedisService,
         {
             provide: IConcertReaderRepositoryToken,
             useClass: ConcertReaderRepositoryTypeORM,
@@ -40,8 +42,8 @@ import { TypeORMDataAccessor } from 'src/infrastructure/db/typeorm/typeorm-data-
             useClass: UserWriterRepositoryTypeORM,
         },
         {
-            provide: IWaitingWriterRepositoryToken,
-            useClass: WaitingWriterRepositoryTypeORM,
+            provide: IWaitingWriterRepositoryRedisToken,
+            useClass: WaitingWriterRepositoryRedis,
         },
         {
             provide: DataAccessorToken,

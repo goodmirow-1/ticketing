@@ -2,7 +2,7 @@ import type { TestingModule } from '@nestjs/testing'
 import { Test } from '@nestjs/testing'
 import { HttpStatus, type INestApplication } from '@nestjs/common'
 import * as request from 'supertest'
-import { AppModule } from './../src/app.module'
+import { AppModule } from '../src/app.module'
 import { EntityManager } from 'typeorm'
 import { randomInt } from 'crypto'
 
@@ -23,6 +23,19 @@ describe('AppController (e2e)', () => {
     })
 
     afterAll(async () => {
+        // await entityManager.delete('valid_token', {})
+        // await entityManager.delete('point_history', {})
+        // await entityManager.delete('reservation', {})
+        // await entityManager.delete('seat', {})
+        // await entityManager.delete('concert_date', {})
+        // await entityManager.delete('concert', {})
+        // await entityManager.delete('waiting_user', {})
+        // await entityManager.delete('user', {})
+
+        await app.close()
+    })
+
+    const emptydb = async () => {
         await entityManager.delete('valid_token', {})
         await entityManager.delete('point_history', {})
         await entityManager.delete('reservation', {})
@@ -31,13 +44,13 @@ describe('AppController (e2e)', () => {
         await entityManager.delete('concert', {})
         await entityManager.delete('waiting_user', {})
         await entityManager.delete('user', {})
-
-        await app.close()
-    })
+    }
 
     it(
         'should create 100 users and charge them each 10,000 points',
         async () => {
+            await emptydb()
+
             const MAX_CONNECTIONS = parseInt(process.env.MAX_CONNECTIONS, 10) * 2
 
             for (let i = 0; i < MAX_CONNECTIONS; i++) {
@@ -92,7 +105,7 @@ describe('AppController (e2e)', () => {
         'should handle the token issuance and concert access process for multiple users simultaneously',
         async () => {
             // 1. 동시에 여러 사용자에 대해 토큰 발급 요청
-            const tokenRequests = userIds.map(userId => request(app.getHttpServer()).get(`/user-waiting/${userId}/token/generate`))
+            const tokenRequests = userIds.map(userId => request(app.getHttpServer()).get(`/user/${userId}/token/generate`))
 
             const tokenResponses = await Promise.allSettled(tokenRequests)
             resultControl(tokenResponses)
@@ -100,13 +113,14 @@ describe('AppController (e2e)', () => {
             // 각 토큰 발급 응답을 처리하고, 필요한 경우 폴링을 시작
             const concertAccessRequests = tokenResponses.map(response => {
                 if (response.status === 'fulfilled' && response.value.status === HttpStatus.OK) {
+                    const userId = response.value.body.userId
                     const { token, waitingNumber } = response.value.body
                     // 유효 토큰일 경우 즉시 콘서트 접근 시도
                     if (waitingNumber === 0) {
                         return handleConcertAccess(token)
                     } else {
                         // 대기 토큰일 경우 폴링을 통해 콘서트 접근 시도
-                        return pollForTokenAvailability(token, waitingNumber)
+                        return pollForTokenAvailability(userId, waitingNumber)
                     }
                 } else {
                     return Promise.resolve(null) // 응답이 실패했거나 조건을 만족하지 못하는 경우, null 반환
@@ -120,19 +134,19 @@ describe('AppController (e2e)', () => {
     )
 
     // 폴링 함수: 폴링이 성공적으로 완료될 때까지 재귀적으로 자기 자신을 호출
-    async function pollForTokenAvailability(token, waitingNumber) {
+    async function pollForTokenAvailability(param, waitingNumber) {
         if (waitingNumber === 0) {
-            return handleConcertAccess(token)
+            return handleConcertAccess(param)
         } else {
             const delay = calculatePollingDelay(waitingNumber)
             await new Promise(resolve => setTimeout(resolve, delay))
 
             try {
-                const statusResponse = await request(app.getHttpServer()).get('/user-waiting/token/status').set('Authorization', `Bearer ${token}`)
+                const statusResponse = await request(app.getHttpServer()).get(`/user/${param}/token/generate`)
                 if (statusResponse.body.waitingNumber == 0) {
                     return pollForTokenAvailability(statusResponse.body.token, statusResponse.body.waitingNumber)
                 } else {
-                    return pollForTokenAvailability(token, statusResponse.body.waitingNumber)
+                    return pollForTokenAvailability(param, statusResponse.body.waitingNumber)
                 }
             } catch (error) {
                 console.error('Error during polling token availability:', error)
@@ -145,9 +159,9 @@ describe('AppController (e2e)', () => {
     function calculatePollingDelay(waitingNumber: number): number {
         if (waitingNumber <= 10) {
             return 1000 * 1 // 1초 대기
-        } else if (waitingNumber <= 30) {
+        } else if (waitingNumber <= 25) {
             return 1000 * 3 // 3초 대기
-        } else if (waitingNumber <= 60) {
+        } else if (waitingNumber <= 50) {
             return 1000 * 5 // 5초 대기
         } else if (waitingNumber <= 100) {
             return 1000 * 7 // 7초 대기
@@ -174,17 +188,21 @@ describe('AppController (e2e)', () => {
     async function handleConcertAccess(token: string): Promise<void> {
         try {
             let attempt = 0
-            const maxAttempts = 3 // 최대 시도 횟수 설정
+            const maxAttempts = 1 // 최대 시도 횟수 설정
+            const delay = 1000
 
             while (attempt < maxAttempts) {
                 attempt++
 
+                await new Promise(resolve => setTimeout(resolve, delay))
                 // 1. 콘서트 날짜 조회
                 const concertsResponse = await request(app.getHttpServer()).get('/concert/dates').set('Authorization', `Bearer ${token}`)
                 if (concertsResponse.status !== HttpStatus.OK) {
                     console.error('Failed to fetch concert dates or no dates available.')
                     return
                 }
+
+                await new Promise(resolve => setTimeout(resolve, delay))
 
                 // 2. 랜덤으로 콘서트 날짜 선택
                 // 콘서트 목록 중 concertDates가 있는 콘서트만 필터링
@@ -198,25 +216,35 @@ describe('AppController (e2e)', () => {
                 // 선택된 콘서트에서 랜덤으로 하나의 날짜 선택
                 const randomDate = avaliableConcerts[Math.floor(Math.random() * avaliableConcerts.length)]
                 const concertDateId = randomDate.id
+
                 // 3. 선택된 콘서트 날짜의 좌석 조회
                 const seatsResponse = await request(app.getHttpServer()).get(`/concert/${concertDateId}/seats`).set('Authorization', `Bearer ${token}`)
                 if (seatsResponse.status !== HttpStatus.OK) {
                     console.error('Failed to fetch seats for the selected concert date.')
-                    continue
+                    return
                 }
 
+                await new Promise(resolve => setTimeout(resolve, delay))
                 // 4. 사용 가능한 좌석 찾기
                 const availableSeats = seatsResponse.body.seats.filter(seat => seat.status === 'available')
                 if (availableSeats.length > 0) {
                     const randomIndex = Math.floor(Math.random() * availableSeats.length)
                     const selectedSeat = availableSeats[randomIndex]
+                    let reservationResponse = null
 
                     try {
-                        const reservationResponse = await request(app.getHttpServer())
+                        reservationResponse = await request(app.getHttpServer())
                             .post(`/concert/${selectedSeat.id}/reservation`)
                             .set('Authorization', `Bearer ${token}`)
 
-                        if (reservationResponse.status === HttpStatus.OK) {
+                        await new Promise(resolve => setTimeout(resolve, delay))
+                    } catch (error) {
+                        console.error('Failed to reserve seat:', error.message)
+                        continue
+                    }
+
+                    if (reservationResponse.status === HttpStatus.OK) {
+                        try {
                             // 5. 예약 후 결제 시도
                             const reservationId = reservationResponse.body.id
                             const userId = reservationResponse.body.userId
@@ -226,11 +254,12 @@ describe('AppController (e2e)', () => {
                                 console.log('Payment successful:', paymentResponse.body)
                                 return // 6. 성공적으로 예약 및 결제 완료
                             } else {
-                                throw new Error('Failed to pay for reservation.')
+                                const errorMessage = paymentResponse.body.message || 'Payment failed with unknown error'
+                                throw new Error(errorMessage)
                             }
+                        } catch (error) {
+                            console.error('Failed to pay for reservation:', error.message)
                         }
-                    } catch (error) {
-                        console.error('Failed to reserve seat:', error.message)
                     }
                 } else {
                     console.error('No available seats found.')

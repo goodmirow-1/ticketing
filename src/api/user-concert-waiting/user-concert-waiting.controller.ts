@@ -1,7 +1,6 @@
-import { Body, Controller, Param, Post, Res } from '@nestjs/common'
+import { Controller, Param, Post, Res } from '@nestjs/common'
 import { PaymentUserConcertUseCase } from '../../application/user-concert-waiting/usecase/payment-user-concert.usecase'
 import { ApiBody, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger'
-import { PaymentDto } from './dtos/payment.request.dto'
 import type { ICommand } from 'src/application/common/command.interface'
 import { PaymentUserConcertCommand } from 'src/application/user-concert-waiting/command/payment-user-concert.command'
 import type { PaymentUserConcertResponseDto } from 'src/application/user-concert-waiting/dtos/payment-user-concert.dto'
@@ -20,13 +19,8 @@ export class UserConcertWaitingController {
     @ApiParam({ name: 'userId', required: true, description: 'user ID' })
     @ApiParam({ name: 'reservationId', required: true, description: 'reservation ID' })
     @ApiBody({ schema: { type: 'object', properties: { token: { type: 'string', nullable: true, default: '' } } } })
-    async payment(@Param('userId') userId: string, @Param('reservationId') reservationId: string, @Body() paymentDto: PaymentDto, @Res() response: Response) {
-        const command: ICommand<PaymentUserConcertResponseDto> = new PaymentUserConcertCommand(
-            this.paymentUserConcertUseCase,
-            userId,
-            reservationId,
-            paymentDto.token,
-        )
+    async payment(@Param('userId') userId: string, @Param('reservationId') reservationId: string, @Res() response: Response) {
+        const command: ICommand<PaymentUserConcertResponseDto> = new PaymentUserConcertCommand(this.paymentUserConcertUseCase, userId, reservationId)
         ResponseManager.from(response, await command.execute())
     }
 }
