@@ -172,9 +172,9 @@ jobs:
               ECR_REGISTRY: ${{ steps.ecr-login.outputs.registry }}
               IMAGE_TAG: ${{ env.VERSION }}
             run: |
-              docker build -t $ECR_REDIS_REGISTRY/$ECR_REDIS_REPOSITORY:$IMAGE_TAG . --target=redis
+              docker build -t $ECR_REDIS_REGISTRY:latest . --target=redis
               docker push $ECR_REDIS_REGISTRY:latest
-              echo "image=$ECR_REDIS_REGISTRY/$ECR_REDIS_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+              echo "image=$ECR_REDIS_REGISTRY:latest" >> $GITHUB_OUTPUT
           
           - name: Render ECS task-definition
             id: render-task-definition
