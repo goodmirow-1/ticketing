@@ -9,7 +9,7 @@ env:
     AWS_REGION: ap-northeast-2
     ECR_REGISTRY: 533267347071.dkr.ecr.ap-northeast-2.amazonaws.com/ticketing-prod
     ECR_REPOSITORY: ticketing-prod
-    ECR_REDIS_REGISTRY: 533267347071.dkr.ecr.ap-northeast-2.amazonaws.com/ticketing-redis
+    ECR_REDIS_REGISTRY: 533267347071.dkr.ecr.ap-northeast-2.amazonaws.com
     ECR_REDIS_REPOSITORY: ticketing-redis
 
 jobs:
@@ -172,9 +172,9 @@ jobs:
               ECR_REGISTRY: ${{ steps.ecr-login.outputs.registry }}
               IMAGE_TAG: ${{ env.VERSION }}
             run: |
-              docker build -t $ECR_REDIS_REGISTRY:latest . --target=redis
-              docker push $ECR_REDIS_REGISTRY:latest
-              echo "image=$ECR_REDIS_REGISTRY:latest" >> $GITHUB_OUTPUT
+              docker build -t $ECR_REDIS_REGISTRY/$ECR_REDIS_REPOSITORY:$IMAGE_TAG . --target=redis
+              docker push $ECR_REDIS_REGISTRY/$ECR_REDIS_REPOSITORY:$IMAGE_TAG
+              echo "image=$ECR_REDIS_REGISTRY/$ECR_REDIS_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
           
           - name: Render ECS task-definition
             id: render-task-definition
