@@ -2,7 +2,7 @@ import { Body, Controller, Get, Param, Patch, Post, Res } from '@nestjs/common'
 import { CreateUserUseCase } from '../../application/user/usecase/create-user.usecase'
 import { ChargeUserPointUseCase } from '../../application/user/usecase/charge-user-point.usecase'
 import { ReadUserPointUseCase } from '../../application/user/usecase/read-user-point.usecase'
-import { ApiParam, ApiBody, ApiTags, ApiOperation } from '@nestjs/swagger'
+import { ApiParam, ApiBody, ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger'
 import { ChargePointDto } from './dtos/charge-point.request.dto'
 import { CreateUserDto } from './dtos/create-user.request.dto'
 import type { ICommand } from 'src/application/common/command.interface'
@@ -14,6 +14,9 @@ import { Response } from 'express'
 import type { ReadUserPointResponseDto } from 'src/application/user/dtos/read-user-point.dto'
 import type { ChargeUserPointResponseDto } from 'src/application/user/dtos/charge-user-point.dto'
 import type { CreateUserResponseDto } from 'src/application/user/dtos/create-user.dto'
+import { GenerateTokenUseCase } from 'src/application/user/usecase/generate-token.usecase'
+import type { GenerateTokenResponseDto } from 'src/application/user/dtos/generate-token.dto'
+import { GenerateTokenCommand } from 'src/application/user/command/generate-token.command'
 
 @ApiTags('유저 API')
 @Controller('user')
@@ -22,7 +25,19 @@ export class UserController {
         private readonly chargePointUseCase: ChargeUserPointUseCase,
         private readonly createUserUseCase: CreateUserUseCase,
         private readonly readUserPointUseCase: ReadUserPointUseCase,
+        private readonly generateTokenUseCase: GenerateTokenUseCase,
     ) {}
+
+    @Get(':userId/token/generate')
+    @ApiOperation({
+        summary: '토큰 발급',
+    })
+    @ApiParam({ name: 'userId', required: true, description: 'User ID', example: '6b9d7e44-04bf-4487-9777-faf55fb87b49' })
+    @ApiResponse({ status: 200, description: 'Returns a new token or waiting number for the user.' })
+    async generateToken(@Param('userId') userId: string, @Res() response: Response) {
+        const command: ICommand<GenerateTokenResponseDto> = new GenerateTokenCommand(this.generateTokenUseCase, userId)
+        ResponseManager.from(response, await command.execute())
+    }
 
     @Get(':userId/point')
     @ApiOperation({

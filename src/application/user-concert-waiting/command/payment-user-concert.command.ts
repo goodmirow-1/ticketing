@@ -9,11 +9,10 @@ export class PaymentUserConcertCommand implements ICommand<PaymentUserConcertRes
         private readonly paymentUserConcertUseCase: PaymentUserConcertUseCase,
         private readonly userId: string,
         private readonly reservationId: string,
-        private readonly token?: string,
     ) {}
 
     execute(): Promise<PaymentUserConcertResponseDto> {
-        const requestDto = new PaymentUserConcertRequestDto(this.userId, this.reservationId, this.token)
+        const requestDto = new PaymentUserConcertRequestDto(this.userId, this.reservationId)
         // Specify the return type if known
         return this.paymentUserConcertUseCase.execute(requestDto)
     }
