@@ -29,9 +29,6 @@ dependencies:
   'jsonwebtoken':
     specifier: ^9.0.2
     version: 9.0.2
-  'mysql':
-    specifier: ^2.18.1
-    version: 2.18.1
   'mysql2':
     specifier: ^3.9.7
     version: 3.9.7

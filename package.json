@@ -33,7 +33,6 @@
     "class-validator": "^0.14.1",
     "ioredis": "^5.4.1",
     "jsonwebtoken": "^9.0.2",
-    "mysql": "^2.18.1",
     "mysql2": "^3.9.7",
     "reflect-metadata": "^0.2.1",
     "request": "^2.88.2",
