@@ -31,56 +31,8 @@
             },
             "environment": [
                 {
-                    "name": "VALID_TOKEN_EXPIRATION_TIME",
-                    "value": "300"
-                },
-                {
-                    "name": "DB_TYPE",
-                    "value": "mariadb"
-                },
-                {
-                    "name": "DATABASE",
-                    "value": "ticketing"
-                },
-                {
-                    "name": "DB_PORT",
-                    "value": "3306"
-                },
-                {
-                    "name": "MAX_SEATS",
-                    "value": "50"
-                },
-                {
-                    "name": "SEAT_HOLD_EXPIRATION_TIME",
-                    "value": "300"
-                },
-                {
-                    "name": "DB_HOST",
-                    "value": "ticketing.c72y2e8oapsn.ap-northeast-2.rds.amazonaws.com"
-                },
-                {
-                    "name": "MAX_CONNECTIONS",
-                    "value": "100"
-                },
-                {
-                    "name": "REDIS_HOST",
-                    "value": "redis-ticketing-p89qsd.serverless.apn2.cache.amazonaws.com"
-                },
-                {
-                    "name": "REDIS_PORT",
-                    "value": "6379"
-                },
-                {
-                    "name": "DB_USER_NAME",
-                    "value": "admin"
-                },
-                {
-                    "name": "DB_PASSWORD",
-                    "value": "1krnrgus"
-                },
-                {
-                    "name": "JWT_SECRET_KEY",
-                    "value": "TICKETING"
+                    "name": "S3_BUCKET",
+                    "value": "ticketing-env"
                 }
             ],
             "mountPoints": [],
