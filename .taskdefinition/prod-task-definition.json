@@ -1,61 +1,61 @@
 {
-    "taskDefinitionArn": "arn:aws:ecs:ap-northeast-2:533267347071:task-definition/task-definition-ticketing-nets-prod:29",
+    "taskDefinitionArn": "arn:aws:ecs:ap-northeast-2:533267347071:task-definition/task-definition-ticketing-nest-prod:1",
     "containerDefinitions": [
         {
-            "name": "service-prod",
-            "image": "533267347071.dkr.ecr.ap-northeast-2.amazonaws.com/ticketing-prod:prod-e38c2dc00a2df0610fb30e39c3e98a380016b958",
+            "name": "ticketing-prod",
+            "image": "533267347071.dkr.ecr.ap-northeast-2.amazonaws.com/ticketing-prod",
             "cpu": 0,
             "portMappings": [
                 {
-                    "name": "container-port-protocol",
-                    "containerPort": 3000,
-                    "hostPort": 3000,
+                    "name": "http",
+                    "containerPort": 80,
+                    "hostPort": 80,
                     "protocol": "tcp",
                     "appProtocol": "http"
                 },
                 {
-                    "name": "mariadb-port-protocol",
+                    "name": "maria",
                     "containerPort": 3306,
                     "hostPort": 3306,
+                    "protocol": "tcp",
+                    "appProtocol": "http"
+                },
+                {
+                    "name": "redis",
+                    "containerPort": 6379,
+                    "hostPort": 6379,
                     "protocol": "tcp",
                     "appProtocol": "http"
                 }
             ],
             "essential": true,
-            "healthCheck": {
-                "command": ["CMD-SHELL", "curl -f http://lb-ticketing-nest-prod-996027504.ap-northeast-2.elb.amazonaws.com || exit 1"],
-                "interval": 30,
-                "timeout": 5,
-                "retries": 3,
-                "startPeriod": 10
-            },
-            "environment": [
+            "environment": [],
+            "environmentFiles": [
                 {
-                    "name": "S3_BUCKET",
-                    "value": "ticketing-env"
+                    "value": "arn:aws:s3:::ticketing-env/ticketing.env",
+                    "type": "s3"
                 }
             ],
             "mountPoints": [],
             "volumesFrom": [],
-            "secrets": [
-            ],
+            "ulimits": [],
             "logConfiguration": {
                 "logDriver": "awslogs",
                 "options": {
                     "awslogs-create-group": "true",
-                    "awslogs-group": "/ecs/task-definition-ticketing-nets-prod",
+                    "awslogs-group": "/ecs/task-definition-ticketing-nest-prod",
                     "awslogs-region": "ap-northeast-2",
                     "awslogs-stream-prefix": "ecs"
-                }
+                },
+                "secretOptions": []
             },
             "systemControls": []
         }
     ],
-    "family": "task-definition-ticketing-nets-prod",
-    "taskRoleArn": "arn:aws:iam::533267347071:role/role-ecs-tasks",
-    "executionRoleArn": "arn:aws:iam::533267347071:role/role-ecs-tasks",
+    "family": "task-definition-ticketing-nest-prod",
+    "executionRoleArn": "arn:aws:iam::533267347071:role/ecsTaskExecutionRole",
     "networkMode": "awsvpc",
-    "revision": 29,
+    "revision": 1,
     "volumes": [],
     "status": "ACTIVE",
     "requiresAttributes": [
@@ -72,10 +72,7 @@
             "name": "com.amazonaws.ecs.capability.docker-remote-api.1.19"
         },
         {
-            "name": "ecs.capability.secrets.asm.environment-variables"
-        },
-        {
-            "name": "com.amazonaws.ecs.capability.task-iam-role"
+            "name": "ecs.capability.env-files.s3"
         },
         {
             "name": "ecs.capability.execution-role-ecr-pull"
@@ -98,13 +95,13 @@
     "requiresCompatibilities": [
         "FARGATE"
     ],
-    "cpu": "512",
-    "memory": "1024",
+    "cpu": "1024",
+    "memory": "3072",
     "runtimePlatform": {
         "cpuArchitecture": "X86_64",
         "operatingSystemFamily": "LINUX"
     },
-    "registeredAt": "2024-04-24T15:48:39.402Z",
+    "registeredAt": "2024-05-03T02:52:15.698Z",
     "registeredBy": "arn:aws:iam::533267347071:root",
     "tags": []
 }
