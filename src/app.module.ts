@@ -29,6 +29,7 @@ import { AppController } from './app.controller'
                     entities: [__dirname + '/**/*.entity{.ts,.js}'],
                     synchronize: true,
                     logging: false,
+                    drvier: 'mysql2',
                 } as TypeOrmModuleOptions
             },
         }),
