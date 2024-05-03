@@ -10,24 +10,24 @@ export class WaitingWriterRepositoryRedis implements IWaitingWriterRedisReposito
     }
 
     private async subscribeToExpiredTokens() {
-        // const subscribeClient = await this.redisService.getSubscribeClient()
+        const subscribeClient = await this.redisService.getSubscribeClient()
 
-        // await subscribeClient.subscribe('__keyevent@0__:expired', (error, count) => {
-        //     if (error) {
-        //         console.log(count)
-        //         console.error('Failed to subscribe:', error)
-        //         return
-        //     }
-        // })
+        await subscribeClient.subscribe('__keyevent@0__:expired', (error, count) => {
+            if (error) {
+                console.log(count)
+                console.error('Failed to subscribe:', error)
+                return
+            }
+        })
 
-        // subscribeClient.on('message', async (channel, message) => {
-        //     if (message.startsWith('token:')) {
-        //         const userId = await this.dequeueWaitingUser()
-        //         if (userId) {
-        //             await this.createValidToken(userId)
-        //         }
-        //     }
-        // })
+        subscribeClient.on('message', async (channel, message) => {
+            if (message.startsWith('token:')) {
+                const userId = await this.dequeueWaitingUser()
+                if (userId) {
+                    await this.createValidToken(userId)
+                }
+            }
+        })
     }
 
     // Implementation of IWaitingWriterRepository methods

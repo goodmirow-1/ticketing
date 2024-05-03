@@ -54,25 +54,25 @@ describe('Integration Tests for User Use Cases', () => {
             await expect(generateTokenUseCase.execute(requestDto)).rejects.toThrow(NotFoundUserError)
         })
 
-        // it('should generate valid and waiting token is successfully', async () => {
-        //     const requestUserId = await getUserID('tester')
-        //     const requestDtoOne = new GenerateTokenRequestDto(requestUserId)
-        //     const resultOne = await generateTokenUseCase.execute(requestDtoOne)
+        it('should generate valid and waiting token is successfully', async () => {
+            const requestUserId = await getUserID('tester')
+            const requestDtoOne = new GenerateTokenRequestDto(requestUserId)
+            const resultOne = await generateTokenUseCase.execute(requestDtoOne)
 
-        //     expect(resultOne.waitingNumber).toBe(0)
+            expect(resultOne.waitingNumber).toBe(0)
 
-        //     for (let i = 0; i < parseInt(process.env.MAX_CONNECTIONS, 10); i++) {
-        //         const uuid = uuidv4()
-        //         const userId = await getUserID(uuid)
-        //         const requestDto = new GenerateTokenRequestDto(userId)
-        //         await generateTokenUseCase.execute(requestDto)
-        //     }
+            for (let i = 0; i < parseInt(process.env.MAX_CONNECTIONS, 10); i++) {
+                const uuid = uuidv4()
+                const userId = await getUserID(uuid)
+                const requestDto = new GenerateTokenRequestDto(userId)
+                await generateTokenUseCase.execute(requestDto)
+            }
 
-        //     const userId = await getUserID('tester')
-        //     const requestDto = new GenerateTokenRequestDto(userId)
-        //     const result = await generateTokenUseCase.execute(requestDto)
+            const userId = await getUserID('tester')
+            const requestDto = new GenerateTokenRequestDto(userId)
+            const result = await generateTokenUseCase.execute(requestDto)
 
-        //     expect(result.waitingNumber).toBeGreaterThanOrEqual(1)
-        // })
+            expect(result.waitingNumber).toBeGreaterThanOrEqual(1)
+        })
     })
 })
