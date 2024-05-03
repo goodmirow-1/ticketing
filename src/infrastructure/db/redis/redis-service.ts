@@ -1,7 +1,7 @@
 import type { OnModuleDestroy, OnModuleInit } from '@nestjs/common'
 import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
-import Redis from 'ioredis'
+import type Redis from 'ioredis'
 
 @Injectable()
 export class RedisService implements OnModuleInit, OnModuleDestroy {
@@ -9,11 +9,11 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
     private subscriberClient: Redis
 
     constructor(private configService: ConfigService) {
-        const host = process.env.REDIS_HOST
-        const port = parseInt(process.env.REDIS_PORT, 10)
+        // const host = process.env.REDIS_HOST
+        // const port = parseInt(process.env.REDIS_PORT, 10)
 
-        this.redisClient = new Redis({ host: host, port: port })
-        this.subscriberClient = new Redis({ host: host, port: port })
+        // this.redisClient = new Redis({ host: host, port: port })
+        // this.subscriberClient = new Redis({ host: host, port: port })
 
         this.clearTokensAndQueue()
     }
