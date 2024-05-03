@@ -69,23 +69,23 @@
                 {
                     "name": "REDIS_PORT",
                     "value": "6379"
+                },
+                {
+                    "name": "DB_USER_NAME",
+                    "value": "admin"
+                },
+                {
+                    "name": "DB_PASSWORD",
+                    "value": "1krnrgus"
+                },
+                {
+                    "name": "JWT_SECRET_KEY",
+                    "value": "TICKETING"
                 }
             ],
             "mountPoints": [],
             "volumesFrom": [],
             "secrets": [
-                {
-                    "name": "DB_USER_NAME",
-                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-2:533267347071:secret:DB_USER_NAME-yIMMFS"
-                },
-                {
-                    "name": "DB_PASSWORD",
-                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-2:533267347071:secret:DB_PASSWORD-EHYl4E"
-                },
-                {
-                    "name" : "JWT_SECRET_KEY",
-                    "valueFrom" : "arn:aws:secretsmanager:ap-northeast-2:533267347071:secret:JWT_SECRET_KEY-y0vUgM"
-                }
             ],
             "logConfiguration": {
                 "logDriver": "awslogs",
