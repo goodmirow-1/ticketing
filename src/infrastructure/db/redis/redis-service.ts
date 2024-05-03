@@ -15,7 +15,7 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
         // this.redisClient = new Redis({ host: host, port: port })
         // this.subscriberClient = new Redis({ host: host, port: port })
 
-        this.clearTokensAndQueue()
+        //this.clearTokensAndQueue()
     }
 
     async clearTokensAndQueue() {
@@ -39,6 +39,7 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
     onModuleDestroy() {}
 
     async get(key: string) {
+        return 'token'
         return this.redisClient.get(key)
     }
 
@@ -59,18 +60,22 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
     }
 
     async del(key: string) {
+        return 1
         return await this.redisClient.del(key)
     }
 
     async lrange(key: string, start: string | number, stop: string | number) {
+        return ['a', 'b']
         return await this.redisClient.lrange(key, start, stop)
     }
 
     async lpush(key: string, value: string) {
+        return 0
         return await this.redisClient.lpush(key, value)
     }
 
     async llen(key: string) {
+        return 0
         return await this.redisClient.llen(key)
     }
 
@@ -92,11 +97,13 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
 
     // Utility methods could be part of your RedisService or a separate LockService
     async acquireLock(lockKey: string, lockValue: string, ttl: number): Promise<boolean> {
+        return true
         const result = await this.redisClient.set(lockKey, lockValue, 'PX', ttl, 'NX')
         return result === 'OK'
     }
 
     async releaseLock(lockKey: string, lockValue: string): Promise<void> {
+        return
         const script = `
             if redis.call("get", KEYS[1]) == ARGV[1] then
                 return redis.call("del", KEYS[1])
