@@ -12,8 +12,24 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
         const host = process.env.REDIS_HOST
         const port = parseInt(process.env.REDIS_PORT, 10)
 
-        this.redisClient = new Redis({ host: host, port: port })
-        this.subscriberClient = new Redis({ host: host, port: port })
+        this.redisClient = new Redis({
+            host: host,
+            port: port,
+            retryStrategy: function (times) {
+                const delay = Math.min(times * 50, 2000)
+                return delay
+            },
+            maxRetriesPerRequest: null, // Set to null to disable the limit })
+        })
+        this.subscriberClient = new Redis({
+            host: host,
+            port: port,
+            retryStrategy: function (times) {
+                const delay = Math.min(times * 50, 2000)
+                return delay
+            },
+            maxRetriesPerRequest: null, // Set to null to disable the limit })
+        })
 
         this.clearTokensAndQueue()
     }
