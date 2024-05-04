@@ -176,6 +176,6 @@ jobs:
             uses: aws-actions/amazon-ecs-deploy-task-definition@v1
             with:
               task-definition: ${{ steps.render-task-definition.outputs.task-definition }}
-              service: service-product-redis-prod 
+              service: service-ticketing-redis-prod 
               cluster: cluster-ticketing-nest-product
               wait-for-service-stability: false
