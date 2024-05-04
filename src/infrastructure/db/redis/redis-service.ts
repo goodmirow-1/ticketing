@@ -15,19 +15,31 @@ export class RedisService {
 
         this.redisClient = new Redis({
             host: host,
-            username: userName,
             port: port,
-            password: password,
             lazyConnect: true,
-            keepAlive: 1000,
+            connectTimeout: 15000,
+            retryStrategy(times) {
+                return Math.min(times * 30, 1000)
+            },
+            reconnectOnError(error) {
+                const targetErrors = [/READONLY/, /ETIMEDOUT/]
+                console.warn(`Redis connection error: ${error.message}`, error)
+                return targetErrors.some(targetError => targetError.test(error.message))
+            },
         })
         this.subscriberClient = new Redis({
             host: host,
-            username: userName,
             port: port,
-            password: password,
             lazyConnect: true,
-            keepAlive: 1000,
+            connectTimeout: 15000,
+            retryStrategy(times) {
+                return Math.min(times * 30, 1000)
+            },
+            reconnectOnError(error) {
+                const targetErrors = [/READONLY/, /ETIMEDOUT/]
+                console.warn(`Redis connection error: ${error.message}`, error)
+                return targetErrors.some(targetError => targetError.test(error.message))
+            },
         })
 
         this.clearTokensAndQueue()
