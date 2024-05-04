@@ -14,10 +14,18 @@ export class RedisService {
         this.redisClient = new Redis({
             host: host,
             port: port,
+            tls: {
+                servername: host,
+                rejectUnauthorized: false, // 필요에 따라 설정
+            },
         })
         this.subscriberClient = new Redis({
             host: host,
             port: port,
+            tls: {
+                servername: host,
+                rejectUnauthorized: false, // 필요에 따라 설정
+            },
         })
 
         this.clearTokensAndQueue()
