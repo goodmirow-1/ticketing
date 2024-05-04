@@ -38,14 +38,13 @@ hotfix : master 브랜치로 배포를 했는데 버그가 생겼을 떄 긴급 
 
 | API | Method | URI | Req | Res
 |----------|----------|----------|----------|----------|
-| 유저 토큰 발급 | Get | /user-waiting/:userId/token/generate |  | { 'token', 0 } |
-| 토큰 상태 조회 | Get | /user-waiting/token/status |  | { 'token', 0 } or 0 |
 | 예약 가능 날짜 | Get | /concert/dates |  | [{id,date,availableSeats,concert}] |
 | 예약 가능 좌석 | Get | /concert/:concertDateId/seats |  | [{id,seatNumber,concertDate,status,reservations}] |
 | 좌석 예약 요청 | Post | /concert/:seatId/reservation |  | {id,seatNumber,concertDate,status,reservations} |
 | 잔액 충전 | Patch | /user/charge/:userId/point | 0 | 0 |
 | 잔액 조회 | Get |/user/:userId/point |  | 0 |
 | 결제 | Post |/user-concert/payment/:userId/:reservationId |  | {id,amount,reason,user,reservation,paymentDate} |
+| 유저 토큰 발급 | Get | /user/:userId/token/generate |  | { 'token', 0 } |
 
 ## 시퀀스 다이어그램
 ### 유저 토큰 발급

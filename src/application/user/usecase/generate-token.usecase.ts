@@ -30,6 +30,7 @@ export class GenerateTokenUseCase {
         const lockValue = (Date.now() + ttl + 1).toString()
 
         try {
+            //분산락 획득
             const isAcquiredLock = await this.waitingReaderRedisRepository.acquireLock(lockKey, lockValue, ttl)
             if (!isAcquiredLock) {
                 throw new Error('Unable to acquire lock, operation is currently being processed by another instance.')
@@ -37,6 +38,7 @@ export class GenerateTokenUseCase {
 
             //유효 토큰에 있는지 확인
             const validToken = await this.waitingReaderRedisRepository.getValidTokenByUserId(userId)
+            //유효 토큰에 있으면 바로 return
             if (validToken) return new GenerateTokenResponseDto(userId, validToken, 0)
             //대기열에 사용자가 있는지 확인
             const position = await this.waitingReaderRedisRepository.getWaitingNumber(userId)
@@ -53,7 +55,7 @@ export class GenerateTokenUseCase {
 
             return new GenerateTokenResponseDto(userId, token, waitingNumber)
         } finally {
-            // Always release the lock
+            // 분산락 릴리즈
             await this.waitingReaderRedisRepository.releaseLock(lockKey, lockValue)
         }
     }
