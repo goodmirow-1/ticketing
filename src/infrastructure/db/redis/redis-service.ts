@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import Redis from 'ioredis'
-import type { ConnectionOptions } from 'tls'
 
 @Injectable()
 export class RedisService {
@@ -11,17 +10,14 @@ export class RedisService {
     constructor(private configService: ConfigService) {
         const host = process.env.REDIS_HOST
         const port = parseInt(process.env.REDIS_PORT, 10)
-        const redisTls: ConnectionOptions | undefined = process.env.REDIS_TLS ? { servername: host } : undefined
 
         this.redisClient = new Redis({
             host: host,
             port: port,
-            tls: redisTls,
         })
         this.subscriberClient = new Redis({
             host: host,
             port: port,
-            tls: redisTls,
         })
 
         this.clearTokensAndQueue()
