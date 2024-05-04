@@ -70,25 +70,4 @@ CMD ["node", "dist/main"]
 # 🟥 Redis phase
 #
 FROM redis:alpine as redis
-
-# 필요한 패키지 설치
-RUN apk add --no-cache nodejs npm
-
-# 작업 디렉토리 생성 및 설정
-WORKDIR /usr/src/app
-
-# 헬스체크 서버 스크립트
-COPY healthcheck-server.js .
-
-# Node.js 의존성 설치
-RUN npm init -y
-RUN npm install express redis
-
-# 시작 스크립트 복사
-COPY start-redis.sh .
-
-# 실행 권한 부여
-RUN chmod +x start-redis.sh
-
-# 컨테이너 시작 시 스크립트 실행
-CMD ["./start-redis.sh"]
+CMD ["redis-server", "--notify-keyspace-events", "Ex"]
