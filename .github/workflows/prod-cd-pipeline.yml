@@ -128,18 +128,6 @@ jobs:
                 service: service-ticketing-nest-prod
                 cluster: cluster-ticketing-nest-product
                 wait-for-service-stability: false
-            
-            - name: Close PR on failure
-              if: ${{ failure() }}
-              uses: actions/github-script@v6
-              with:
-                script: |
-                  github.rest.pulls.update({
-                    owner: context.repo.owner,
-                    repo: context.repo.repo,
-                    pull_number: context.issue.number,
-                    state: 'closed'
-                  })
                   
     prod-redis-cd:
       needs: test

@@ -1,10 +1,9 @@
-import type { OnModuleDestroy, OnModuleInit } from '@nestjs/common'
 import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import Redis from 'ioredis'
 
 @Injectable()
-export class RedisService implements OnModuleInit, OnModuleDestroy {
+export class RedisService {
     private redisClient: Redis
     private subscriberClient: Redis
 
@@ -39,10 +38,6 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
         // 대기열 삭제
         await this.redisClient.del('waitingQueue')
     }
-
-    onModuleInit() {}
-
-    onModuleDestroy() {}
 
     async get(key: string) {
         return this.redisClient.get(key)
