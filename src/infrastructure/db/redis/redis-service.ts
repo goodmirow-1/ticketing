@@ -18,7 +18,6 @@ export class RedisService {
             port: port,
             lazyConnect: true,
             connectTimeout: 15000,
-            tls: {},
             retryStrategy(times) {
                 return Math.min(times * 30, 1000)
             },
@@ -34,7 +33,6 @@ export class RedisService {
             port: port,
             lazyConnect: true,
             connectTimeout: 15000,
-            tls: {},
             retryStrategy(times) {
                 return Math.min(times * 30, 1000)
             },
