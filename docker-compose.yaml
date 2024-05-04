@@ -1,5 +1,19 @@
 version: '3.8'
 services:
+  redis:
+    container_name: redis
+    hostname: redis
+    image: redis:latest  # Ensure this is compatible with your RDB file
+    restart: unless-stopped
+    command: ["redis-server", "--bind", "redis", "--port", "6379", "--notify-keyspace-events", "Ex"]
+    ports:
+      - "${REDIS_PORT}:${REDIS_PORT}"
+    networks:
+      - ticketing-net
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    volumes:
+      - redis-data:/data
   api:
     container_name: nestjs
     image: nestjs-dev
@@ -31,6 +45,8 @@ services:
       - "3000:3000"
     networks:
       - ticketing-net
+    depends_on:
+      - redis
     external_links:
       - redis
     command: pnpm run start
@@ -47,22 +63,10 @@ services:
     networks:
       - ticketing-net
     ports:
-      - "3306:3306"
+      - "3307:3306"
 
-  redis:
-    container_name: redis
-    hostname: redis
-    image: redis:7.0.0
-    restart: unless-stopped
-    command: redis-server --notify-keyspace-events Ex
-    ports:
-      - "${REDIS_PORT}:${REDIS_PORT}"
-    networks:
-      - ticketing-net
-    extra_hosts:
-      - host.docker.internal:host-gateway
-    volumes:
-      - redis-data:/data
+  
+
     
 networks:
   ticketing-net:
