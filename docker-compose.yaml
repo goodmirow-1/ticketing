@@ -14,8 +14,6 @@ services:
       - host.docker.internal:host-gateway
     volumes:
       - redis-data:/data
-    sysctls:
-      - vm.overcommit_memory=1
 
   api:
     container_name: nestjs
