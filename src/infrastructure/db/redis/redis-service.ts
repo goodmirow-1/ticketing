@@ -9,15 +9,25 @@ export class RedisService {
 
     constructor(private configService: ConfigService) {
         const host = process.env.REDIS_HOST
+        const userName = process.env.REDIS_USER_NAME
+        const password = process.env.REDIS_PASSWORD
         const port = parseInt(process.env.REDIS_PORT, 10)
 
         this.redisClient = new Redis({
             host: host,
+            username: userName,
             port: port,
+            password: password,
+            lazyConnect: true,
+            keepAlive: 1000,
         })
         this.subscriberClient = new Redis({
             host: host,
+            username: userName,
             port: port,
+            password: password,
+            lazyConnect: true,
+            keepAlive: 1000,
         })
 
         this.clearTokensAndQueue()
