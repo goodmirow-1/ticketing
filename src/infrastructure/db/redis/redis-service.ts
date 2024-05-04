@@ -9,8 +9,8 @@ export class RedisService {
 
     constructor(private configService: ConfigService) {
         const host = process.env.REDIS_HOST
-        const userName = process.env.REDIS_USER_NAME
-        const password = process.env.REDIS_PASSWORD
+        // const userName = process.env.REDIS_USER_NAME
+        // const password = process.env.REDIS_PASSWORD
         const port = parseInt(process.env.REDIS_PORT, 10)
 
         this.redisClient = new Redis({
@@ -18,6 +18,7 @@ export class RedisService {
             port: port,
             lazyConnect: true,
             connectTimeout: 15000,
+            tls: {},
             retryStrategy(times) {
                 return Math.min(times * 30, 1000)
             },
@@ -27,11 +28,13 @@ export class RedisService {
                 return targetErrors.some(targetError => targetError.test(error.message))
             },
         })
+
         this.subscriberClient = new Redis({
             host: host,
             port: port,
             lazyConnect: true,
             connectTimeout: 15000,
+            tls: {},
             retryStrategy(times) {
                 return Math.min(times * 30, 1000)
             },
