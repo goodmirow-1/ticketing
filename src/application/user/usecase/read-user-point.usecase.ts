@@ -16,9 +16,9 @@ export class ReadUserPointUseCase {
 
         const { userId } = requestDto.toUseCaseInput()
 
-        await this.userReaderRepository.findUserById(userId)
+        const user = await this.userReaderRepository.findUserById(userId)
 
         //유저 포인트 조회
-        return new ReadUserPointResponseDto(await this.userReaderRepository.findUserPointById(userId))
+        return new ReadUserPointResponseDto(user.point)
     }
 }

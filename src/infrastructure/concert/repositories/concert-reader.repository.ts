@@ -105,7 +105,12 @@ export class ConcertReaderRepositoryTypeORM implements IConcertReaderRepository 
         if (!concertDate) throw new NotFoundConcertDateError(`Concert date id ${id} not found`)
         if (concertDate.availableSeats === 0) throw new NotAvailableSeatError(`No seats available for concert date id ${id}`)
 
-        return this.entityManager.find(Seat, { where: { concertDate } })
+        return this.entityManager
+            .createQueryBuilder(Seat, 'seat')
+            .leftJoin('seat.concertDate', 'concertDate')
+            .where('concertDate.id = :id', { id })
+            .andWhere('seat.status = :status', { status: 'available' })
+            .getMany()
     }
 
     /**

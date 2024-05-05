@@ -65,9 +65,6 @@ services:
       - ticketing-net
     ports:
       - "3307:3306"
-
-  
-
     
 networks:
   ticketing-net:

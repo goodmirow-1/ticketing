@@ -9,8 +9,6 @@ export class RedisService {
 
     constructor(private configService: ConfigService) {
         const host = process.env.REDIS_HOST
-        const userName = process.env.REDIS_USER_NAME
-        const password = process.env.REDIS_PASSWORD
         const port = parseInt(process.env.REDIS_PORT, 10)
 
         this.redisClient = new Redis({
