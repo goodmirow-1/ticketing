@@ -25,6 +25,7 @@ export class RedisService {
                 return targetErrors.some(targetError => targetError.test(error.message))
             },
         })
+
         this.subscriberClient = new Redis({
             host: host,
             port: port,
