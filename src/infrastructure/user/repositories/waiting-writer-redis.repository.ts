@@ -5,30 +5,7 @@ import { RedisService } from 'src/infrastructure/db/redis/redis-service'
 
 @Injectable()
 export class WaitingWriterRepositoryRedis implements IWaitingWriterRedisRepository {
-    constructor(private redisService: RedisService) {
-        this.subscribeToExpiredTokens()
-    }
-
-    private async subscribeToExpiredTokens() {
-        const subscribeClient = await this.redisService.getSubscribeClient()
-
-        await subscribeClient.subscribe('__keyevent@0__:expired', (error, count) => {
-            if (error) {
-                console.log(count)
-                console.error('Failed to subscribe:', error)
-                return
-            }
-        })
-
-        subscribeClient.on('message', async (channel, message) => {
-            if (message.startsWith('token:')) {
-                const userId = await this.dequeueWaitingUser()
-                if (userId) {
-                    await this.createValidToken(userId)
-                }
-            }
-        })
-    }
+    constructor(private redisService: RedisService) {}
 
     // Implementation of IWaitingWriterRepository methods
     async enqueueWaitingUser(userId: string, position: number) {

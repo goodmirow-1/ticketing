@@ -1,5 +1,5 @@
 import type { ICommand } from 'src/application/common/command.interface'
-import type { CreateReservationUseCase } from 'src/application/concert/usecase/create-reservation.usecase'
+import type { CreateReservationUseCase } from 'src/application/user-concert-waiting/usecase/create-reservation.usecase'
 import type { CreateReservationResponseDto } from '../dtos/create-reservation.dto'
 import { CreateReservationRequestDto } from '../dtos/create-reservation.dto'
 

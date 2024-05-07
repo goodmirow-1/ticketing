@@ -18,6 +18,7 @@ import { IWaitingReaderRepositoryRedisToken } from 'src/domain/user/repositories
 import { WaitingReaderRepositoryRedis } from 'src/infrastructure/user/repositories/waiting-reader-redis.repository'
 import { IWaitingWriterRepositoryRedisToken } from 'src/domain/user/repositories/waiting-writer-redis.repository.interface'
 import { WaitingWriterRepositoryRedis } from 'src/infrastructure/user/repositories/waiting-writer-redis.repository'
+import { WaitingSchedulerUseCase } from 'src/application/user/usecase/waiting-scheduler.usecase'
 
 @Module({
     imports: [TypeOrmModule.forFeature([User, PointHistory])],
@@ -27,6 +28,7 @@ import { WaitingWriterRepositoryRedis } from 'src/infrastructure/user/repositori
         CreateUserUseCase,
         ReadUserPointUseCase,
         GenerateTokenUseCase,
+        WaitingSchedulerUseCase,
         RedisService,
         {
             provide: IUserReaderRepositoryToken,

@@ -1,21 +1,21 @@
-// dtos/application-create-concert.request.dto.ts
-
 import type { IRequestDTO } from 'src/application/common/request.interface'
 import type { ISeat } from 'src/domain/concert/models/seat.entity.interface'
 
-// Define the type for the Create Concert request data
 export type ReadAllSeatsByConcertDateRequestType = {
     concertDateId: string
+    userId: string
 }
 
 export class ReadAllSeatsByConcertRequestDto implements IRequestDTO<ReadAllSeatsByConcertDateRequestType> {
-    constructor(private readonly concertDateId: string) {}
+    constructor(
+        private readonly concertDateId: string,
+        private readonly userId: string,
+    ) {}
 
     validate() {}
 
     toUseCaseInput(): ReadAllSeatsByConcertDateRequestType {
-        // Returns the data in the format expected by the use case
-        return { concertDateId: this.concertDateId }
+        return { concertDateId: this.concertDateId, userId: this.userId }
     }
 }
 

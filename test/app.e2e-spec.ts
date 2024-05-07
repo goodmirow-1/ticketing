@@ -129,8 +129,7 @@ describe('AppController (e2e)', () => {
         if (waitingNumber === 0) {
             return handleConcertAccess(param)
         } else {
-            const delay = calculatePollingDelay(waitingNumber)
-            await new Promise(resolve => setTimeout(resolve, delay))
+            await new Promise(resolve => setTimeout(resolve, 1000 * 5))
 
             try {
                 const statusResponse = await request(app.getHttpServer()).get(`/user/${param}/token/generate`)
@@ -143,21 +142,6 @@ describe('AppController (e2e)', () => {
                 console.error('Error during polling token availability:', error)
                 throw error // 에러를 다시 발생시켜 호출자에게 알림
             }
-        }
-    }
-
-    // 폴링 주기를 계산하는 함수
-    function calculatePollingDelay(waitingNumber: number): number {
-        if (waitingNumber <= 10) {
-            return 1000 * 1 // 1초 대기
-        } else if (waitingNumber <= 25) {
-            return 1000 * 3 // 3초 대기
-        } else if (waitingNumber <= 50) {
-            return 1000 * 5 // 5초 대기
-        } else if (waitingNumber <= 100) {
-            return 1000 * 7 // 7초 대기
-        } else {
-            return 1000 * 10 // 10초 대기
         }
     }
 
@@ -187,7 +171,7 @@ describe('AppController (e2e)', () => {
 
                 await new Promise(resolve => setTimeout(resolve, delay))
                 // 1. 콘서트 날짜 조회
-                const concertsResponse = await request(app.getHttpServer()).get('/concert/dates').set('Authorization', `Bearer ${token}`)
+                const concertsResponse = await request(app.getHttpServer()).get('/user-concert/dates').set('Authorization', `Bearer ${token}`)
                 if (concertsResponse.status !== HttpStatus.OK) {
                     console.error('Failed to fetch concert dates or no dates available.')
                     return
@@ -209,7 +193,7 @@ describe('AppController (e2e)', () => {
                 const concertDateId = randomDate.id
 
                 // 3. 선택된 콘서트 날짜의 좌석 조회
-                const seatsResponse = await request(app.getHttpServer()).get(`/concert/${concertDateId}/seats`).set('Authorization', `Bearer ${token}`)
+                const seatsResponse = await request(app.getHttpServer()).get(`/user-concert/${concertDateId}/seats`).set('Authorization', `Bearer ${token}`)
                 if (seatsResponse.status !== HttpStatus.OK) {
                     console.error('Failed to fetch seats for the selected concert date.')
                     return
@@ -225,7 +209,7 @@ describe('AppController (e2e)', () => {
 
                     try {
                         reservationResponse = await request(app.getHttpServer())
-                            .post(`/concert/${selectedSeat.id}/reservation`)
+                            .post(`/user-concert/${selectedSeat.id}/reservation`)
                             .set('Authorization', `Bearer ${token}`)
 
                         await new Promise(resolve => setTimeout(resolve, delay))

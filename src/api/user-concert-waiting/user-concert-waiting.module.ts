@@ -18,12 +18,20 @@ import { TypeORMDataAccessor } from 'src/infrastructure/db/typeorm/typeorm-data-
 import { IWaitingWriterRepositoryRedisToken } from 'src/domain/user/repositories/waiting-writer-redis.repository.interface'
 import { WaitingWriterRepositoryRedis } from 'src/infrastructure/user/repositories/waiting-writer-redis.repository'
 import { RedisService } from 'src/infrastructure/db/redis/redis-service'
+import { IWaitingReaderRepositoryRedisToken } from 'src/domain/user/repositories/waiting-reader-redis.repository.interface'
+import { WaitingReaderRepositoryRedis } from 'src/infrastructure/user/repositories/waiting-reader-redis.repository'
+import { CreateReservationUseCase } from '../../application/user-concert-waiting/usecase/create-reservation.usecase'
+import { ReadAllConcertsUseCase } from '../../application/user-concert-waiting/usecase/read-all-concerts.usecase'
+import { ReadAllSeatsByConcertDateIdUseCase } from '../../application/user-concert-waiting/usecase/read-all-seats-by-concert-date.usecase'
 
 @Module({
     imports: [TypeOrmModule.forFeature([User, Reservation, PointHistory])],
     controllers: [UserConcertWaitingController],
     providers: [
         PaymentUserConcertUseCase,
+        CreateReservationUseCase,
+        ReadAllConcertsUseCase,
+        ReadAllSeatsByConcertDateIdUseCase,
         RedisService,
         {
             provide: IConcertReaderRepositoryToken,
@@ -40,6 +48,10 @@ import { RedisService } from 'src/infrastructure/db/redis/redis-service'
         {
             provide: IUserWriterRepositoryToken,
             useClass: UserWriterRepositoryTypeORM,
+        },
+        {
+            provide: IWaitingReaderRepositoryRedisToken,
+            useClass: WaitingReaderRepositoryRedis,
         },
         {
             provide: IWaitingWriterRepositoryRedisToken,

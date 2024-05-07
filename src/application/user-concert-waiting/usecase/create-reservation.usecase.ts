@@ -4,6 +4,7 @@ import { IConcertWriterRepository, IConcertWriterRepositoryToken } from '../../.
 import type { IRequestDTO } from 'src/application/common/request.interface'
 import type { CreateReservationRequestType } from '../dtos/create-reservation.dto'
 import { CreateReservationResponseDto } from '../dtos/create-reservation.dto'
+import { IWaitingReaderRedisRepository, IWaitingReaderRepositoryRedisToken } from 'src/domain/user/repositories/waiting-reader-redis.repository.interface'
 
 @Injectable()
 export class CreateReservationUseCase {
@@ -12,6 +13,8 @@ export class CreateReservationUseCase {
         private readonly concertReaderRepository: IConcertReaderRepository,
         @Inject(IConcertWriterRepositoryToken)
         private readonly concertWriterRepository: IConcertWriterRepository,
+        @Inject(IWaitingReaderRepositoryRedisToken)
+        private readonly waitingReaderRepository: IWaitingReaderRedisRepository,
     ) {}
 
     async execute(requestDto: IRequestDTO<CreateReservationRequestType>): Promise<CreateReservationResponseDto> {
@@ -19,6 +22,8 @@ export class CreateReservationUseCase {
 
         const { seatId, userId } = requestDto.toUseCaseInput()
 
+        //토큰 유효성 조회
+        await this.waitingReaderRepository.validateUser(userId)
         //좌석 조회
         const seat = await this.concertReaderRepository.findSeatById(seatId)
         //예약 저장

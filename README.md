@@ -163,17 +163,17 @@ redis를 활용한 대기열 기능 구현은 다음과 같다.
 2. redis.acquirelock를 사용해 lock을 얻고 프로세스 끝난후 redis.releaselock을 통해 락을 해제한다.
 3. 사용자는 process.env.MAX_CONNECTION와 redis.scan(...)으로 접근에 대한 수를 제한한다.
 3. 특정 수를 넘으면  redis.lpush('waitingQueue', userId)을 통해 대기열에 진입한다.
-4. subscribeClient.subscribe('__keyevent@0__:expired') 을 활용하여 key del이 됐을 경우 waitingQueue의 user를 꺼내서 유효 토큰으로 등록한다.
+~~4. subscribeClient.subscribe('__keyevent@0__:expired') 을 활용하여 key del이 됐을 경우 waitingQueue의 user를 꺼내서 유효 토큰으로 등록한다.~~
+4. redis의 스케줄러를 통한 일정 수를 대기열에서 유효 토큰으로 전환한다.
 5. 사용자는 user/generateToken/ api만을 사용해서 계속해서 접근요청을 하며 4번이 되었을 경우 이후 프로세스를 진행할 수 있다.
 6. 대기중이던 사용자는 폴링을 통해 redis.lrange('waitingQueue', 0, -1).indexof()를 사용하여 현재 대기중인 위치를 알 수 있다.
 
 **문제** :
-1. 기존 DB에서 구현했던 대기열에서 비효율적이던 부분(scheduler와 관련 API가 추가됨)을 발견했다.
-2. 키 만료시 이벤트가 정상적으로 발동하지 않던 이슈를 발견했다.
+1. 기존 DB에서 구현했던 대기열에서 비효율적이던 부분(단일 인스턴스의 scheduler와 관련 API가 추가됨)을 발견했다.
+~~2. 키 만료시 이벤트가 정상적으로 발동하지 않던 이슈를 발견했다.~~
+3. 키 만료시 이벤트는 등록의 수에 제한이 있으므로, 스케줄러를 통한 일정 수를 대기열에서 유효 토큰으로 전환하는 과정을 가진다.
 
 **해결** :
-1. 토큰 발급 관련 단일 API로 수정되었으며, Scheduler를 삭제하고 Redis의 Subscribe기능을 활용하여 대기열을 pop 하고 유효 토큰을 생성하는 기능을 적용했다.
-2. --notify-keyspace-events Ex 을 사용하여 키 만료시 이벤트가 정상적으로 처리되도록 한다.
+1. 토큰 발급 관련 단일 API로 수정되었으며, 단일 인스턴스에서만 제어가 되던 Scheduler를 Redis로 실행한다.
+~~2. --notify-keyspace-events Ex 을 사용하여 키 만료시 이벤트가 정상적으로 처리되도록 한다.~~
 
-**개선방안** :
-1. 키 만료시 이벤트가 2번 발동하는 이슈가 발생함.

@@ -45,11 +45,11 @@ export class GenerateTokenUseCase {
             //유효 토큰에 등록할 수 있는지 확인
             const isValidToken = await this.waitingReaderRedisRepository.isValidTokenCountUnderThreshold()
             //대기열이 없는지 확인
-            const isWaitingQueueEmpty = await this.waitingReaderRedisRepository.isWaitingQueueEmpty()
-            //대기열 등록 or 토큰 발급
+            const getWaitingQueueCount = await this.waitingReaderRedisRepository.getWaitingQueueCount()
+            //대기열 등록 or 유효 토큰 발급
             const { token, waitingNumber } = await this.waitingWriterRedisRepository.createValidTokenOrWaitingUser(
                 userId,
-                isWaitingQueueEmpty && isValidToken,
+                getWaitingQueueCount == 0 && isValidToken,
                 position,
             )
 
