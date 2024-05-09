@@ -63,6 +63,10 @@ export class RedisService {
         return await this.redisClient.llen(key)
     }
 
+    async rpop(key: string) {
+        return await this.redisClient.rpop(key)
+    }
+
     // Utility methods could be part of your RedisService or a separate LockService
     async acquireLock(lockKey: string, lockValue: string, ttl: number): Promise<boolean> {
         const result = await this.redisClient.set(lockKey, lockValue, 'PX', ttl, 'NX')

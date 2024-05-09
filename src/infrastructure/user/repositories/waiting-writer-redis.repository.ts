@@ -17,7 +17,7 @@ export class WaitingWriterRepositoryRedis implements IWaitingWriterRedisReposito
     }
 
     async dequeueWaitingUser(): Promise<string> {
-        return (await this.redisService.getClient()).rpop('waitingQueue')
+        return await this.redisService.rpop('waitingQueue')
     }
 
     async createValidToken(userId: string) {

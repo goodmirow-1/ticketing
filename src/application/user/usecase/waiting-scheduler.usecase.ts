@@ -28,7 +28,7 @@ export class WaitingSchedulerUseCase {
             //대기열이 비어있지 않을때만 실행
             const count = await this.waitingReaderRedisRepository.getWaitingQueueCount()
             if (count != 0) {
-                const dequeueCount = count >= 10 ? 10 : count
+                const dequeueCount = count >= 50 ? 50 : count
 
                 for (let i = 0; i < dequeueCount; ++i) {
                     const userId = await this.waitingWriterRedisRepository.dequeueWaitingUser()
