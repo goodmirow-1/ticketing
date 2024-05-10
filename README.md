@@ -49,9 +49,7 @@ hotfix : master 브랜치로 배포를 했는데 버그가 생겼을 떄 긴급 
 
 ## 다이어그램
 
-[시퀀스](https://github.com/goodmirow-1/ticketing/milestones)
-
-[엔티티 릴레이션](https://github.com/goodmirow-1/ticketing/milestones)
+[시퀀스 및 엔티티 릴레이션]([https://github.com/goodmirow-1/ticketing/milestones](https://github.com/goodmirow-1/ticketing/blob/main/documents/README-DIAGRAMS.md))
 
 ## 트러블 슈팅
 
