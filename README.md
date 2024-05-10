@@ -69,7 +69,7 @@ hotfix : master 브랜치로 배포를 했는데 버그가 생겼을 떄 긴급 
 ![image](https://github.com/goodmirow-1/ticketing/assets/57578975/b2b5944a-dcae-4393-b1b4-3cedb2d941e3)
 
 
-## 엔티티 릴래이션 다이어그램 ( ERD )
+## 엔티티 릴래이션 다이어그램 ( ERD - DB )
 
 1. 대기열 역할을 하는 WaitingUser 테이블, 유효한 토큰을 관리하는 ValidToken 테이블로 대기열을 관리함
 2. Seat 테이블의 concertDateId, status를 Index로 설정해서 콘서트 좌석 조회에 대한 성능을 높임
