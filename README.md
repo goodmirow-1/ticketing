@@ -49,7 +49,8 @@ hotfix : master 브랜치로 배포를 했는데 버그가 생겼을 떄 긴급 
 ## 시퀀스 다이어그램
 ### 유저 토큰 발급
    
-![image](https://github.com/goodmirow-1/ticketing/assets/57578975/1d83edd8-213a-4e98-a59e-f292e208936c)
+![image](https://github.com/goodmirow-1/ticketing/assets/57578975/1ad4dec7-c3b3-45d0-aa4b-1a8a75f89bce)
+
 
 ### 예약 가능 날짜 / 좌석 조회
    
