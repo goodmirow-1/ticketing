@@ -133,7 +133,7 @@
         • 처음 함수가 실행 될 때를 기준으로 체크합니다.
         • 기준 데이터의 개수를 6000개로 함
         • 어느 Column도 Index 설정이 되어 있지 않았을 경우 함수 실행 시간 : 480ms
-        • Index(date, concert)를 설정 후 함수 실행 시간 : 250ms
-        • Index(date, concert)를 따로따로 설정한 후 함수 실행 시간 : 400ms
+        • Index(concertDate, status의)를 설정 후 함수 실행 시간 : 250ms
+        • Index(concertDate, status의)를 따로따로 설정한 후 함수 실행 시간 : 400ms
     3. 결과
-        • 처음 인덱스 설정한 것(date와 concert를 복합 인덱스로 사용)이 성능이 더 우세하므로 그대로 설정
+        • 처음 인덱스 설정한 것(concertDate status의 복합 인덱스로 사용)이 성능이 더 우세하므로 그대로 설정
