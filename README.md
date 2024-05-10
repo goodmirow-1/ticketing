@@ -36,6 +36,11 @@
 
  [마일스톤](https://github.com/goodmirow-1/ticketing/milestones)  [로드맵](https://github.com/users/goodmirow-1/projects/2/views/1)
 
+## APIS
+
+ [스펙 및 스웨거](https://github.com/goodmirow-1/ticketing/blob/main/documents/README-API.md)
+ 
+
 ## 다이어그램
 
  [시퀀스 및 엔티티 릴레이션 링크](https://github.com/goodmirow-1/ticketing/blob/main/documents/README-DIAGRAMS.md)
