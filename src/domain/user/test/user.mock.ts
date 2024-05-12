@@ -13,5 +13,6 @@ export function initUserWriterMockRepo(): Record<keyof IUserWriterRepository, je
     return {
         createUser: jest.fn(),
         calculatePoint: jest.fn(),
+        createPointHistory: jest.fn(),
     }
 }

@@ -30,11 +30,13 @@ export class ChargeUserPointUseCase {
             const user = await this.userReaderRepository.findUserById(userId, session, {
                 mode: 'pessimistic_write',
             })
-            //포인트 충전 및 포인트 로그 저장
-            const chargePoint = await this.userWriterRepository.calculatePoint(user, amount, null, session)
+            //포인트 충전
+            await this.userWriterRepository.calculatePoint(user, amount, null, session)
+            //충전 로그 저장
+            const pointHistory = await this.userWriterRepository.createPointHistory(user, amount, null, session)
 
             await this.dataAccessor.commitTransaction(session)
-            return new ChargeUserPointResponseDto(chargePoint.amount)
+            return new ChargeUserPointResponseDto(pointHistory.amount)
         } catch (error) {
             await this.dataAccessor.rollbackTransaction(session)
             throw error

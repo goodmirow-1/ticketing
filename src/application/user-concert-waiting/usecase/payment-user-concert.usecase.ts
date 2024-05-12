@@ -46,9 +46,10 @@ export class PaymentUserConcertUseCase {
 
             //예약 정보의 사용자와 사용자 정보가 일치하는지 확인
             this.concertReaderRepository.checkValidReservation(reservation, userId)
-            //결제 진행 및 예약정보에 따른 사용자의 포인트 차감
-            pointHistory = await this.userWriterRepository.calculatePoint(user, -reservation.seat.price, reservation.id, session)
-
+            //결제 진행(예약정보에 따른 사용자의 포인트 차감)
+            await this.userWriterRepository.calculatePoint(user, -reservation.seat.price, 'payment', session)
+            //결제 로그 저장
+            pointHistory = this.userWriterRepository.createPointHistory(user, reservation.seat.price, reservation.id, session)
             //예약 정보 수정
             await this.concertWriterRepository.doneReservationPaid(reservation, session)
 
