@@ -163,7 +163,7 @@ describe('유닛 콘서트 서비스 유닛 테스트', () => {
             mockConcertReaderRepo.findReservationById.mockResolvedValue({ id: reservationId, seat: { id: '1' }, user: { id: '1' } })
             mockUserReaderRepo.findUserById.mockResolvedValue({ id: '1', name: 'test', point: 100, reservations: [] })
             mockUserWriterRepo.calculatePoint.mockResolvedValue(true)
-            mockUserWriterRepo.createPointHistory.mockRejectedValue({ id: '1', user: { id: '1' }, amount: 1, reason: 'payment' })
+            mockUserWriterRepo.createPointHistory.mockResolvedValue({ id: '1', user: { id: '1' }, amount: 1, reason: 'payment' })
 
             const requestDto = new PaymentUserConcertRequestDto(userId, reservationId)
             const result = await paymentUserConcertUseCase.execute(requestDto)
