@@ -50,8 +50,10 @@ export class PaymentUserConcertUseCase {
             await this.userWriterRepository.calculatePoint(user, -reservation.seat.price, 'payment', session)
             //결제 로그 저장
             pointHistory = await this.userWriterRepository.createPointHistory(user, -reservation.seat.price, reservation.id, session)
-            //예약 정보 수정
-            await this.concertWriterRepository.doneReservationPaid(reservation, session)
+            //좌석 상태 변경
+            await this.concertWriterRepository.updateSeatStatus(reservation.seat.id, 'held', session)
+            //예약 만료 스케줄러 삭제
+            await this.concertWriterRepository.clearReservationExpireScheduler(reservation.id)
 
             await this.dataAccessor.commitTransaction(session)
         } catch (error) {

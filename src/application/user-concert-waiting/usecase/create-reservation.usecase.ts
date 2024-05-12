@@ -28,6 +28,10 @@ export class CreateReservationUseCase {
         const seat = await this.concertReaderRepository.findSeatById(seatId)
         //예약 저장
         const reservation = await this.concertWriterRepository.createReservation(seat, userId)
+        //좌석 상태 변경
+        await this.concertWriterRepository.updateSeatStatus(seat.id, 'reserved')
+        //예약 만료 스케줄러 등록
+        await this.concertWriterRepository.addReservationExpireScheduler(reservation)
         //좌석의 상태 값 수정
         await this.concertWriterRepository.updateConcertDateAvailableSeat(seat.concertDate.id, -1)
 
