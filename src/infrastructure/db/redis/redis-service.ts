@@ -1,42 +1,35 @@
-import type { OnModuleDestroy, OnModuleInit } from '@nestjs/common'
-import { Injectable } from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
+import { HttpStatus, Injectable } from '@nestjs/common'
 import Redis from 'ioredis'
+import { CustomException } from 'src/custom-exception'
+
+export const RedisServiceToken = Symbol('RedisService')
 
 @Injectable()
-export class RedisService implements OnModuleInit, OnModuleDestroy {
+export class RedisService {
     private redisClient: Redis
-    private subscriberClient: Redis
 
-    constructor(private configService: ConfigService) {
+    constructor() {
         const host = process.env.REDIS_HOST
         const port = parseInt(process.env.REDIS_PORT, 10)
 
-        this.redisClient = new Redis({ host: host, port: port })
-        this.subscriberClient = new Redis({ host: host, port: port })
+        this.redisClient = new Redis({
+            host: host,
+            port: port,
+        })
 
-        this.clearTokensAndQueue()
+        //this.clearTokensAndQueue()
     }
 
     async clearTokensAndQueue() {
         // 모든 'token:*' 키를 삭제
-        let cursor = '0'
-        do {
-            const scanResult = await this.redisClient.scan(cursor, 'MATCH', 'token:*', 'COUNT', 100)
-            cursor = scanResult[0]
-            const keys = scanResult[1]
-            if (keys.length) {
-                await this.redisClient.del(...keys)
-            }
-        } while (cursor !== '0')
+        const keys = await this.redisClient.keys('token:*')
+        if (keys.length) {
+            await this.redisClient.del(...keys)
+        }
 
         // 대기열 삭제
         await this.redisClient.del('waitingQueue')
     }
-
-    onModuleInit() {}
-
-    onModuleDestroy() {}
 
     async get(key: string) {
         return this.redisClient.get(key)
@@ -44,10 +37,6 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
 
     async getClient() {
         return this.redisClient
-    }
-
-    async getSubscribeClient() {
-        return this.subscriberClient
     }
 
     async set(key: string, value: string, ttl?: number): Promise<string> {
@@ -74,20 +63,8 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
         return await this.redisClient.llen(key)
     }
 
-    async subscribeToExpiredTokens(handler: () => void) {
-        await this.subscriberClient.subscribe('__keyevent@0__:expired', (error, count) => {
-            if (error) {
-                console.log(count)
-                console.error('Failed to subscribe:', error)
-                return
-            }
-        })
-
-        this.subscriberClient.on('message', (channel, message) => {
-            if (message.startsWith('token:')) {
-                handler()
-            }
-        })
+    async rpop(key: string) {
+        return await this.redisClient.rpop(key)
     }
 
     // Utility methods could be part of your RedisService or a separate LockService
@@ -105,5 +82,17 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
             end
         `
         await this.redisClient.eval(script, 1, lockKey, lockValue)
+    }
+
+    async validateUser(userId: string) {
+        const isValidate = await this.redisClient.get(`token:${userId}`)
+
+        if (!isValidate) {
+            throw new CustomException('Forbidden resource', HttpStatus.FORBIDDEN)
+        }
+    }
+
+    async clearAllData(): Promise<void> {
+        await this.redisClient.flushall()
     }
 }

@@ -32,9 +32,8 @@ export class WaitingReaderRepositoryRedis implements IWaitingReaderRedisReposito
         return count < maxConnections
     }
 
-    async isWaitingQueueEmpty(): Promise<boolean> {
-        const length = await this.redisService.llen('waitingQueue')
-        return length == 0 ? true : false
+    async getWaitingQueueCount(): Promise<number> {
+        return await this.redisService.llen('waitingQueue')
     }
 
     async acquireLock(lockKey: string, lockValue: string, ttl: number): Promise<boolean> {
@@ -43,5 +42,9 @@ export class WaitingReaderRepositoryRedis implements IWaitingReaderRedisReposito
 
     async releaseLock(lockKey: string, lockValue: string): Promise<void> {
         return await this.redisService.releaseLock(lockKey, lockValue)
+    }
+
+    async validateUser(userId: string) {
+        return await this.redisService.validateUser(userId)
     }
 }

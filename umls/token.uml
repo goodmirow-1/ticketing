@@ -1,39 +1,52 @@
 @startuml
 participant "Client" as Client
 participant "Server" as Server
+participant "UserReaderRepository" as URepo
+participant "WaitingReaderRedisRepository" as WReader
+participant "WaitingWriterRedisRepository" as WWriter
+participant "WaitingScheduler" as Scheduler
 
 == 토큰 요청 ==
 Client -> Server: 토큰 요청 (/api/token)
+Server -> Server: 요청 검증
+Server -> URepo: 사용자 조회
+URepo -> Server: 사용자 정보 반환
 
-== 요청 검증 ==
-Server -> Server: 요청
-Server -> Server: 수용 능력(100명) 내인지 확인?
+== 분산락 처리 ==
+Server -> WReader: 분산락 획득 시도
+WReader -> Server: 분산락 획득 성공
 
-alt 수용 능력 내인 경우
-    Server -> Server: 대기 번호 0으로 유효 토큰 발급
-else 수용 능력 초과인 경우
-    Server -> Server: 대기열에서 마지막 번호 가져오기
-    Server -> Server: 대기 번호로 대기열 토큰 발급
-end
-
-== 토큰 생성 ==
-Server -> Server: UUID 및 대기 번호 정보를 포함한 토큰 설정
-Server -> Server: 토큰 인코딩
-
-== 클라이언트에 토큰 발급 ==
-Server -> Client: 토큰으로 응답
-
-== 대기열 토큰일 경우 폴링을 통한 토큰 상태 확인 ==
-loop 폴링
-    Client -> Server: 토큰 상태 요청 (/api/token/status)
-    Server -> Server: 토큰 검증 및 대기 번호 확인
-    alt 수용 능력 내인 경우
-        Server -> Server: 대기 번호 0으로 유효 토큰 발급
-        Server -> Client: 유효 토큰으로 응답
-    else 수용 능력 초과인 경우
-        Server -> Server: 대기열에서 현재 번호 확인, 
+== 대기열 및 유효 토큰 검증 ==
+Server -> WReader: 유효 토큰 조회
+alt 유효 토큰 있음
+    WReader -> Server: 유효 토큰 정보 반환
+    Server -> Client: 유효 토큰 발급
+else 유효 토큰 없음
+    Server -> WReader: 대기 번호 조회
+    WReader -> Server: 대기 번호 반환
+    Server -> WReader: 유효 토큰 생성 가능 여부 확인
+    WReader -> Server: 대기열 수 확인
+    alt 대기열 없고 유효 토큰 가능
+        Server -> WWriter: 유효 토큰 생성
+        WWriter -> Server: 토큰 발급
+        Server -> Client: 토큰으로 응답
+    else 대기열 있거나 유효 토큰 불가능
+        Server -> WWriter: 대기열에 사용자 등록
+        WWriter -> Server: 대기 번호로 응답
         Server -> Client: 대기 번호로 응답
     end
+end
+
+== 분산락 해제 ==
+Server -> WReader: 분산락 해제
+WReader -> Server: 분산락 해제 완료
+
+== 대기열 처리 ==
+loop every 5 seconds
+    Scheduler -> WReader: 대기열 상태 확인
+    WReader -> Scheduler: 대기열 정보 반환
+    Scheduler -> WWriter: N명 대기열에서 제거 및 유효 토큰으로 전환
+    WWriter -> Scheduler: 토큰 생성 및 대기열 업데이트
 end
 
 @enduml

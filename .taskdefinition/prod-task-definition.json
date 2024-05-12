@@ -19,6 +19,13 @@
                     "hostPort": 3306,
                     "protocol": "tcp",
                     "appProtocol": "http"
+                },
+                {
+                    "name": "redis",
+                    "containerPort": 6379,
+                    "hostPort": 6379,
+                    "protocol": "tcp",
+                    "appProtocol": "http"
                 }
             ],
             "essential": true,
@@ -30,62 +37,16 @@
                 "startPeriod": 10
             },
             "environment": [
+            ],
+            "environmentFiles": [
                 {
-                    "name": "VALID_TOKEN_EXPIRATION_TIME",
-                    "value": "300"
-                },
-                {
-                    "name": "DB_TYPE",
-                    "value": "mariadb"
-                },
-                {
-                    "name": "DATABASE",
-                    "value": "ticketing"
-                },
-                {
-                    "name": "DB_PORT",
-                    "value": "3306"
-                },
-                {
-                    "name": "MAX_SEATS",
-                    "value": "50"
-                },
-                {
-                    "name": "SEAT_HOLD_EXPIRATION_TIME",
-                    "value": "300"
-                },
-                {
-                    "name": "DB_HOST",
-                    "value": "ticketing.c72y2e8oapsn.ap-northeast-2.rds.amazonaws.com"
-                },
-                {
-                    "name": "MAX_CONNECTIONS",
-                    "value": "100"
-                },
-                {
-                    "name": "REDIS_HOST",
-                    "value": "arn:aws:ecs:ap-northeast-2:533267347071:service/cluster-ticketing-nest-product/service-ticketing-redis-prod"
-                },
-                {
-                    "name": "REDIS_PORT",
-                    "value": "6379"
+                    "value": "arn:aws:s3:::ticketing-env/ticketing.env",
+                    "type": "s3"
                 }
             ],
             "mountPoints": [],
             "volumesFrom": [],
             "secrets": [
-                {
-                    "name": "DB_USER_NAME",
-                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-2:533267347071:secret:DB_USER_NAME-yIMMFS"
-                },
-                {
-                    "name": "DB_PASSWORD",
-                    "valueFrom": "arn:aws:secretsmanager:ap-northeast-2:533267347071:secret:DB_PASSWORD-EHYl4E"
-                },
-                {
-                    "name" : "JWT_SECRET_KEY",
-                    "valueFrom" : "arn:aws:secretsmanager:ap-northeast-2:533267347071:secret:JWT_SECRET_KEY-y0vUgM"
-                }
             ],
             "logConfiguration": {
                 "logDriver": "awslogs",

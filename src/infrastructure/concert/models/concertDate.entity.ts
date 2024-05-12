@@ -5,11 +5,11 @@ import { Seat } from './seat.entity'
 import type { IConcertDate } from '../../../domain/concert/models/concertDate.entity.interface'
 
 @Entity()
+@Index('IDX_CONCERT_DATE', ['concert.id'])
 export class ConcertDate implements IConcertDate {
     @PrimaryColumn({ type: 'char', length: 36 })
     id: string
 
-    @Index() // Adding an index to improve performance for queries filtering by date
     @Column()
     date: Date
 
