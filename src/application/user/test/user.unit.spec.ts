@@ -61,7 +61,8 @@ describe('유저 서비스 유닛 테스트', () => {
             const uuid = uuidv4()
 
             mockReaderRepo.findUserById.mockResolvedValue({ id: uuid, name: 'test', point: 0, reservations: [] })
-            mockWriterRepo.calculatePoint.mockResolvedValue({ id: '1', user: { id: uuid }, amount: 1, reason: 'charge' })
+            mockWriterRepo.calculatePoint.mockResolvedValue(true)
+            mockWriterRepo.createPointHistory.mockResolvedValue({ id: '1', user: { id: uuid }, amount: 1, reason: 'charge' })
 
             const requestDto = new ChargeUserPointRequestDto('1', 100)
             const result = await chargeUserPointUseCase.execute(requestDto)

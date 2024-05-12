@@ -125,6 +125,9 @@ describe('유닛 콘서트 서비스 유닛 테스트', () => {
 
             mockConcertReaderRepo.findSeatById.mockResolvedValue({ id: seatId, concertDate: { concert: { id: '1' } } })
             mockConcertWriterRepo.createReservation.mockResolvedValue({ id: reservationId, seat: { id: seatId }, user: { id: userId } })
+            mockConcertWriterRepo.updateSeatStatus.mockResolvedValue(true)
+            mockConcertWriterRepo.addReservationExpireScheduler.mockResolvedValue(true)
+            mockConcertWriterRepo.updateConcertDateAvailableSeat.mockResolvedValue(true)
 
             const reqeustDto = new CreateReservationRequestDto(seatId, userId)
             const result = await createReservationUseCase.execute(reqeustDto)
@@ -162,7 +165,10 @@ describe('유닛 콘서트 서비스 유닛 테스트', () => {
 
             mockConcertReaderRepo.findReservationById.mockResolvedValue({ id: reservationId, seat: { id: '1' }, user: { id: '1' } })
             mockUserReaderRepo.findUserById.mockResolvedValue({ id: '1', name: 'test', point: 100, reservations: [] })
-            mockUserWriterRepo.calculatePoint.mockResolvedValue({ id: '1', user: { id: '1' }, amount: 1, reason: 'payment' })
+            mockUserWriterRepo.calculatePoint.mockResolvedValue(true)
+            mockUserWriterRepo.createPointHistory.mockResolvedValue({ id: '1', user: { id: '1' }, amount: 1, reason: 'payment' })
+            mockConcertWriterRepo.updateSeatStatus.mockResolvedValue(true)
+            mockConcertWriterRepo.clearReservationExpireScheduler.mockResolvedValue(true)
 
             const requestDto = new PaymentUserConcertRequestDto(userId, reservationId)
             const result = await paymentUserConcertUseCase.execute(requestDto)

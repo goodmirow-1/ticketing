@@ -84,65 +84,9 @@ export class ConcertWriterRepositoryTypeORM implements IConcertWriterRepository 
             }
         }
 
-        const result = await this.updateSeatStatus(seat.id, 'reserved')
-
-        if (result === false) {
-            //rollback
-            await this.entityManager.delete(Reservation, reservation.id)
-
-            throw new FailedUpdateSeatStatusError('Failed to update seat status')
-        }
-
-        // 예약 만료 시간 설정
-        {
-            const expirationTime = parseInt(process.env.SEAT_HOLD_EXPIRATION_TIME, 10)
-
-            const timeout = setTimeout(async () => {
-                //예약했으면
-                if (reservation.paymentCompleted) return
-
-                await this.entityManager.delete(Reservation, reservation.id)
-                await this.updateSeatStatus(seat.id, 'available')
-                await this.updateConcertDateAvailableSeat(seat.concertDate.id, 1)
-            }, expirationTime * 1000)
-
-            this.schedulerRegistry.addTimeout(reservation.id, timeout)
-        }
-
         reservation.seat.status = 'reserved'
 
         return reservation
-    }
-
-    /**
-     * Finalizes the payment for a reservation, updating its status to paid.
-     * @param reservation The Reservation entity to update.
-     * @throws FailedUpdateReservationError if updating the reservation fails.
-     */
-    async doneReservationPaid(reservation: Reservation, querryRunner?: any) {
-        const manager = querryRunner ? querryRunner.manager : this.entityManager
-
-        const paymentUpdateResult = await manager
-            .createQueryBuilder()
-            .update(Reservation)
-            .set({ paymentCompleted: true })
-            .where('id = :id', { id: reservation.id })
-            .execute()
-
-        if (paymentUpdateResult.affected === 0) {
-            throw new FailedUpdateReservationError('Failed to update reservation payment status.')
-        }
-
-        const result = await this.updateSeatStatus(reservation.seat.id, 'held', querryRunner)
-
-        if (result === false) {
-            throw new FailedUpdateSeatStatusError('Failed to update seat status')
-        }
-
-        const reservationScheduler = this.schedulerRegistry.doesExist('timeout', reservation.id)
-        if (reservationScheduler) {
-            clearTimeout(this.schedulerRegistry.getTimeout(reservation.id))
-        }
     }
 
     /**
@@ -151,16 +95,19 @@ export class ConcertWriterRepositoryTypeORM implements IConcertWriterRepository 
      * @param status The new status of the seat.
      * @returns True if the update was successful, otherwise false.
      */
-    private async updateSeatStatus(id: string, status: string, querryRunner?: any): Promise<boolean> {
+    async updateSeatStatus(id: string, status: string, querryRunner?: any) {
         const manager = querryRunner ? querryRunner.manager : this.entityManager
 
-        return await manager
+        const result = await manager
             .createQueryBuilder()
             .update(Seat)
             .set({ status })
             .where('id = :id', { id }) // Add a comma after the placeholder
             .execute()
-            .then(result => result.affected > 0)
+
+        if (result.affected == 0) {
+            throw new FailedUpdateSeatStatusError('Failed to update seat status')
+        }
     }
 
     /**
@@ -169,11 +116,58 @@ export class ConcertWriterRepositoryTypeORM implements IConcertWriterRepository 
      * @param amount The amount to adjust the available seats by.
      */
     async updateConcertDateAvailableSeat(concertDateId: string, amount: number) {
-        await this.entityManager
+        const result = await this.entityManager
             .createQueryBuilder()
             .update(ConcertDate)
             .set({ availableSeats: () => `availableSeats + ${amount}` })
             .where('id = :id', { id: concertDateId })
             .execute()
+
+        if (result.affected == 0) {
+            throw new FailedUpdateSeatStatusError('Failed to update ConcertDate availableSeats')
+        }
+    }
+
+    /**
+     * Finalizes the payment for a reservation, updating its status to paid.
+     * @param reservation The Reservation entity to update.
+     * @throws FailedUpdateReservationError if updating the reservation fails.
+     */
+    async updateReservationPaymentCompleted(reservationId: string, querryRunner?: any){
+        const manager = querryRunner ? querryRunner.manager : this.entityManager
+
+        const paymentUpdateResult = await manager
+            .createQueryBuilder()
+            .update(Reservation)
+            .set({ paymentCompleted: true })
+            .where('id = :id', { id: reservationId })
+            .execute()
+
+        if (paymentUpdateResult.affected === 0) {
+            throw new FailedUpdateReservationError('Failed to update reservation payment status.')
+        }
+    }
+
+    addReservationExpireScheduler(reservation: Reservation) {
+        // 예약 만료 시간 설정
+        const expirationTime = parseInt(process.env.SEAT_HOLD_EXPIRATION_TIME, 10)
+
+        const timeout = setTimeout(async () => {
+            //예약했으면
+            if (reservation.paymentCompleted) return
+
+            await this.entityManager.delete(Reservation, reservation.id)
+            await this.updateSeatStatus(reservation.seat.id, 'available')
+            await this.updateConcertDateAvailableSeat(reservation.seat.concertDate.id, 1)
+        }, expirationTime * 1000)
+
+        this.schedulerRegistry.addTimeout(reservation.id, timeout)
+    }
+
+    clearReservationExpireScheduler(reservationId: string) {
+        const reservationScheduler = this.schedulerRegistry.doesExist('timeout', reservationId)
+        if (reservationScheduler) {
+            clearTimeout(this.schedulerRegistry.getTimeout(reservationId))
+        }
     }
 }

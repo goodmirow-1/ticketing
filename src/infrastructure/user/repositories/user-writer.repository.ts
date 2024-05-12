@@ -32,8 +32,7 @@ export class UserWriterRepositoryTypeORM implements IUserWriterRepository {
      * @throws InValidPointError if the transaction would result in a negative point balance.
      * @throws FailedUserChargePointError if updating the user's points fails.
      */
-    async calculatePoint(user: User, amount: number, reservationId?: string, querryRunner?: any): Promise<PointHistory> {
-        const reason = reservationId ? 'payment' : 'charge'
+    async calculatePoint(user: User, amount: number, reason: string, querryRunner?: any) {
         const manager = querryRunner ? querryRunner.manager : this.entityManager
 
         if (reason == 'payment' && user.point < Math.abs(amount)) {
@@ -45,6 +44,11 @@ export class UserWriterRepositoryTypeORM implements IUserWriterRepository {
         const result = await manager.createQueryBuilder().update(User).set({ point }).where('id = :id', { id: user.id }).execute()
 
         if (result.affected === 0) throw new FailedUserChargePointError('Failed to charge point')
+    }
+
+    async createPointHistory(user: User, amount: number, reservationId?: string, querryRunner?: any): Promise<PointHistory> {
+        const reason = reservationId ? 'payment' : 'charge'
+        const manager = querryRunner ? querryRunner.manager : this.entityManager
 
         const uuid = uuidv4()
         return await manager.save(PointHistory, {

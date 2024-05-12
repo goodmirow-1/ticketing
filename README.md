@@ -109,7 +109,7 @@
   
   네번째 : 기존 db에서의 방식은 매 초 스케줄러를 통해 대기열에서 하나씩 꺼내서 유효 토큰으로 변환시키는 방식이었는데 이는 성능, 에러에 대한 제어 등에 대해 효율적으로 관리하기 힘듬으로 redis의 set, list, sorted set 등의 방식을 활용하면 보다 효율적으로 관리할 수 있다.
  
- *시스템 설계에 대한 내용은 다음 링크에 있습니다. [링크](https://github.com/goodmirow-1/ticketing/milestones)
+ *시스템 설계에 대한 내용은 다음 링크에 있습니다. [링크](https://github.com/goodmirow-1/ticketing/blob/main/documents/README-WAITING-QUEUE.md)
  
  * redis를 활용한 대기열 기능 구현은 다음과 같다.
  1. jwt.sign을 활용하여 토큰을 생성 및 api에 대한 접근 관리와, redis.set('token:${userId}, ...)을 활용하여 유효토큰 만료를 관리한다.

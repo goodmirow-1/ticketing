@@ -21,7 +21,10 @@ export function initConcertWriterMockRepo(): Record<keyof IConcertWriterReposito
         createConcert: jest.fn(),
         createConcertDate: jest.fn(),
         createSeat: jest.fn(),
+        updateSeatStatus: jest.fn(),
         updateConcertDateAvailableSeat: jest.fn(),
-        doneReservationPaid: jest.fn(),
+        updateReservationPaymentCompleted: jest.fn(),
+        addReservationExpireScheduler: jest.fn(),
+        clearReservationExpireScheduler: jest.fn(),
     }
 }

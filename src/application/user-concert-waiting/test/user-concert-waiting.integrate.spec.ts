@@ -167,26 +167,36 @@ describe('Integration Tests for User Use Cases', () => {
             await expect(readAllSeatsByConcertDateIdUseCase.execute(requestDto)).rejects.toThrow(NotFoundConcertDateError)
         })
 
-        it('should read is seats concert NotAvailableSeatError', async () => {
-            const concertId = await getConcertID()
-            const concertDateId = await getConcertDateID(concertId)
+        it(
+            'should read is seats concert NotAvailableSeatError',
+            async () => {
+                const concertId = await getConcertID()
+                const concertDateId = await getConcertDateID(concertId)
 
-            for (let i = 0; i < parseInt(process.env.MAX_SEATS, 10); i++) {
+                for (let i = 0; i < parseInt(process.env.MAX_SEATS, 10); i++) {
+                    const userId = await getUserID('tester')
+                    await generateToken(userId)
+
+                    const requestUserChargeDto = new ChargeUserPointRequestDto(userId, 10000)
+                    await chargeUserPointUseCase.execute(requestUserChargeDto)
+
+                    const seatId = await getSeatID(concertDateId, i + 1)
+                    const requestReservationDto = new CreateReservationRequestDto(seatId, userId)
+
+                    const resultReservation = await createReservationUseCase.execute(requestReservationDto)
+
+                    const requestDto = new PaymentUserConcertRequestDto(userId, resultReservation.id)
+                    await paymentUserConcertUseCase.execute(requestDto)
+                }
+
                 const userId = await getUserID('tester')
                 await generateToken(userId)
+                const requestDto = new ReadAllSeatsByConcertRequestDto(concertDateId, userId)
 
-                const seatId = await getSeatID(concertDateId, i + 1)
-                const requestReservationDto = new CreateReservationRequestDto(seatId, userId)
-
-                await createReservationUseCase.execute(requestReservationDto)
-            }
-
-            const userId = await getUserID('tester')
-            await generateToken(userId)
-            const requestDto = new ReadAllSeatsByConcertRequestDto(concertDateId, userId)
-
-            await expect(readAllSeatsByConcertDateIdUseCase.execute(requestDto)).rejects.toThrow(NotAvailableSeatError)
-        })
+                await expect(readAllSeatsByConcertDateIdUseCase.execute(requestDto)).rejects.toThrow(NotAvailableSeatError)
+            },
+            6000 * 1000,
+        )
 
         it('should read a seats is succes', async () => {
             const userId = await getUserID('tester')
