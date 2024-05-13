@@ -42,6 +42,8 @@ export class CreateReservationUseCase {
             await this.concertWriterRepository.updateSeatStatus(seat.id, 'reserved', session)
             //사용 가능한 좌석수 차감
             await this.concertWriterRepository.updateConcertDateAvailableSeat(seat.concertDate.id, -1, session)
+            //예약 정보 전달
+            await this.concertWriterRepository.sendReservationInfo()
 
             await this.dataAccessor.commitTransaction(session)
         } catch (error) {

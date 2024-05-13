@@ -152,6 +152,14 @@ export class ConcertWriterRepositoryTypeORM implements IConcertWriterRepository 
         }
     }
 
+    /**
+     * Send reservation information to the Data Platform via a mock API
+     * @param reservation The Reservation entity to update.
+     */
+    async sendReservationInfo(): Promise<boolean> {
+        return true
+    }
+
     addReservationExpireScheduler(reservation: Reservation) {
         // 예약 만료 시간 설정
         const expirationTime = parseInt(process.env.SEAT_HOLD_EXPIRATION_TIME, 10)
