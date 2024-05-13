@@ -50,7 +50,7 @@ describe('유닛 콘서트 서비스 유닛 테스트', () => {
             mockDataAccessor,
         )
 
-        createReservationUseCase = new CreateReservationUseCase(mockConcertReaderRepo, mockConcertWriterRepo, mockWaitingReaderRedisRepo)
+        createReservationUseCase = new CreateReservationUseCase(mockConcertReaderRepo, mockConcertWriterRepo, mockWaitingReaderRedisRepo, mockDataAccessor)
         readAllConcertsUseCase = new ReadAllConcertsUseCase(mockConcertReaderRepo, mockWaitingReaderRedisRepo)
         readAllSeatsByConcertDateIdUseCase = new ReadAllSeatsByConcertDateIdUseCase(mockConcertReaderRepo, mockWaitingReaderRedisRepo)
     })
