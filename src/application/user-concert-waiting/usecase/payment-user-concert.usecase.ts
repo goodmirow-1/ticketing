@@ -52,6 +52,8 @@ export class PaymentUserConcertUseCase {
             //좌석 상태 변경
             await this.concertWriterRepository.updateSeatStatus(reservation.seat.id, 'held', session)
 
+            await this.concertWriterRepository.updateReservationPaymentCompleted(reservation.id, session)
+
             await this.dataAccessor.commitTransaction(session)
         } catch (error) {
             await this.dataAccessor.rollbackTransaction(session)
