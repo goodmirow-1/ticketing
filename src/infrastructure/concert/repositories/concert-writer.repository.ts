@@ -60,12 +60,14 @@ export class ConcertWriterRepositoryTypeORM implements IConcertWriterRepository 
      * @throws DuplicateReservationError if the reservation already exists.
      * @throws FailedCreateReservationError if there is an error creating the reservation.
      */
-    async createReservation(seat: Seat, userId: string): Promise<Reservation> {
+    async createReservation(seat: Seat, userId: string, querryRunner?: any): Promise<Reservation> {
+        const manager = querryRunner ? querryRunner.manager : this.entityManager
         const uuid = uuidv4()
+
         let reservation
 
         try {
-            reservation = await this.entityManager.save(Reservation, {
+            reservation = await manager.save(Reservation, {
                 id: uuid,
                 userId,
                 seat,
@@ -115,8 +117,10 @@ export class ConcertWriterRepositoryTypeORM implements IConcertWriterRepository 
      * @param concertDateId The ID of the concert date to update.
      * @param amount The amount to adjust the available seats by.
      */
-    async updateConcertDateAvailableSeat(concertDateId: string, amount: number) {
-        const result = await this.entityManager
+    async updateConcertDateAvailableSeat(concertDateId: string, amount: number, querryRunner?: any) {
+        const manager = querryRunner ? querryRunner.manager : this.entityManager
+
+        const result = manager
             .createQueryBuilder()
             .update(ConcertDate)
             .set({ availableSeats: () => `availableSeats + ${amount}` })

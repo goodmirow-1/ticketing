@@ -13,7 +13,7 @@ export interface IConcertReaderRepository {
     findConcertDateById(concertDateId: string): Promise<IConcertDate>
 
     checkValidSeatNumber(concertDateId: string, seatNumber: number)
-    findSeatById(seatId: string): Promise<ISeat>
+    findSeatById(seatId: string, querryRunner?: any, lockOption?: any): Promise<ISeat>
     findSeatsByConcertDateId(concertDateId: string): Promise<ISeat[]>
 
     findReservationById(reservationId: string, querryRunner?: any, lockOption?: any): Promise<IReservation>

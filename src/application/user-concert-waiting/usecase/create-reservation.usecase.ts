@@ -5,6 +5,7 @@ import type { IRequestDTO } from 'src/application/common/request.interface'
 import type { CreateReservationRequestType } from '../dtos/create-reservation.dto'
 import { CreateReservationResponseDto } from '../dtos/create-reservation.dto'
 import { IWaitingReaderRedisRepository, IWaitingReaderRepositoryRedisToken } from 'src/domain/user/repositories/waiting-reader-redis.repository.interface'
+import { DataAccessor, DataAccessorToken } from 'src/infrastructure/db/data-accesor.interface'
 
 @Injectable()
 export class CreateReservationUseCase {
@@ -15,25 +16,43 @@ export class CreateReservationUseCase {
         private readonly concertWriterRepository: IConcertWriterRepository,
         @Inject(IWaitingReaderRepositoryRedisToken)
         private readonly waitingReaderRepository: IWaitingReaderRedisRepository,
+        @Inject(DataAccessorToken)
+        private readonly dataAccessor: DataAccessor,
     ) {}
 
     async execute(requestDto: IRequestDTO<CreateReservationRequestType>): Promise<CreateReservationResponseDto> {
         requestDto.validate()
 
         const { seatId, userId } = requestDto.toUseCaseInput()
+        let reservation = null
+
+        const session = await this.dataAccessor.getSession()
 
         //토큰 유효성 조회
         await this.waitingReaderRepository.validateUser(userId)
-        //좌석 조회
-        const seat = await this.concertReaderRepository.findSeatById(seatId)
-        //예약 저장
-        const reservation = await this.concertWriterRepository.createReservation(seat, userId)
-        //좌석 상태 변경
-        await this.concertWriterRepository.updateSeatStatus(seat.id, 'reserved')
+
+        try {
+            //좌석 조회
+            const seat = await this.concertReaderRepository.findSeatById(seatId, session, {
+                mode: 'pessimistic_write',
+            })
+            //예약 저장
+            reservation = await this.concertWriterRepository.createReservation(seat, userId, session)
+            //좌석 상태 변경
+            await this.concertWriterRepository.updateSeatStatus(seat.id, 'reserved', session)
+            //사용 가능한 좌석수 차감
+            await this.concertWriterRepository.updateConcertDateAvailableSeat(seat.concertDate.id, -1, session)
+
+            await this.dataAccessor.commitTransaction(session)
+        } catch (error) {
+            await this.dataAccessor.rollbackTransaction(session)
+            throw error
+        } finally {
+            await this.dataAccessor.releaseQueryRunner(session)
+        }
+
         //예약 만료 스케줄러 등록
         await this.concertWriterRepository.addReservationExpireScheduler(reservation)
-        //좌석의 상태 값 수정
-        await this.concertWriterRepository.updateConcertDateAvailableSeat(seat.concertDate.id, -1)
 
         return new CreateReservationResponseDto(
             reservation.id,

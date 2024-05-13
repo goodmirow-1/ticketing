@@ -30,10 +30,9 @@ export class PaymentUserConcertUseCase {
         requestDto.validate()
 
         const { userId, reservationId } = requestDto.toUseCaseInput()
+        let pointHistory = null
 
         const session = await this.dataAccessor.getSession()
-
-        let pointHistory = null
         try {
             //예약 정보 조회
             const reservation = await this.concertReaderRepository.findReservationById(reservationId, session, {
@@ -52,8 +51,8 @@ export class PaymentUserConcertUseCase {
             pointHistory = await this.userWriterRepository.createPointHistory(user, -reservation.seat.price, reservation.id, session)
             //좌석 상태 변경
             await this.concertWriterRepository.updateSeatStatus(reservation.seat.id, 'held', session)
-            //예약 만료 스케줄러 삭제
-            await this.concertWriterRepository.clearReservationExpireScheduler(reservation.id)
+
+            await this.concertWriterRepository.updateReservationPaymentCompleted(reservation.id, session)
 
             await this.dataAccessor.commitTransaction(session)
         } catch (error) {
@@ -62,6 +61,10 @@ export class PaymentUserConcertUseCase {
         } finally {
             await this.dataAccessor.releaseQueryRunner(session)
         }
+
+        //예약 만료 스케줄러 삭제
+        await this.concertWriterRepository.clearReservationExpireScheduler(pointHistory.reservationId)
+
         //유효토큰 만료로 변경 수정
         await this.waitingWriterRedisRepository.setExpireToken(userId)
 
