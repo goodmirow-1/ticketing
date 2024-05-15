@@ -137,7 +137,7 @@ export class ConcertWriterRepositoryTypeORM implements IConcertWriterRepository 
      * @param reservation The Reservation entity to update.
      * @throws FailedUpdateReservationError if updating the reservation fails.
      */
-    async updateReservationPaymentCompleted(reservationId: string, querryRunner?: any){
+    async updateReservationPaymentCompleted(reservationId: string, querryRunner?: any) {
         const manager = querryRunner ? querryRunner.manager : this.entityManager
 
         const paymentUpdateResult = await manager
@@ -150,14 +150,6 @@ export class ConcertWriterRepositoryTypeORM implements IConcertWriterRepository 
         if (paymentUpdateResult.affected === 0) {
             throw new FailedUpdateReservationError('Failed to update reservation payment status.')
         }
-    }
-
-    /**
-     * Send reservation information to the Data Platform via a mock API
-     * @param reservation The Reservation entity to update.
-     */
-    async sendReservationInfo(): Promise<boolean> {
-        return true
     }
 
     addReservationExpireScheduler(reservation: Reservation) {
