@@ -12,32 +12,32 @@ export class KafkaService implements OnModuleInit, OnModuleDestroy {
     private consumer: Consumer
 
     constructor() {
-        // this.kafka = new Kafka({
-        //     clientId: 'concert-app',
-        //     brokers: [process.env.KAFKA_HOST + ':9092'], // Kafka 브로커 주소
-        // })
-        // this.producer = this.kafka.producer()
-        // this.consumer = this.kafka.consumer({ groupId: 'reservation-group' })
+        this.kafka = new Kafka({
+            clientId: 'concert-app',
+            brokers: [process.env.KAFKA_HOST + ':9092'], // Kafka 브로커 주소
+        })
+        this.producer = this.kafka.producer()
+        this.consumer = this.kafka.consumer({ groupId: 'reservation-group' })
     }
 
     async onModuleInit() {
-        // await this.producer.connect()
-        // await this.consumer.connect()
-        // await this.consumer.subscribe({ topic: 'reservation-created', fromBeginning: true })
-        // await this.consumer.run({
-        //     eachMessage: async ({ topic, partition, message }) => {
-        //         const payload = JSON.parse(message.value.toString())
-        //         this.logger.log(`Received message: ${JSON.stringify(payload)} from topic: ${topic}`)
-        //         switch (topic) {
-        //             case 'reservation-created':
-        //                 await this.handleReservationCreated(payload, partition)
-        //                 break
-        //             default:
-        //                 this.logger.warn(`No handler for topic: ${topic}`)
-        //                 break
-        //         }
-        //     },
-        // })
+        await this.producer.connect()
+        await this.consumer.connect()
+        await this.consumer.subscribe({ topic: 'reservation-created', fromBeginning: true })
+        await this.consumer.run({
+            eachMessage: async ({ topic, partition, message }) => {
+                const payload = JSON.parse(message.value.toString())
+                this.logger.log(`Received message: ${JSON.stringify(payload)} from topic: ${topic}`)
+                switch (topic) {
+                    case 'reservation-created':
+                        await this.handleReservationCreated(payload, partition)
+                        break
+                    default:
+                        this.logger.warn(`No handler for topic: ${topic}`)
+                        break
+                }
+            },
+        })
     }
 
     async sendMessage(topic: string, message: any) {
@@ -51,7 +51,7 @@ export class KafkaService implements OnModuleInit, OnModuleDestroy {
         }
     }
     async onModuleDestroy() {
-        //await this.consumer.disconnect()
+        await this.consumer.disconnect()
     }
 
     private async handleReservationCreated(payload: any, partition: number) {

@@ -1,155 +1,167 @@
 name: PullRequest CI Pipeline
 
 on:
-  pull_request:
-      branches:
-      - develop
-      - release-*
+    pull_request:
+        branches:
+            - develop
+            - release-*
 
 jobs:
-  test: 
-    runs-on: ubuntu-latest
-    services:
-      mariadb:
-        image: mariadb:latest
-        env:
-          MYSQL_ROOT_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          MYSQL_DATABASE: ${{ secrets.DATABASE }}
-        ports:
-          - 3306:3306
-      redis:
-        image: redis:latest
-        ports:
-          - 6379:6379 # Expose Redis on port 6379
-          
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+    test:
+        runs-on: ubuntu-latest
+        services:
+            mariadb:
+                image: mariadb:latest
+                env:
+                    MYSQL_ROOT_PASSWORD: ${{ secrets.DB_PASSWORD }}
+                    MYSQL_DATABASE: ${{ secrets.DATABASE }}
+                ports:
+                    - 3306:3306
+            redis:
+                image: redis:latest
+                ports:
+                    - 6379:6379 # Expose Redis on port 6379
+            zookeeper:
+                image: wurstmeister/zookeeper:latest
+                ports:
+                    - 2181:2181
+            kafka:
+                image: wurstmeister/kafka:latest
+                env:
+                    KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+                    KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+                    KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+                ports:
+                    - 9092:9092
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 8
-      
-      - name: Set Environment Variables
-        run: |
-          echo "DB_TYPE=${{ secrets.DB_TYPE }}" >> $GITHUB_ENV
-          echo "DB_HOST=localhost" >> $GITHUB_ENV
-          echo "DB_PORT=${{ secrets.DB_PORT }}" >> $GITHUB_ENV
-          echo "DB_USER_NAME=${{ secrets.DB_USER_NAME }}" >> $GITHUB_ENV
-          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> $GITHUB_ENV
-          echo "DATABASE=${{ secrets.DATABASE }}" >> $GITHUB_ENV
-          echo "MAX_CONNECTIONS=${{ secrets.MAX_CONNECTIONS }}" >> $GITHUB_ENV
-          echo "MAX_SEATS=${{ secrets.MAX_SEATS }}" >> $GITHUB_ENV
-          echo "SEAT_HOLD_EXPIRATION_TIME=${{ secrets.SEAT_HOLD_EXPIRATION_TIME }}" >> $GITHUB_ENV
-          echo "VALID_TOKEN_EXPIRATION_TIME=${{ secrets.VALID_TOKEN_EXPIRATION_TIME }}" >> $GITHUB_ENV
-          echo "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}" >> $GITHUB_ENV
-          echo "REDIS_HOST=localhost" >> $GITHUB_ENV # Set Redis host
-          echo "REDIS_PORT=6379" >> $GITHUB_ENV # Set Redis port
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v3
 
-      - name: Restore dependencies from Cache
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: '**/node_modules'
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-node-modules-
-      
-      - name: Install dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: pnpm install --no-frozen-lockfile
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v2
+              with:
+                  version: 8
 
-      - name: Run test
-        run: |
-          pnpm run test
+            - name: Set Environment Variables
+              run: |
+                  echo "DB_TYPE=${{ secrets.DB_TYPE }}" >> $GITHUB_ENV
+                  echo "DB_HOST=localhost" >> $GITHUB_ENV
+                  echo "DB_PORT=${{ secrets.DB_PORT }}" >> $GITHUB_ENV
+                  echo "DB_USER_NAME=${{ secrets.DB_USER_NAME }}" >> $GITHUB_ENV
+                  echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> $GITHUB_ENV
+                  echo "DATABASE=${{ secrets.DATABASE }}" >> $GITHUB_ENV
+                  echo "MAX_CONNECTIONS=${{ secrets.MAX_CONNECTIONS }}" >> $GITHUB_ENV
+                  echo "MAX_SEATS=${{ secrets.MAX_SEATS }}" >> $GITHUB_ENV
+                  echo "SEAT_HOLD_EXPIRATION_TIME=${{ secrets.SEAT_HOLD_EXPIRATION_TIME }}" >> $GITHUB_ENV
+                  echo "VALID_TOKEN_EXPIRATION_TIME=${{ secrets.VALID_TOKEN_EXPIRATION_TIME }}" >> $GITHUB_ENV
+                  echo "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}" >> $GITHUB_ENV
+                  echo "REDIS_HOST=localhost" >> $GITHUB_ENV # Set Redis host
+                  echo "REDIS_PORT=6379" >> $GITHUB_ENV # Set Redis port
 
-      - name: Close PR on failure
-        if: ${{ failure() }}
-        uses: actions/github-script@v6
-        with:
-          script: |
-            github.rest.pulls.update({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: context.issue.number,
-              state: 'closed'
-            })
+            - name: Restore dependencies from Cache
+              id: cache
+              uses: actions/cache@v3
+              with:
+                  path: '**/node_modules'
+                  key: ${{ runner.os }}-node-modules-${{ hashFiles('**/pnpm-lock.yaml') }}
+                  restore-keys: |
+                      ${{ runner.os }}-node-modules-
 
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 8
+            - name: Install dependencies
+              if: steps.cache.outputs.cache-hit != 'true'
+              run: pnpm install --no-frozen-lockfile
 
-      - name: Restore dependencies from Cache
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: '**/node_modules'
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-node-modules-
-      
-      - name: Install dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: pnpm install --no-frozen-lockfile
-        
-      - name: Run lint
-        run: pnpm run lint
+            - name: Run test
+              run: |
+                  pnpm run test
 
-      - name: Close PR on failure
-        if: ${{ failure() }}
-        uses: actions/github-script@v6
-        with:
-          script: |
-            github.rest.pulls.update({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: context.issue.number,
-              state: 'closed'
-            })
+            - name: Close PR on failure
+              if: ${{ failure() }}
+              uses: actions/github-script@v6
+              with:
+                  script: |
+                      github.rest.pulls.update({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        pull_number: context.issue.number,
+                        state: 'closed'
+                      })
 
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 8
+    lint:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v3
 
-      - name: Restore dependencies from Cache
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: '**/node_modules'
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-node-modules-
-      
-      - name: Install dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: pnpm install --no-frozen-lockfile
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v2
+              with:
+                  version: 8
 
-      - name: Run build
-        run: pnpm run build
+            - name: Restore dependencies from Cache
+              id: cache
+              uses: actions/cache@v3
+              with:
+                  path: '**/node_modules'
+                  key: ${{ runner.os }}-node-modules-${{ hashFiles('**/pnpm-lock.yaml') }}
+                  restore-keys: |
+                      ${{ runner.os }}-node-modules-
 
-      - name: Close PR on failure
-        if: ${{ failure() }}
-        uses: actions/github-script@v6
-        with:
-          script: |
-            github.rest.pulls.update({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: context.issue.number,
-              state: 'closed'
-            })
+            - name: Install dependencies
+              if: steps.cache.outputs.cache-hit != 'true'
+              run: pnpm install --no-frozen-lockfile
+
+            - name: Run lint
+              run: pnpm run lint
+
+            - name: Close PR on failure
+              if: ${{ failure() }}
+              uses: actions/github-script@v6
+              with:
+                  script: |
+                      github.rest.pulls.update({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        pull_number: context.issue.number,
+                        state: 'closed'
+                      })
+
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v3
+
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v2
+              with:
+                  version: 8
+
+            - name: Restore dependencies from Cache
+              id: cache
+              uses: actions/cache@v3
+              with:
+                  path: '**/node_modules'
+                  key: ${{ runner.os }}-node-modules-${{ hashFiles('**/pnpm-lock.yaml') }}
+                  restore-keys: |
+                      ${{ runner.os }}-node-modules-
+
+            - name: Install dependencies
+              if: steps.cache.outputs.cache-hit != 'true'
+              run: pnpm install --no-frozen-lockfile
+
+            - name: Run build
+              run: pnpm run build
+
+            - name: Close PR on failure
+              if: ${{ failure() }}
+              uses: actions/github-script@v6
+              with:
+                  script: |
+                      github.rest.pulls.update({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        pull_number: context.issue.number,
+                        state: 'closed'
+                      })
