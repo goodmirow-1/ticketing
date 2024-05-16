@@ -66,6 +66,9 @@ jobs:
                   echo "REDIS_PORT=6379" >> $GITHUB_ENV # Set Redis port
                   echo "KAFKA_HOST=localhost" >> $GITHUB_ENV # Set Kafka host
 
+            - name: Wait for Kafka to be ready
+              run: sleep 60 # 대기 시간을 60초로 늘림
+
             - name: Restore dependencies from Cache
               id: cache
               uses: actions/cache@v3
