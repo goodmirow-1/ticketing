@@ -14,7 +14,7 @@ export class KafkaService implements OnModuleInit, OnModuleDestroy {
     constructor() {
         this.kafka = new Kafka({
             clientId: 'concert-app',
-            brokers: [process.env.KAFKA_HOST + ':9092'], // Kafka 브로커 주소
+            brokers: ['kafka:9092'], // Kafka 브로커 주소
         })
         this.producer = this.kafka.producer()
         this.consumer = this.kafka.consumer({ groupId: 'reservation-group' })
