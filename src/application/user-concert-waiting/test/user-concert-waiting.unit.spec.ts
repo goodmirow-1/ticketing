@@ -18,7 +18,7 @@ import { NotFoundSeatError } from 'src/domain/concert/exceptions/not-found-seat.
 import { CreateReservationRequestDto } from '../dtos/create-reservation.dto'
 import { FailedCreateReservationError } from 'src/domain/concert/exceptions/failed-create-reservation.exception'
 import { FailedUpdateSeatStatusError } from 'src/domain/concert/exceptions/failed-update-seat-status.exception'
-import type { CreateReservationCompleteEventPublisher } from '../event/create-reservation-complete.event.publisher'
+import type { EventPublisher } from '../event/event-publisher'
 
 describe('유닛 콘서트 서비스 유닛 테스트', () => {
     let mockConcertReaderRepo: ReturnType<typeof initConcertReaderMockRepo>
@@ -28,7 +28,7 @@ describe('유닛 콘서트 서비스 유닛 테스트', () => {
     let mockWaitingWriterRedisRepo: ReturnType<typeof initWaitingWriterRedisMockRepo>
     let mockWaitingReaderRedisRepo: ReturnType<typeof initWaitingReaderRedisMockRepo>
     let mockDataAccessor: ReturnType<typeof initDataAccesorMock>
-    let mockEventPublisher: CreateReservationCompleteEventPublisher
+    let mockEventPublisher: EventPublisher
     let paymentUserConcertUseCase: PaymentUserConcertUseCase
     let createReservationUseCase: CreateReservationUseCase
     let readAllConcertsUseCase: ReadAllConcertsUseCase
@@ -43,15 +43,15 @@ describe('유닛 콘서트 서비스 유닛 테스트', () => {
         mockWaitingReaderRedisRepo = initWaitingReaderRedisMockRepo()
         mockDataAccessor = initDataAccesorMock()
 
-        mockEventPublisher = { publish: jest.fn() } as unknown as CreateReservationCompleteEventPublisher
+        mockEventPublisher = { createReservationCompletepublish: jest.fn(), paymentCompetePublish: jest.fn() } as unknown as EventPublisher
 
         paymentUserConcertUseCase = new PaymentUserConcertUseCase(
             mockConcertReaderRepo,
-            mockConcertWriterRepo,
             mockUserReaderRepo,
             mockUserWriterRepo,
             mockWaitingWriterRedisRepo,
             mockDataAccessor,
+            mockEventPublisher,
         )
 
         createReservationUseCase = new CreateReservationUseCase(
@@ -172,7 +172,7 @@ describe('유닛 콘서트 서비스 유닛 테스트', () => {
             const userId = uuidv4()
             const reservationId = uuidv4()
 
-            mockConcertReaderRepo.findReservationById.mockResolvedValue({ id: reservationId, seat: { id: '1' }, user: { id: '1' } })
+            mockConcertReaderRepo.findReservationById.mockResolvedValue({ id: reservationId, seat: { id: '1', price: 1 }, userId: userId })
             mockUserReaderRepo.findUserById.mockResolvedValue({ id: '1', name: 'test', point: 100, reservations: [] })
             mockUserWriterRepo.calculatePoint.mockResolvedValue(true)
             mockUserWriterRepo.createPointHistory.mockResolvedValue({ id: '1', user: { id: '1' }, amount: 1, reason: 'payment' })

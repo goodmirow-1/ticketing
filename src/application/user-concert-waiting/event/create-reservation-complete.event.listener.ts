@@ -1,6 +1,6 @@
 import type { OnModuleDestroy } from '@nestjs/common'
 import { Inject, Injectable } from '@nestjs/common'
-import { CreateReservationCompleteEvent } from '../../../infrastructure/concert/event/create-reservation-complete.event'
+import { CreateReservationCompleteEvent } from './create-reservation-complete.event'
 import { EventEmitter2 } from '@nestjs/event-emitter'
 import { KafkaService } from '../../../infrastructure/db/kafka/kafka.service'
 import { IConcertWriterRepository, IConcertWriterRepositoryToken } from 'src/domain/concert/repositories/concert-writer.repository.interface'
@@ -15,7 +15,7 @@ export class CreateReservationCompleteEventListener implements OnModuleDestroy {
         private readonly eventEmitter: EventEmitter2,
     ) {}
 
-    @OnEventSafe('reservation.created')
+    @OnEventSafe('reservation.created.completed')
     async handleReservationCreated(event: CreateReservationCompleteEvent) {
         try {
             // 좌석 상태 변경
@@ -23,20 +23,19 @@ export class CreateReservationCompleteEventListener implements OnModuleDestroy {
             // 사용 가능한 좌석수 차감
             await this.concertWriterRepository.updateConcertDateAvailableSeat(event.reservation.seat.concertDate.id, -1, event.session)
 
-            // Kafka 메시지 발행 (주석 처리된 부분)
-            // const payload = {
-            //     eventId: event.eventId,
-            //     publishing: event.publishing,
-            //     reservationId: event.reservation.id,
-            // };
-            // await this.kafkaService.sendMessage('reservation-created', payload);
+            const payload = {
+                eventId: event.eventId,
+                publishing: event.publishing,
+                reservationId: event.reservation.id,
+            }
+            await this.kafkaService.sendMessage('reservation-created-completed', payload)
         } catch (error) {
-            console.error('Error handling reservation.created event', error)
+            console.error('Error handling reservation.created.completed event', error)
         }
     }
 
     onModuleDestroy() {
         // 리스너 해제
-        this.eventEmitter.removeAllListeners('reservation.created')
+        this.eventEmitter.removeAllListeners('reservation.created.completed')
     }
 }

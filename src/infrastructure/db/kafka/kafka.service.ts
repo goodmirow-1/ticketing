@@ -1,4 +1,3 @@
-// kafka-producer.service.ts
 import type { OnModuleDestroy, OnModuleInit } from '@nestjs/common'
 import { Injectable, Logger } from '@nestjs/common'
 import type { Consumer, Producer } from 'kafkajs'
@@ -23,14 +22,18 @@ export class KafkaService implements OnModuleInit, OnModuleDestroy {
     async onModuleInit() {
         await this.producer.connect()
         await this.consumer.connect()
-        await this.consumer.subscribe({ topic: 'reservation-created', fromBeginning: true })
+        await this.consumer.subscribe({ topic: 'reservation-created-completed', fromBeginning: true })
+        await this.consumer.subscribe({ topic: 'payment-completed', fromBeginning: true })
         await this.consumer.run({
             eachMessage: async ({ topic, partition, message }) => {
                 const payload = JSON.parse(message.value.toString())
                 this.logger.log(`Received message: ${JSON.stringify(payload)} from topic: ${topic}`)
                 switch (topic) {
-                    case 'reservation-created':
+                    case 'reservation-created-completed':
                         await this.handleReservationCreated(payload, partition)
+                        break
+                    case 'payment-completed':
+                        await this.handlePaymentCompleted(payload, partition)
                         break
                     default:
                         this.logger.warn(`No handler for topic: ${topic}`)
@@ -50,6 +53,7 @@ export class KafkaService implements OnModuleInit, OnModuleDestroy {
             console.log(err)
         }
     }
+
     async onModuleDestroy() {
         await this.consumer.disconnect()
     }
@@ -61,9 +65,16 @@ export class KafkaService implements OnModuleInit, OnModuleDestroy {
         await this.sendToExternalApi(payload)
     }
 
+    private async handlePaymentCompleted(payload: any, partition: number) {
+        // 파티션별로 다른 로직을 적용할 수 있음
+        this.logger.log(`Handling payment completed for partition: ${partition}`)
+        // 외부 API 호출
+        await this.sendToExternalApi(payload)
+    }
+
     private async sendToExternalApi(payload: any) {
         try {
-            //외부 api 호출 await this.httpService.post('http://external.api/endpoint', payload).toPromise()
+            // 외부 api 호출 await this.httpService.post('http://external.api/endpoint', payload).toPromise()
             this.logger.log(`Successfully sent payload to external API: ${JSON.stringify(payload)}`)
         } catch (error) {
             this.logger.error(`Failed to send payload to external API: ${error.message}`)

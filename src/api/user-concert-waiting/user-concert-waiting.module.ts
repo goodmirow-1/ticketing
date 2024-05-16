@@ -25,8 +25,9 @@ import { ReadAllConcertsUseCase } from '../../application/user-concert-waiting/u
 import { ReadAllSeatsByConcertDateIdUseCase } from '../../application/user-concert-waiting/usecase/read-all-seats-by-concert-date.usecase'
 import { KafkaService } from 'src/infrastructure/db/kafka/kafka.service'
 import { CreateReservationCompleteEventListener } from 'src/application/user-concert-waiting/event/create-reservation-complete.event.listener'
-import { CreateReservationCompleteEventPublisher } from 'src/application/user-concert-waiting/event/create-reservation-complete.event.publisher'
 import { ExpiredReservationSchedulerUseCase } from 'src/application/user-concert-waiting/usecase/expired-reservation-scheduler.usecase'
+import { EventPublisher } from 'src/application/user-concert-waiting/event/event-publisher'
+import { PaymentCompleteEventListener } from 'src/application/user-concert-waiting/event/payment-complete.event.listener'
 
 @Module({
     imports: [TypeOrmModule.forFeature([User, Reservation, PointHistory])],
@@ -40,7 +41,8 @@ import { ExpiredReservationSchedulerUseCase } from 'src/application/user-concert
         RedisService,
         KafkaService,
         CreateReservationCompleteEventListener,
-        CreateReservationCompleteEventPublisher,
+        PaymentCompleteEventListener,
+        EventPublisher,
         {
             provide: IConcertReaderRepositoryToken,
             useClass: ConcertReaderRepositoryTypeORM,
