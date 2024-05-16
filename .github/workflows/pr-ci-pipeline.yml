@@ -59,6 +59,7 @@ jobs:
                   echo "REDIS_HOST=localhost" >> $GITHUB_ENV # Set Redis host
                   echo "REDIS_PORT=6379" >> $GITHUB_ENV # Set Redis port
                   echo "KAFKA_HOST=localhost" > $GITHUB_ENV # Set Kafka host
+                  echo "KAFKAJS_NO_PARTITIONER_WARNING=1" >> $GITHUB_ENV # 경고 무시
 
             - name: Restore dependencies from Cache
               id: cache
