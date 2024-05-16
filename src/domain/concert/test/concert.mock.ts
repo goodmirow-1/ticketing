@@ -6,6 +6,7 @@ export function initConcertReaderMockRepo(): Record<keyof IConcertReaderReposito
         findConcertById: jest.fn(),
         findConcertDateById: jest.fn(),
         findAllConcerts: jest.fn(),
+        findExpiredReservations: jest.fn(),
         checkValidConcertDateByDate: jest.fn(),
         checkValidSeatNumber: jest.fn(),
         findSeatById: jest.fn(),
@@ -24,7 +25,6 @@ export function initConcertWriterMockRepo(): Record<keyof IConcertWriterReposito
         updateSeatStatus: jest.fn(),
         updateConcertDateAvailableSeat: jest.fn(),
         updateReservationPaymentCompleted: jest.fn(),
-        addReservationExpireScheduler: jest.fn(),
-        clearReservationExpireScheduler: jest.fn(),
+        deleteReservation: jest.fn(),
     }
 }

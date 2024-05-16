@@ -6,8 +6,8 @@ import type { CreateReservationRequestType } from '../dtos/create-reservation.dt
 import { CreateReservationResponseDto } from '../dtos/create-reservation.dto'
 import { IWaitingReaderRedisRepository, IWaitingReaderRepositoryRedisToken } from 'src/domain/user/repositories/waiting-reader-redis.repository.interface'
 import { DataAccessor, DataAccessorToken } from 'src/infrastructure/db/data-accesor.interface'
-import { ReservationCreatedEvent } from '../../../domain/common/reservation-created.event'
-import { ReservationEventPublisher, ReservationEventPublisherToken } from '../../../infrastructure/event/reservation-event-publisher'
+import { CreateReservationCompleteEvent } from '../../../infrastructure/concert/event/create-reservation-complete.event'
+import { CreateReservationCompleteEventPublisher } from '../event/create-reservation-complete.event.publisher'
 
 @Injectable()
 export class CreateReservationUseCase {
@@ -20,8 +20,7 @@ export class CreateReservationUseCase {
         private readonly waitingReaderRepository: IWaitingReaderRedisRepository,
         @Inject(DataAccessorToken)
         private readonly dataAccessor: DataAccessor,
-        @Inject(ReservationEventPublisherToken)
-        private readonly eventPublisher: ReservationEventPublisher,
+        private readonly eventPublisher: CreateReservationCompleteEventPublisher,
     ) {}
 
     async execute(requestDto: IRequestDTO<CreateReservationRequestType>): Promise<CreateReservationResponseDto> {
@@ -42,10 +41,8 @@ export class CreateReservationUseCase {
             })
             //예약 저장
             reservation = await this.concertWriterRepository.createReservation(seat, userId, session)
-            //좌석 상태 변경
-            await this.concertWriterRepository.updateSeatStatus(seat.id, 'reserved', session)
-            //사용 가능한 좌석수 차감
-            await this.concertWriterRepository.updateConcertDateAvailableSeat(seat.concertDate.id, -1, session)
+            //예약 성공 이벤트 발행
+            await this.eventPublisher.publish(new CreateReservationCompleteEvent(reservation, session))
 
             await this.dataAccessor.commitTransaction(session)
         } catch (error) {
@@ -54,12 +51,6 @@ export class CreateReservationUseCase {
         } finally {
             await this.dataAccessor.releaseQueryRunner(session)
         }
-
-        //예약 성공 이벤트 발행
-        this.eventPublisher.publish(new ReservationCreatedEvent(reservation))
-
-        //예약 만료 스케줄러 등록
-        await this.concertWriterRepository.addReservationExpireScheduler(reservation)
 
         return new CreateReservationResponseDto(
             reservation.id,

@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
 import type { IConcertReaderRepository } from '../../../domain/concert/repositories/concert-reader.repository.interface'
-import { EntityManager } from 'typeorm'
+import { EntityManager, LessThan } from 'typeorm'
 import { Concert } from '../models/concert.entity'
 import { Seat } from '../models/seat.entity'
 import { ConcertDate } from '../models/concertDate.entity'
@@ -13,6 +13,7 @@ import { DuplicateConcertDateError } from '../../../domain/concert/exceptions/du
 import { NotFoundReservationError } from 'src/domain/concert/exceptions/not-found-reservation.exception'
 import { NotFoundConcertDateError } from 'src/domain/concert/exceptions/not-found-concert-date.exception'
 import { NotAuthReservationError } from 'src/domain/concert/exceptions/not-auth-reservation.exception'
+import { DuplicateReservationError } from 'src/domain/concert/exceptions/duplicate-reservation.exception'
 
 @Injectable()
 export class ConcertReaderRepositoryTypeORM implements IConcertReaderRepository {
@@ -65,6 +66,14 @@ export class ConcertReaderRepositoryTypeORM implements IConcertReaderRepository 
         return this.entityManager.find(Concert, { relations: ['concertDates'] })
     }
 
+    async findExpiredReservations(): Promise<Reservation[]> {
+        const currentTime = new Date()
+        return await this.entityManager.find(Reservation, {
+            where: { holdExpiresAt: LessThan(currentTime) },
+            relations: ['concertDate', 'seat'],
+        })
+    }
+
     /**
      * Finds a concert date by its ID.
      * @param id ID of the concert date to find
@@ -91,6 +100,7 @@ export class ConcertReaderRepositoryTypeORM implements IConcertReaderRepository 
         const seat = await manager.findOne(Seat, { where: { id }, relations: ['concertDate', 'concertDate.concert'], lock: lockOption })
 
         if (!seat) throw new NotFoundSeatError(`Seat id ${id} not found`)
+        if (seat.status != 'available') throw new DuplicateReservationError(`Seat id ${id} is not available`)
 
         return seat
     }

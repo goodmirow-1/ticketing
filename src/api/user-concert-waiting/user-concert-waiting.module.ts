@@ -23,8 +23,10 @@ import { WaitingReaderRepositoryRedis } from 'src/infrastructure/user/repositori
 import { CreateReservationUseCase } from '../../application/user-concert-waiting/usecase/create-reservation.usecase'
 import { ReadAllConcertsUseCase } from '../../application/user-concert-waiting/usecase/read-all-concerts.usecase'
 import { ReadAllSeatsByConcertDateIdUseCase } from '../../application/user-concert-waiting/usecase/read-all-seats-by-concert-date.usecase'
-import { ReservationEventPublisher, ReservationEventPublisherToken } from 'src/infrastructure/event/reservation-event-publisher'
 import { KafkaService } from 'src/infrastructure/db/kafka/kafka.service'
+import { CreateReservationCompleteEventListener } from 'src/application/user-concert-waiting/event/create-reservation-complete.event.listener'
+import { CreateReservationCompleteEventPublisher } from 'src/application/user-concert-waiting/event/create-reservation-complete.event.publisher'
+import { ExpiredReservationSchedulerUseCase } from 'src/application/user-concert-waiting/usecase/expired-reservation-scheduler.usecase'
 
 @Module({
     imports: [TypeOrmModule.forFeature([User, Reservation, PointHistory])],
@@ -34,8 +36,11 @@ import { KafkaService } from 'src/infrastructure/db/kafka/kafka.service'
         CreateReservationUseCase,
         ReadAllConcertsUseCase,
         ReadAllSeatsByConcertDateIdUseCase,
+        ExpiredReservationSchedulerUseCase,
         RedisService,
         KafkaService,
+        CreateReservationCompleteEventListener,
+        CreateReservationCompleteEventPublisher,
         {
             provide: IConcertReaderRepositoryToken,
             useClass: ConcertReaderRepositoryTypeORM,
@@ -63,10 +68,6 @@ import { KafkaService } from 'src/infrastructure/db/kafka/kafka.service'
         {
             provide: DataAccessorToken,
             useClass: TypeORMDataAccessor,
-        },
-        {
-            provide: ReservationEventPublisherToken,
-            useClass: ReservationEventPublisher,
         },
     ],
     exports: [],

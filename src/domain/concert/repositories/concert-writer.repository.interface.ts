@@ -14,6 +14,5 @@ export interface IConcertWriterRepository {
     updateConcertDateAvailableSeat(concertDateId: string, amount: number, querryRunner?: any)
     updateReservationPaymentCompleted(reservationId: string, querryRunner?: any)
 
-    addReservationExpireScheduler(reservation: IReservation)
-    clearReservationExpireScheduler(reservationId: string)
+    deleteReservation(reservationId: string, querryRunner?: any)
 }

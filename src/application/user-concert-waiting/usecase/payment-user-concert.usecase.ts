@@ -62,9 +62,6 @@ export class PaymentUserConcertUseCase {
             await this.dataAccessor.releaseQueryRunner(session)
         }
 
-        //예약 만료 스케줄러 삭제
-        await this.concertWriterRepository.clearReservationExpireScheduler(pointHistory.reservationId)
-
         //유효토큰 만료로 변경 수정
         await this.waitingWriterRedisRepository.setExpireToken(userId)
 
