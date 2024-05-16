@@ -22,17 +22,19 @@ jobs:
                 ports:
                     - 6379:6379 # Expose Redis on port 6379
             zookeeper:
-                image: wurstmeister/zookeeper:latest
+                image: wurstmeister/zookeeper:3.4.6
                 ports:
                     - 2181:2181
+
             kafka:
-                image: wurstmeister/kafka:latest
-                env:
-                    KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-                    KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
-                    KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+                image: wurstmeister/kafka:2.13-2.7.0
                 ports:
                     - 9092:9092
+                options: >
+                    --network-alias kafka
+                env:
+                    KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+                    KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
 
         steps:
             - name: Checkout
@@ -58,7 +60,7 @@ jobs:
                   echo "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}" >> $GITHUB_ENV
                   echo "REDIS_HOST=localhost" >> $GITHUB_ENV # Set Redis host
                   echo "REDIS_PORT=6379" >> $GITHUB_ENV # Set Redis port
-                  echo "KAFKA_HOST=localhost" > $GITHUB_ENV # Set Kafka host
+                  echo "KAFKA_HOST=kafka" > $GITHUB_ENV # Set Kafka host
                   echo "KAFKAJS_NO_PARTITIONER_WARNING=1" >> $GITHUB_ENV # 경고 무시
 
             - name: Restore dependencies from Cache
