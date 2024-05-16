@@ -67,7 +67,7 @@ jobs:
                   echo "KAFKA_HOST=localhost" >> $GITHUB_ENV # Set Kafka host
 
             - name: Wait for Kafka to be ready
-              run: sleep 10 # 대기 시간을 60초로 늘림
+              run: sleep 120 # 대기 시간을 60초로 늘림
 
             - name: Restore dependencies from Cache
               id: cache
