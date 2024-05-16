@@ -21,12 +21,12 @@ jobs:
                 ports:
                     - 6379:6379 # Expose Redis on port 6379
             zookeeper:
-                image: wurstmeister/zookeeper:3.4.6
+                image: wurstmeister/zookeeper:latest
                 ports:
                     - 2181:2181
 
             kafka:
-                image: wurstmeister/kafka:2.13-2.7.0
+                image: wurstmeister/kafka:2.11-1.1.1
                 ports:
                     - 9092:9092
                 env:
