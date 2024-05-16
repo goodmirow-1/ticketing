@@ -52,7 +52,6 @@ jobs:
                   echo "DATABASE=${{ secrets.DATABASE }}" >> $GITHUB_ENV
                   echo "MAX_CONNECTIONS=${{ secrets.MAX_CONNECTIONS }}" >> $GITHUB_ENV
                   echo "MAX_SEATS=${{ secrets.MAX_SEATS }}" >> $GITHUB_ENV
-                  echo "SEAT_HOLD_EXPIRATION_TIME=${{ secrets.SEAT_HOLD_EXPIRATION_TIME }}" >> $GITHUB_ENV
                   echo "VALID_TOKEN_EXPIRATION_TIME=${{ secrets.VALID_TOKEN_EXPIRATION_TIME }}" >> $GITHUB_ENV
                   echo "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}" >> $GITHUB_ENV
                   echo "REDIS_HOST=localhost" >> $GITHUB_ENV # Set Redis host
