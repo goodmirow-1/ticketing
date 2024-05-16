@@ -21,12 +21,12 @@ jobs:
                 ports:
                     - 6379:6379 # Expose Redis on port 6379
             zookeeper:
-                image: wurstmeister/zookeeper:latest
+                image: wurstmeister/zookeeper:3.4.6
                 ports:
                     - 2181:2181
 
             kafka:
-                image: wurstmeister/kafka:2.11-1.1.1
+                image: wurstmeister/kafka:2.13-2.7.0
                 ports:
                     - 9092:9092
                 env:
@@ -67,7 +67,7 @@ jobs:
                   echo "KAFKA_HOST=localhost" >> $GITHUB_ENV # Set Kafka host
 
             - name: Wait for Kafka to be ready
-              run: sleep 60 # 대기 시간을 60초로 늘림
+              run: sleep 10 # 대기 시간을 60초로 늘림
 
             - name: Restore dependencies from Cache
               id: cache

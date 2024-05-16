@@ -2,7 +2,7 @@
 import type { OnModuleDestroy, OnModuleInit } from '@nestjs/common'
 import { Injectable, Logger } from '@nestjs/common'
 import type { Consumer, Producer } from 'kafkajs'
-import { Kafka } from 'kafkajs'
+import { Kafka, Partitioners } from 'kafkajs'
 
 @Injectable()
 export class KafkaService implements OnModuleInit, OnModuleDestroy {
@@ -16,7 +16,7 @@ export class KafkaService implements OnModuleInit, OnModuleDestroy {
             clientId: 'concert-app',
             brokers: [process.env.KAFKA_HOST + ':9092'], // Kafka 브로커 주소
         })
-        this.producer = this.kafka.producer()
+        this.producer = this.kafka.producer({ createPartitioner: Partitioners.LegacyPartitioner })
         this.consumer = this.kafka.consumer({ groupId: 'reservation-group' })
     }
 
