@@ -1,77 +1,111 @@
-version: '3.8'
+version: '2'
 services:
-  redis:
-    container_name: redis
-    hostname: redis
-    image: redis:latest  # Ensure this is compatible with your RDB file
-    restart: unless-stopped
-    command: ["redis-server", "--bind", "redis", "--port", "6379", "--notify-keyspace-events", "Ex"]
-    ports:
-      - "${REDIS_PORT}:${REDIS_PORT}"
-    networks:
-      - ticketing-net
-    extra_hosts:
-      - host.docker.internal:host-gateway
-    volumes:
-      - redis-data:/data
+    redis:
+        container_name: redis
+        hostname: redis
+        image: redis:latest # Ensure this is compatible with your RDB file
+        restart: unless-stopped
+        command: ['redis-server', '--bind', 'redis', '--port', '6379']
+        ports:
+            - '${REDIS_PORT}:${REDIS_PORT}'
+        networks:
+            - ticketing-net
+        extra_hosts:
+            - host.docker.internal:host-gateway
+        volumes:
+            - redis-data:/data
 
-  api:
-    container_name: nestjs
-    image: nestjs-dev
-    restart: unless-stopped
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: dev
-    environment:
-      DB_TYPE: ${DB_TYPE}
-      DB_HOST: ${DB_HOST}
-      DB_PORT: ${DB_PORT}
-      DB_USER_NAME: ${DB_USER_NAME}
-      DB_PASSWORD: ${DB_PASSWORD}
-      DATABASE: ${DATABASE}
-      MAX_CONNECTIONS: ${MAX_CONNECTIONS}
-      MAX_SEATS: ${MAX_SEATS}
-      VALID_TOKEN_EXPIRATION_TIME: ${VALID_TOKEN_EXPIRATION_TIME}
-      SEAT_HOLD_EXPIRATION_TIME: ${SEAT_HOLD_EXPIRATION_TIME}
-      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
-      MYSQL_DATABASE: ${DATABASE}
-      REDIS_HOST: ${REDIS_HOST}
-      REDIS_PORT: ${REDIS_PORT}
-    volumes:
-      - .:/app
-      - /app/node_modules
-    ports:
-      - "3000:3000"
-    networks:
-      - ticketing-net
-    depends_on:
-      - redis
-    external_links:
-      - redis
-    command: pnpm run start
+    api:
+        container_name: nestjs
+        image: nestjs-dev
+        restart: unless-stopped
+        build:
+            context: .
+            dockerfile: Dockerfile
+            target: dev
+        environment:
+            DB_TYPE: ${DB_TYPE}
+            DB_HOST: database
+            DB_PORT: ${DB_PORT}
+            DB_USER_NAME: ${DB_USER_NAME}
+            DB_PASSWORD: ${DB_PASSWORD}
+            DATABASE: ${DATABASE}
+            MAX_CONNECTIONS: ${MAX_CONNECTIONS}
+            MAX_SEATS: ${MAX_SEATS}
+            VALID_TOKEN_EXPIRATION_TIME: ${VALID_TOKEN_EXPIRATION_TIME}
+            SEAT_HOLD_EXPIRATION_TIME: ${SEAT_HOLD_EXPIRATION_TIME}
+            JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+            MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+            MYSQL_DATABASE: ${DATABASE}
+            REDIS_HOST: redis
+            REDIS_PORT: ${REDIS_PORT}
+            KAFKA_HOST: kafka
+        volumes:
+            - .:/app
+            - /app/node_modules
+        ports:
+            - '3000:3000'
+        networks:
+            - ticketing-net
+        depends_on:
+            - redis
+        external_links:
+            - redis
+        command: pnpm run start
 
-  database:
-    container_name: mariadb
-    image: mariadb:10.6
-    restart: unless-stopped
-    volumes:
-      - mariadb-data:/var/lib/mysql
-    environment:
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
-      MYSQL_DATABASE: ${DATABASE}
-    networks:
-      - ticketing-net
-    ports:
-      - "3307:3306"
-    
+    database:
+        container_name: mariadb
+        image: mariadb:10.6
+        restart: unless-stopped
+        volumes:
+            - mariadb-data:/var/lib/mysql
+        environment:
+            MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+            MYSQL_DATABASE: ${DATABASE}
+        networks:
+            - ticketing-net
+        ports:
+            - '3307:3306'
+
+    zookeeper:
+        container_name: zookeeper
+        image: wurstmeister/zookeeper:latest
+        ports:
+            - '2181:2181'
+        networks:
+            - ticketing-net
+
+    kafka:
+        container_name: kafka
+        image: wurstmeister/kafka:2.11-1.1.1
+        ports:
+            - '9092:9092'
+        links:
+            - zookeeper
+        environment:
+            KAFKA_BROKER_ID: 1
+            KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+            KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+            KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092 # 호스트 머신의 IP 주소
+            KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+            KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+            KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+            KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+            KAFKA_DELETE_TOPIC_ENABLE: 'true'
+            KAFKA_CREATE_TOPICS: 'reservation-created:1:1,payment-completed:1:1'
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
+        networks:
+            - ticketing-net
+        depends_on:
+            - zookeeper
+
 networks:
-  ticketing-net:
-    driver: bridge
+    ticketing-net:
+        driver: bridge
 
 volumes:
-  mariadb-data:
-    driver: local
-  redis-data:
-    driver: local
+    mariadb-data:
+        driver: local
+    redis-data:
+        driver: local

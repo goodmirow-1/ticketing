@@ -8,6 +8,7 @@ export const IConcertReaderRepositoryToken = Symbol.for('IConcertReaderRepositor
 export interface IConcertReaderRepository {
     findConcertById(id: string): Promise<IConcert>
     findAllConcerts(): Promise<IConcert[]>
+    findExpiredReservations(): Promise<IReservation[]>
 
     checkValidConcertDateByDate(date: Date)
     findConcertDateById(concertDateId: string): Promise<IConcertDate>

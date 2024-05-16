@@ -1,215 +1,238 @@
 name: Development CD Pipeline
 
 on:
-  push:
-    branches:
-      - develop
+    push:
+        branches:
+            - develop
 
 jobs:
-  test: 
-    runs-on: ubuntu-latest
-    services:
-      mariadb:
-        image: mariadb:latest
-        env:
-          MYSQL_ROOT_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          MYSQL_DATABASE: ${{ secrets.DATABASE }}
-        ports:
-          - 3306:3306
-      redis:
-        image: redis:latest
-        ports:
-          - 6379:6379 # Expose Redis on port 6379
-          
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+    test:
+        runs-on: ubuntu-latest
+        services:
+            mariadb:
+                image: mariadb:latest
+                env:
+                    MYSQL_ROOT_PASSWORD: ${{ secrets.DB_PASSWORD }}
+                    MYSQL_DATABASE: ${{ secrets.DATABASE }}
+                ports:
+                    - 3306:3306
+            redis:
+                image: redis:latest
+                ports:
+                    - 6379:6379 # Expose Redis on port 6379
+            zookeeper:
+                image: wurstmeister/zookeeper:3.4.6
+                ports:
+                    - 2181:2181
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 8
-      
-      - name: Set Environment Variables
-        run: |
-          echo "DB_TYPE=${{ secrets.DB_TYPE }}" >> $GITHUB_ENV
-          echo "DB_HOST=localhost" >> $GITHUB_ENV
-          echo "DB_PORT=${{ secrets.DB_PORT }}" >> $GITHUB_ENV
-          echo "DB_USER_NAME=${{ secrets.DB_USER_NAME }}" >> $GITHUB_ENV
-          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> $GITHUB_ENV
-          echo "DATABASE=${{ secrets.DATABASE }}" >> $GITHUB_ENV
-          echo "MAX_CONNECTIONS=${{ secrets.MAX_CONNECTIONS }}" >> $GITHUB_ENV
-          echo "MAX_SEATS=${{ secrets.MAX_SEATS }}" >> $GITHUB_ENV
-          echo "SEAT_HOLD_EXPIRATION_TIME=${{ secrets.SEAT_HOLD_EXPIRATION_TIME }}" >> $GITHUB_ENV
-          echo "VALID_TOKEN_EXPIRATION_TIME=${{ secrets.VALID_TOKEN_EXPIRATION_TIME }}" >> $GITHUB_ENV
-          echo "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}" >> $GITHUB_ENV
-          echo "REDIS_HOST=localhost" >> $GITHUB_ENV # Set Redis host
-          echo "REDIS_PORT=6379" >> $GITHUB_ENV # Set Redis port
+            kafka:
+                image: wurstmeister/kafka:2.13-2.7.0
+                ports:
+                    - 9092:9092
+                env:
+                    KAFKA_BROKER_ID: 1
+                    KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+                    KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+                    KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092 # 호스트 머신의 IP 주소
+                    KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+                    KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+                    KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+                    KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+                    KAFKA_DELETE_TOPIC_ENABLE: 'true'
+                    KAFKA_CREATE_TOPICS: 'reservation-created:1:1'
 
-      - name: Restore dependencies from Cache
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: '**/node_modules'
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-node-modules-
-      
-      - name: Install dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: pnpm install --no-frozen-lockfile
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v3
 
-      - name: Run test
-        run: |
-          pnpm run test
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v2
+              with:
+                  version: 8
 
-      - name: Close PR on failure
-        if: ${{ failure() }}
-        uses: actions/github-script@v6
-        with:
-          script: |
-            github.rest.pulls.update({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: context.issue.number,
-              state: 'closed'
-            })
+            - name: Set Environment Variables
+              run: |
+                  echo "DB_TYPE=${{ secrets.DB_TYPE }}" >> $GITHUB_ENV
+                  echo "DB_HOST=localhost" >> $GITHUB_ENV
+                  echo "DB_PORT=${{ secrets.DB_PORT }}" >> $GITHUB_ENV
+                  echo "DB_USER_NAME=${{ secrets.DB_USER_NAME }}" >> $GITHUB_ENV
+                  echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> $GITHUB_ENV
+                  echo "DATABASE=${{ secrets.DATABASE }}" >> $GITHUB_ENV
+                  echo "MAX_CONNECTIONS=${{ secrets.MAX_CONNECTIONS }}" >> $GITHUB_ENV
+                  echo "MAX_SEATS=${{ secrets.MAX_SEATS }}" >> $GITHUB_ENV
+                  echo "VALID_TOKEN_EXPIRATION_TIME=${{ secrets.VALID_TOKEN_EXPIRATION_TIME }}" >> $GITHUB_ENV
+                  echo "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}" >> $GITHUB_ENV
+                  echo "REDIS_HOST=localhost" >> $GITHUB_ENV # Set Redis host
+                  echo "REDIS_PORT=6379" >> $GITHUB_ENV # Set Redis port
+                  echo "KAFKA_HOST=localhost" >> $GITHUB_ENV # Set Kafka host
 
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 8
+            - name: Wait for Kafka to be ready
+              run: sleep 10 # 대기 시간을 줌
 
-      - name: Restore dependencies from Cache
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: '**/node_modules'
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-node-modules-
-      
-      - name: Install dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: pnpm install --no-frozen-lockfile
-        
-      - name: Run lint
-        run: pnpm run lint
+            - name: Restore dependencies from Cache
+              id: cache
+              uses: actions/cache@v3
+              with:
+                  path: '**/node_modules'
+                  key: ${{ runner.os }}-node-modules-${{ hashFiles('**/pnpm-lock.yaml') }}
+                  restore-keys: |
+                      ${{ runner.os }}-node-modules-
 
-      - name: Close PR on failure
-        if: ${{ failure() }}
-        uses: actions/github-script@v6
-        with:
-          script: |
-            github.rest.pulls.update({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: context.issue.number,
-              state: 'closed'
-            })
+            - name: Install dependencies
+              if: steps.cache.outputs.cache-hit != 'true'
+              run: pnpm install --no-frozen-lockfile
 
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 8
+            - name: Run test
+              run: |
+                  pnpm run test
 
-      - name: Restore dependencies from Cache
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: '**/node_modules'
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-node-modules-
-      
-      - name: Install dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: pnpm install --no-frozen-lockfile
+            - name: Close PR on failure
+              if: ${{ failure() }}
+              uses: actions/github-script@v6
+              with:
+                  script: |
+                      github.rest.pulls.update({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        pull_number: context.issue.number,
+                        state: 'closed'
+                      })
 
-      - name: Run build
-        run: pnpm run build
+    lint:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v3
 
-      - name: Close PR on failure
-        if: ${{ failure() }}
-        uses: actions/github-script@v6
-        with:
-          script: |
-            github.rest.pulls.update({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: context.issue.number,
-              state: 'closed'
-            })
-  dev-cd:
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v3
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v2
+              with:
+                  version: 8
 
-    - name: Create prod environments
-      run: |
-        echo "DOCKER_HUB_USERNAME=${{ secrets.DOCKER_HUB_USERNAME }}" >> .env.production
-        echo "DOCKER_HUB_ACCESS_TOKEN=${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}" >> .env.production
-      
-    - name: Log in to Docker Hub
-      uses: docker/login-action@v1
-      with:
-        username: ${{ secrets.DOCKER_HUB_USERNAME }}
-        password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-    - name: Build and Push Docker images
-      run: |
-        docker build -t goodmirow/ticketing:latest .
-        docker push goodmirow/ticketing:latest
+            - name: Restore dependencies from Cache
+              id: cache
+              uses: actions/cache@v3
+              with:
+                  path: '**/node_modules'
+                  key: ${{ runner.os }}-node-modules-${{ hashFiles('**/pnpm-lock.yaml') }}
+                  restore-keys: |
+                      ${{ runner.os }}-node-modules-
 
-    - name: Close PR on failure
-      if: ${{ failure() }}
-      uses: actions/github-script@v6
-      with:
-        script: |
-          github.rest.pulls.update({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            pull_number: context.issue.number,
-            state: 'closed'
-          })
-    
-  # dev-cd:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v3
-      
-  #     - name: Configure AWS credentials
-  #       uses: aws-actions/configure-aws-credentials@v1
-  #       with:
-  #           aws-region: ${{ env.AWS_REGION }}
-  #           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
-  #           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-    
-  #     - name: Login AWS ECR service
-  #       id: ecr-login
-  #       uses: aws-actions/amazon-ecr-login@v2
-        
-  #     - name: Build, tag, and push dev-image to Amazon ECR
-  #       id: build-image
-  #       env:
-  #           ECR_REGISTRY: ${{ steps.ecr-login.outputs.registry }}
-  #           IMAGE_TAG: dev-${{ github.sha }}
-  #       run: |
-  #           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG . --target=dev
-  #           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-  #           echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
-        # if you want to deploy development application, specify the steps
+            - name: Install dependencies
+              if: steps.cache.outputs.cache-hit != 'true'
+              run: pnpm install --no-frozen-lockfile
+
+            - name: Run lint
+              run: pnpm run lint
+
+            - name: Close PR on failure
+              if: ${{ failure() }}
+              uses: actions/github-script@v6
+              with:
+                  script: |
+                      github.rest.pulls.update({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        pull_number: context.issue.number,
+                        state: 'closed'
+                      })
+
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v3
+
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v2
+              with:
+                  version: 8
+
+            - name: Restore dependencies from Cache
+              id: cache
+              uses: actions/cache@v3
+              with:
+                  path: '**/node_modules'
+                  key: ${{ runner.os }}-node-modules-${{ hashFiles('**/pnpm-lock.yaml') }}
+                  restore-keys: |
+                      ${{ runner.os }}-node-modules-
+
+            - name: Install dependencies
+              if: steps.cache.outputs.cache-hit != 'true'
+              run: pnpm install --no-frozen-lockfile
+
+            - name: Run build
+              run: pnpm run build
+
+            - name: Close PR on failure
+              if: ${{ failure() }}
+              uses: actions/github-script@v6
+              with:
+                  script: |
+                      github.rest.pulls.update({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        pull_number: context.issue.number,
+                        state: 'closed'
+                      })
+    dev-cd:
+        needs: test
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v3
+
+            - name: Create prod environments
+              run: |
+                  echo "DOCKER_HUB_USERNAME=${{ secrets.DOCKER_HUB_USERNAME }}" >> .env.production
+                  echo "DOCKER_HUB_ACCESS_TOKEN=${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}" >> .env.production
+
+            - name: Log in to Docker Hub
+              uses: docker/login-action@v1
+              with:
+                  username: ${{ secrets.DOCKER_HUB_USERNAME }}
+                  password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+            - name: Build and Push Docker images
+              run: |
+                  docker build -t goodmirow/ticketing:latest .
+                  docker push goodmirow/ticketing:latest
+
+            - name: Close PR on failure
+              if: ${{ failure() }}
+              uses: actions/github-script@v6
+              with:
+                  script: |
+                      github.rest.pulls.update({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        pull_number: context.issue.number,
+                        state: 'closed'
+                      })
+
+    # dev-cd:
+    #   runs-on: ubuntu-latest
+    #   steps:
+    #     - name: Checkout
+    #       uses: actions/checkout@v3
+
+    #     - name: Configure AWS credentials
+    #       uses: aws-actions/configure-aws-credentials@v1
+    #       with:
+    #           aws-region: ${{ env.AWS_REGION }}
+    #           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+    #           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+    #     - name: Login AWS ECR service
+    #       id: ecr-login
+    #       uses: aws-actions/amazon-ecr-login@v2
+
+    #     - name: Build, tag, and push dev-image to Amazon ECR
+    #       id: build-image
+    #       env:
+    #           ECR_REGISTRY: ${{ steps.ecr-login.outputs.registry }}
+    #           IMAGE_TAG: dev-${{ github.sha }}
+    #       run: |
+    #           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG . --target=dev
+    #           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+    #           echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+    # if you want to deploy development application, specify the steps

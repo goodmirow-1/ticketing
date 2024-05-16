@@ -137,7 +137,7 @@ export class ConcertWriterRepositoryTypeORM implements IConcertWriterRepository 
      * @param reservation The Reservation entity to update.
      * @throws FailedUpdateReservationError if updating the reservation fails.
      */
-    async updateReservationPaymentCompleted(reservationId: string, querryRunner?: any){
+    async updateReservationPaymentCompleted(reservationId: string, querryRunner?: any) {
         const manager = querryRunner ? querryRunner.manager : this.entityManager
 
         const paymentUpdateResult = await manager
@@ -152,26 +152,9 @@ export class ConcertWriterRepositoryTypeORM implements IConcertWriterRepository 
         }
     }
 
-    addReservationExpireScheduler(reservation: Reservation) {
-        // 예약 만료 시간 설정
-        const expirationTime = parseInt(process.env.SEAT_HOLD_EXPIRATION_TIME, 10)
+    async deleteReservation(reservationId: string, querryRunner?: any) {
+        const manager = querryRunner ? querryRunner.manager : this.entityManager
 
-        const timeout = setTimeout(async () => {
-            //예약했으면
-            if (reservation.paymentCompleted) return
-
-            await this.entityManager.delete(Reservation, reservation.id)
-            await this.updateSeatStatus(reservation.seat.id, 'available')
-            await this.updateConcertDateAvailableSeat(reservation.seat.concertDate.id, 1)
-        }, expirationTime * 1000)
-
-        this.schedulerRegistry.addTimeout(reservation.id, timeout)
-    }
-
-    clearReservationExpireScheduler(reservationId: string) {
-        const reservationScheduler = this.schedulerRegistry.doesExist('timeout', reservationId)
-        if (reservationScheduler) {
-            clearTimeout(this.schedulerRegistry.getTimeout(reservationId))
-        }
+        manager.delete(Reservation, reservationId)
     }
 }

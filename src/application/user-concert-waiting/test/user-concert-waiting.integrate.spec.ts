@@ -51,7 +51,7 @@ describe('Integration Tests for User Use Cases', () => {
     let generateTokenUseCase: GenerateTokenUseCase
     let redisService: RedisService
 
-    beforeEach(async () => {
+    beforeAll(async () => {
         const moduleFixture: TestingModule = await Test.createTestingModule({
             imports: [AppModule],
         }).compile()

@@ -10,8 +10,10 @@ import { APP_FILTER } from '@nestjs/core'
 import { GlobalExceptionFilter } from './custom-exception'
 import { AppService } from './app.service'
 import { AppController } from './app.controller'
+import { EventEmitterModule } from '@nestjs/event-emitter'
 @Module({
     imports: [
+        EventEmitterModule.forRoot(),
         ScheduleModule.forRoot(),
         ConfigModule.forRoot({
             envFilePath: '.env',
