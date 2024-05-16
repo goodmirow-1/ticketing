@@ -22,19 +22,25 @@ jobs:
                 ports:
                     - 6379:6379 # Expose Redis on port 6379
             zookeeper:
-                image: wurstmeister/zookeeper:3.4.6
+                image: wurstmeister/zookeeper:latest
                 ports:
                     - 2181:2181
 
             kafka:
-                image: wurstmeister/kafka:2.13-2.7.0
+                image: wurstmeister/kafka:2.11-1.1.1
                 ports:
                     - 9092:9092
-                options: >
-                    --network-alias kafka
                 env:
-                    KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+                    KAFKA_BROKER_ID: 1
                     KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+                    KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+                    KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092 # 호스트 머신의 IP 주소
+                    KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+                    KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+                    KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+                    KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+                    KAFKA_DELETE_TOPIC_ENABLE: 'true'
+                    KAFKA_CREATE_TOPICS: 'reservation-created:1:1'
 
         steps:
             - name: Checkout
@@ -55,13 +61,11 @@ jobs:
                   echo "DATABASE=${{ secrets.DATABASE }}" >> $GITHUB_ENV
                   echo "MAX_CONNECTIONS=${{ secrets.MAX_CONNECTIONS }}" >> $GITHUB_ENV
                   echo "MAX_SEATS=${{ secrets.MAX_SEATS }}" >> $GITHUB_ENV
-                  echo "SEAT_HOLD_EXPIRATION_TIME=${{ secrets.SEAT_HOLD_EXPIRATION_TIME }}" >> $GITHUB_ENV
                   echo "VALID_TOKEN_EXPIRATION_TIME=${{ secrets.VALID_TOKEN_EXPIRATION_TIME }}" >> $GITHUB_ENV
                   echo "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}" >> $GITHUB_ENV
                   echo "REDIS_HOST=localhost" >> $GITHUB_ENV # Set Redis host
                   echo "REDIS_PORT=6379" >> $GITHUB_ENV # Set Redis port
                   echo "KAFKA_HOST=kafka" > $GITHUB_ENV # Set Kafka host
-                  echo "KAFKAJS_NO_PARTITIONER_WARNING=1" >> $GITHUB_ENV # 경고 무시
 
             - name: Restore dependencies from Cache
               id: cache
