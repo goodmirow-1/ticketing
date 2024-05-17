@@ -47,6 +47,7 @@ describe('유닛 콘서트 서비스 유닛 테스트', () => {
 
         paymentUserConcertUseCase = new PaymentUserConcertUseCase(
             mockConcertReaderRepo,
+            mockConcertWriterRepo,
             mockUserReaderRepo,
             mockUserWriterRepo,
             mockWaitingWriterRedisRepo,

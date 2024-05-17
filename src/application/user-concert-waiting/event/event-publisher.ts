@@ -8,18 +8,10 @@ export class EventPublisher {
     constructor(private eventEmitter: EventEmitter2) {}
 
     createReservationCompletepublish(event: CreateReservationCompleteEvent) {
-        try {
-            this.eventEmitter.emit('reservation.created.completed', event)
-        } catch (err) {
-            console.log(err)
-        }
+        this.eventEmitter.emit('reservation.created.completed', event)
     }
 
-    async paymentCompetePublish(event: PaymentCompleteEvent) {
-        try {
-            await this.eventEmitter.emitAsync('payment.completed', event)
-        } catch (err) {
-            console.log(err)
-        }
+    paymentCompetePublish(event: PaymentCompleteEvent) {
+        this.eventEmitter.emit('payment.completed', event)
     }
 }

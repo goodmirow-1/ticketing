@@ -41,10 +41,16 @@ export class CreateReservationUseCase {
             })
             //예약 저장
             reservation = await this.concertWriterRepository.createReservation(seat, userId, session)
-            //예약 성공 이벤트 발행
-            this.eventPublisher.createReservationCompletepublish(new CreateReservationCompleteEvent(reservation, session))
+
+            // 좌석 상태 변경
+            await this.concertWriterRepository.updateSeatStatus(seat.id, 'reserved', session)
+            // 사용 가능한 좌석수 차감
+            await this.concertWriterRepository.updateConcertDateAvailableSeat(seat.concertDate.id, -1, session)
 
             await this.dataAccessor.commitTransaction(session)
+
+            //예약 성공 이벤트 발행
+            this.eventPublisher.createReservationCompletepublish(new CreateReservationCompleteEvent(reservation))
         } catch (error) {
             await this.dataAccessor.rollbackTransaction(session)
             throw error
