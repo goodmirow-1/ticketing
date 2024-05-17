@@ -9,12 +9,15 @@ import { DataAccessor, DataAccessorToken } from 'src/infrastructure/db/data-acce
 import { IWaitingWriterRedisRepository, IWaitingWriterRepositoryRedisToken } from 'src/domain/user/repositories/waiting-writer-redis.repository.interface'
 import { PaymentCompleteEvent } from '../event/payment-complete.event'
 import { EventPublisher } from '../event/event-publisher'
+import { IConcertWriterRepository, IConcertWriterRepositoryToken } from 'src/domain/concert/repositories/concert-writer.repository.interface'
 
 @Injectable()
 export class PaymentUserConcertUseCase {
     constructor(
         @Inject(IConcertReaderRepositoryToken)
         private readonly concertReaderRepository: IConcertReaderRepository,
+        @Inject(IConcertWriterRepositoryToken)
+        private readonly concertWriterRepository: IConcertWriterRepository,
         @Inject(IUserReaderRepositoryToken)
         private readonly userReaderRepository: IUserReaderRepository,
         @Inject(IUserWriterRepositoryToken)
@@ -30,12 +33,12 @@ export class PaymentUserConcertUseCase {
         requestDto.validate()
 
         const { userId, reservationId } = requestDto.toUseCaseInput()
-        let reservation = null
+        let pointHistory = null
 
         const session = await this.dataAccessor.getSession()
         try {
             //예약 정보 조회
-            reservation = await this.concertReaderRepository.findReservationById(reservationId, session, {
+            const reservation = await this.concertReaderRepository.findReservationById(reservationId, session, {
                 mode: 'pessimistic_write',
             })
             //사용자 조회
@@ -47,10 +50,16 @@ export class PaymentUserConcertUseCase {
             this.concertReaderRepository.checkValidReservation(reservation, userId)
             //결제 진행(예약정보에 따른 사용자의 포인트 차감)
             await this.userWriterRepository.calculatePoint(user, -reservation.seat.price, 'payment', session)
-
-            await this.eventPublisher.paymentCompetePublish(new PaymentCompleteEvent(user, reservation, session))
+            //결제 로그 저장
+            pointHistory = await this.userWriterRepository.createPointHistory(user, -reservation.seat.price, reservation.id, session)
+            //좌석 상태 변경
+            await this.concertWriterRepository.updateSeatStatus(reservation.seat.id, 'held', session)
+            //예약 상태 변경
+            await this.concertWriterRepository.updateReservationPaymentCompleted(reservation.id, session)
 
             await this.dataAccessor.commitTransaction(session)
+            //결제 성공 이벤트 발행
+            this.eventPublisher.paymentCompetePublish(new PaymentCompleteEvent(pointHistory))
         } catch (error) {
             await this.dataAccessor.rollbackTransaction(session)
             throw error
@@ -61,6 +70,6 @@ export class PaymentUserConcertUseCase {
         //유효토큰 만료로 변경 수정
         await this.waitingWriterRedisRepository.setExpireToken(userId)
 
-        return new PaymentUserConcertResponseDto(reservation.userId, reservation.id, reservation.seat.price, new Date())
+        return new PaymentUserConcertResponseDto(pointHistory.user.id, pointHistory.reservationId, pointHistory.amount, pointHistory.created_at)
     }
 }

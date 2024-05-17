@@ -59,14 +59,12 @@ export class KafkaService implements OnModuleInit, OnModuleDestroy {
     }
 
     private async handleReservationCreated(payload: any, partition: number) {
-        // 파티션별로 다른 로직을 적용할 수 있음
         this.logger.log(`Handling reservation created for partition: ${partition}`)
         // 외부 API 호출
         await this.sendToExternalApi(payload)
     }
 
     private async handlePaymentCompleted(payload: any, partition: number) {
-        // 파티션별로 다른 로직을 적용할 수 있음
         this.logger.log(`Handling payment completed for partition: ${partition}`)
         // 외부 API 호출
         await this.sendToExternalApi(payload)

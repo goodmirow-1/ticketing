@@ -5,12 +5,10 @@ export class CreateReservationCompleteEvent {
     public readonly eventId: string
     public readonly publishing: number
     public readonly reservation: Reservation
-    public readonly session: any
 
-    constructor(reservation: Reservation, session: any) {
+    constructor(reservation: Reservation) {
         this.eventId = uuidv4()
         this.publishing = new Date().getTime()
         this.reservation = reservation
-        this.session = session
     }
 }
