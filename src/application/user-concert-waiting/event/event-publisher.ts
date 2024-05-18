@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { EventEmitter2 } from '@nestjs/event-emitter'
-import type { PaymentCompleteEvent } from './payment-complete.event'
 import type { CreateReservationCompleteEvent } from './create-reservation-complete.event'
+import type { PaymentCompleteFirstEvent } from 'src/application/user-concert-waiting/event/payment-complete-first.event'
 
 @Injectable()
 export class EventPublisher {
@@ -11,7 +11,7 @@ export class EventPublisher {
         this.eventEmitter.emit('reservation.created.completed', event)
     }
 
-    paymentCompetePublish(event: PaymentCompleteEvent) {
-        this.eventEmitter.emit('payment.completed', event)
+    paymentCompetePublish(event: PaymentCompleteFirstEvent) {
+        this.eventEmitter.emit('payment.completed.first', event)
     }
 }
