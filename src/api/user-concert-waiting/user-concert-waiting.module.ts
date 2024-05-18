@@ -27,7 +27,8 @@ import { KafkaService } from 'src/infrastructure/db/kafka/kafka.service'
 import { CreateReservationCompleteEventListener } from 'src/application/user-concert-waiting/event/create-reservation-complete.event.listener'
 import { ExpiredReservationSchedulerUseCase } from 'src/application/user-concert-waiting/usecase/expired-reservation-scheduler.usecase'
 import { EventPublisher } from 'src/application/user-concert-waiting/event/event-publisher'
-import { PaymentCompleteEventListener } from 'src/application/user-concert-waiting/event/payment-complete.event.listener'
+import { PaymentCompleteFirstEventListener } from 'src/application/user-concert-waiting/event/payment-complete-first.event.listener'
+import { PaymentCompleteEventSecondListener } from 'src/application/user-concert-waiting/event/payment-complete-second.event.listener'
 
 @Module({
     imports: [TypeOrmModule.forFeature([User, Reservation, PointHistory])],
@@ -41,7 +42,8 @@ import { PaymentCompleteEventListener } from 'src/application/user-concert-waiti
         RedisService,
         KafkaService,
         CreateReservationCompleteEventListener,
-        PaymentCompleteEventListener,
+        PaymentCompleteFirstEventListener,
+        PaymentCompleteEventSecondListener,
         EventPublisher,
         {
             provide: IConcertReaderRepositoryToken,
