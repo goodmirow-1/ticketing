@@ -34,6 +34,9 @@ import { CustomException } from 'src/custom-exception'
 import { ReadUserPointUseCase } from 'src/application/user/usecase/read-user-point.usecase'
 import { ReadUserPointRequestDto } from 'src/application/user/dtos/read-user-point.dto'
 import { RedisService } from 'src/infrastructure/db/redis/redis-service'
+import { WaitingSchedulerUseCase } from 'src/application/user/usecase/waiting-scheduler.usecase'
+import { CheckWaitingUseCase } from 'src/application/user/usecase/check-waiting.usecase'
+import { CheckWaitingRequestDto } from 'src/application/user/dtos/check-waiting.dto'
 
 describe('Integration Tests for User Use Cases', () => {
     let app: INestApplication
@@ -49,6 +52,8 @@ describe('Integration Tests for User Use Cases', () => {
     let readAllSeatsByConcertDateIdUseCase: ReadAllSeatsByConcertDateIdUseCase
     let readAllConcertsUseCase: ReadAllConcertsUseCase
     let generateTokenUseCase: GenerateTokenUseCase
+    let checkWaitingUseCase: CheckWaitingUseCase
+    let waitingSchedulerUseCase: WaitingSchedulerUseCase
     let redisService: RedisService
 
     beforeAll(async () => {
@@ -72,6 +77,8 @@ describe('Integration Tests for User Use Cases', () => {
         readAllConcertsUseCase = moduleFixture.get(ReadAllConcertsUseCase)
         readAllSeatsByConcertDateIdUseCase = moduleFixture.get(ReadAllSeatsByConcertDateIdUseCase)
         generateTokenUseCase = moduleFixture.get(GenerateTokenUseCase)
+        checkWaitingUseCase = moduleFixture.get(CheckWaitingUseCase)
+        waitingSchedulerUseCase = moduleFixture.get(WaitingSchedulerUseCase)
     })
 
     afterAll(async () => {
@@ -99,9 +106,13 @@ describe('Integration Tests for User Use Cases', () => {
 
     const generateToken = async (userId: string) => {
         const requestDtoOne = new GenerateTokenRequestDto(userId)
-        const resultOne = await generateTokenUseCase.execute(requestDtoOne)
+        await generateTokenUseCase.execute(requestDtoOne)
 
-        expect(resultOne.waitingNumber).toBe(0)
+        await waitingSchedulerUseCase.handleWaitingUser()
+
+        const requestDtoTwo = new CheckWaitingRequestDto(userId)
+        const result = await checkWaitingUseCase.execute(requestDtoTwo)
+        expect(result.waitingNumber).toBe(0)
     }
 
     const getConcertID = async () => {

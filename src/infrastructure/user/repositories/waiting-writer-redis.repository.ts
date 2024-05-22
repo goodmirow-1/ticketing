@@ -8,16 +8,39 @@ export class WaitingWriterRepositoryRedis implements IWaitingWriterRedisReposito
     constructor(private redisService: RedisService) {}
 
     // Implementation of IWaitingWriterRepository methods
-    async enqueueWaitingUser(userId: string, position: number) {
-        if (position && position != 0) return { token: null, waitingNumber: position }
-
-        await this.redisService.lpush('waitingQueue', userId)
-        const length = await this.redisService.llen('waitingQueue')
+    async enqueueWaitingUser(userId: string) {
+        const length = await this.redisService.lpush('waitingQueue', userId)
         return { token: null, waitingNumber: length }
     }
 
     async dequeueWaitingUser(): Promise<string> {
         return await this.redisService.rpop('waitingQueue')
+    }
+
+    async dequeueWaitingUserIdList(dequeueCount: number): Promise<string[]> {
+        const dequeueScript = `
+          local queue_key = KEYS[1]
+          local dequeue_count = tonumber(ARGV[1])
+
+          local user_ids = {}
+
+          for i = 1, dequeue_count do
+              local user_id = redis.call("LPOP", queue_key)
+              if not user_id then
+                  break
+              end
+              table.insert(user_ids, user_id)
+          end
+
+          return user_ids
+        `
+
+        return (await this.redisService.eval(
+            dequeueScript,
+            1,
+            'waitingQueue', // The key for the waiting queue
+            dequeueCount.toString(),
+        )) as unknown as string[]
     }
 
     async createValidToken(userId: string) {
@@ -31,12 +54,36 @@ export class WaitingWriterRepositoryRedis implements IWaitingWriterRedisReposito
         return { token: accessToken, waitingNumber: 0 }
     }
 
-    async createValidTokenOrWaitingUser(userId: string, isValid: boolean, position: number) {
-        if (isValid) {
-            return await this.createValidToken(userId)
-        } else {
-            return await this.enqueueWaitingUser(userId, position)
+    async createValidTokenList(userIdList: string[]) {
+        const tokenKeyPrefix = 'token:'
+        const tokenDataList = []
+
+        const expirationTime = parseInt(process.env.VALID_TOKEN_EXPIRATION_TIME, 10)
+        for (let i = 0; i < userIdList.length; ++i) {
+            const userId = userIdList[i]
+            const expiration = Math.floor(Date.now() / 1000) + i + expirationTime
+            const token = generateAccessToken(userId, expiration, 0)
+
+            tokenDataList.push({
+                userId,
+                token,
+                expirationTime,
+            })
         }
+
+        const createTokensScript = `
+            local token_key_prefix = ARGV[1]
+            local token_data_list = cjson.decode(ARGV[2])
+
+            for _, token_data in ipairs(token_data_list) do
+                local token_key = token_key_prefix .. token_data.userId
+                redis.call("SET", token_key, token_data.token, "EX", token_data.expirationTime)
+            end
+
+            return #token_data_list
+        `
+
+        return await this.redisService.eval(createTokensScript, 0, tokenKeyPrefix, JSON.stringify(tokenDataList))
     }
 
     async setExpireToken(userId: string): Promise<boolean> {

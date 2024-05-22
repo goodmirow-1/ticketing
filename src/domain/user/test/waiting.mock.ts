@@ -5,8 +5,6 @@ export function initWaitingReaderRedisMockRepo(): Record<keyof IWaitingReaderRed
     return {
         getWaitingNumber: jest.fn(),
         getValidTokenByUserId: jest.fn(),
-        isValidTokenCountUnderThreshold: jest.fn(),
-        getWaitingQueueCount: jest.fn(),
         acquireLock: jest.fn(),
         releaseLock: jest.fn(),
         validateUser: jest.fn(),
@@ -17,8 +15,9 @@ export function initWaitingWriterRedisMockRepo(): Record<keyof IWaitingWriterRed
     return {
         enqueueWaitingUser: jest.fn(),
         dequeueWaitingUser: jest.fn(),
+        dequeueWaitingUserIdList: jest.fn(),
         createValidToken: jest.fn(),
-        createValidTokenOrWaitingUser: jest.fn(),
+        createValidTokenList: jest.fn(),
         setExpireToken: jest.fn(),
     }
 }
