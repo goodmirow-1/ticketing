@@ -32,6 +32,6 @@ async function bootstrap() {
     server.maxConnections = Infinity
 
     setupSwagger(app)
-    await app.listen(3000)
+    await app.listen(50000)
 }
 bootstrap()

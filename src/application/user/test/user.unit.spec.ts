@@ -10,6 +10,8 @@ import { ReadUserPointRequestDto } from 'src/application/user/dtos/read-user-poi
 import { initWaitingReaderRedisMockRepo, initWaitingWriterRedisMockRepo } from 'src/domain/user/test/waiting.mock'
 import { GenerateTokenUseCase } from '../usecase/generate-token.usecase'
 import { GenerateTokenRequestDto } from '../dtos/generate-token.dto'
+import { CheckWaitingUseCase } from '../usecase/check-waiting.usecase'
+import { CheckWaitingRequestDto } from '../dtos/check-waiting.dto'
 
 describe('유저 서비스 유닛 테스트', () => {
     let mockReaderRepo: ReturnType<typeof initUserReaderMockRepo>
@@ -21,6 +23,7 @@ describe('유저 서비스 유닛 테스트', () => {
     let createUserUseCase: CreateUserUseCase
     let readUserPointUseCase: ReadUserPointUseCase
     let generateTokenUseCase: GenerateTokenUseCase
+    let checkWaitingUseCase: CheckWaitingUseCase
 
     beforeEach(() => {
         mockReaderRepo = initUserReaderMockRepo()
@@ -31,7 +34,8 @@ describe('유저 서비스 유닛 테스트', () => {
         chargeUserPointUseCase = new ChargeUserPointUseCase(mockReaderRepo, mockWriterRepo, mockDataAccessor)
         createUserUseCase = new CreateUserUseCase(mockWriterRepo)
         readUserPointUseCase = new ReadUserPointUseCase(mockReaderRepo)
-        generateTokenUseCase = new GenerateTokenUseCase(mockReaderRepo, mockWaitingReaderRedisRepo, mockWaitingWriterRedisRepo)
+        generateTokenUseCase = new GenerateTokenUseCase(mockWaitingWriterRedisRepo)
+        checkWaitingUseCase = new CheckWaitingUseCase(mockWaitingReaderRedisRepo)
     })
 
     describe('유저 포인트 API', () => {
@@ -72,42 +76,64 @@ describe('유저 서비스 유닛 테스트', () => {
     })
 
     describe('유저 토큰 발급 API', () => {
-        it('generateTokenUseCase response is valid token', async () => {
+        it('generateTokenUseCase response is waiting success', async () => {
             const uuid = uuidv4()
 
-            mockReaderRepo.findUserById.mockResolvedValue({ id: uuid, name: 'name' })
-            mockWaitingReaderRedisRepo.acquireLock.mockResolvedValue('OK')
-            mockWaitingReaderRedisRepo.getValidTokenByUserId.mockResolvedValue('token')
-            mockWaitingReaderRedisRepo.getWaitingNumber.mockResolvedValue(0)
-            mockWaitingReaderRedisRepo.isValidTokenCountUnderThreshold.mockResolvedValue(true)
-            mockWaitingReaderRedisRepo.getWaitingQueueCount.mockResolvedValue(true)
-            mockWaitingWriterRedisRepo.createValidTokenOrWaitingUser.mockResolvedValue({ token: 'token', userId: uuid, waitingNumber: 0 })
-
             const requestDto = new GenerateTokenRequestDto(uuid)
+
+            mockWaitingWriterRedisRepo.enqueueWaitingUser.mockResolvedValue({ token: null, waitingNumber: 1 })
+
             const result = await generateTokenUseCase.execute(requestDto)
+
+            expect(result.token).toBe(null)
+            expect(result.userId).toBe(uuid)
+            expect(result.waitingNumber).toBeGreaterThan(0)
+        })
+    })
+
+    describe('유저 대기열 확인 API', () => {
+        it('checkWaitingUseCase response is valid token', async () => {
+            const uuid = uuidv4()
+
+            const requestDto = new CheckWaitingRequestDto(uuid)
+
+            mockWaitingReaderRedisRepo.getValidTokenByUserId.mockResolvedValue('token')
+
+            const result = await checkWaitingUseCase.execute(requestDto)
 
             expect(typeof result.token).toBe('string')
             expect(result.userId).toBe(uuid)
             expect(result.waitingNumber).toBe(0)
         })
 
-        it('generateTokenUseCase response is waiting', async () => {
+        it('checkWaitingUseCase response is waiting', async () => {
             const uuid = uuidv4()
 
-            mockReaderRepo.findUserById.mockResolvedValue({ id: uuid, name: 'name' })
-            mockWaitingReaderRedisRepo.acquireLock.mockResolvedValue('OK')
+            const requestDto = new CheckWaitingRequestDto(uuid)
+
             mockWaitingReaderRedisRepo.getValidTokenByUserId.mockResolvedValue(null)
             mockWaitingReaderRedisRepo.getWaitingNumber.mockResolvedValue(1)
-            mockWaitingReaderRedisRepo.isValidTokenCountUnderThreshold.mockResolvedValue(true)
-            mockWaitingReaderRedisRepo.getWaitingQueueCount.mockResolvedValue(true)
-            mockWaitingWriterRedisRepo.createValidTokenOrWaitingUser.mockResolvedValue({ token: 'token', userId: uuid, waitingNumber: 1 })
 
-            const requestDto = new GenerateTokenRequestDto(uuid)
-            const result = await generateTokenUseCase.execute(requestDto)
+            const result = await checkWaitingUseCase.execute(requestDto)
 
-            expect(typeof result.token).toBe('string')
+            expect(result.token).toBe(null)
             expect(result.userId).toBe(uuid)
             expect(result.waitingNumber).toBe(1)
+        })
+
+        it('checkWaitingUseCase response is not waiting', async () => {
+            const uuid = uuidv4()
+
+            const requestDto = new CheckWaitingRequestDto(uuid)
+
+            mockWaitingReaderRedisRepo.getValidTokenByUserId.mockResolvedValue(null)
+            mockWaitingReaderRedisRepo.getWaitingNumber.mockResolvedValue(-1)
+
+            const result = await checkWaitingUseCase.execute(requestDto)
+
+            expect(result.token).toBe(null)
+            expect(result.userId).toBe(uuid)
+            expect(result.waitingNumber).toBe(-1)
         })
     })
 })

@@ -3,7 +3,7 @@ services:
     redis:
         container_name: redis
         hostname: redis
-        image: redis:latest # Ensure this is compatible with your RDB file
+        image: redis:latest
         restart: unless-stopped
         command: ['redis-server', '--bind', 'redis', '--port', '6379']
         ports:
@@ -33,7 +33,6 @@ services:
             MAX_CONNECTIONS: ${MAX_CONNECTIONS}
             MAX_SEATS: ${MAX_SEATS}
             VALID_TOKEN_EXPIRATION_TIME: ${VALID_TOKEN_EXPIRATION_TIME}
-            SEAT_HOLD_EXPIRATION_TIME: ${SEAT_HOLD_EXPIRATION_TIME}
             JWT_SECRET_KEY: ${JWT_SECRET_KEY}
             MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
             MYSQL_DATABASE: ${DATABASE}
@@ -44,14 +43,18 @@ services:
             - .:/app
             - /app/node_modules
         ports:
-            - '3000:3000'
+            - '50000:50000'
         networks:
             - ticketing-net
         depends_on:
             - redis
         external_links:
             - redis
+        extra_hosts:
+            - host.docker.internal:host-gateway
         command: pnpm run start
+        mem_limit: 1g #t3.micro
+        cpus: 2
 
     database:
         container_name: mariadb
@@ -64,6 +67,8 @@ services:
             MYSQL_DATABASE: ${DATABASE}
         networks:
             - ticketing-net
+        extra_hosts:
+            - host.docker.internal:host-gateway
         ports:
             - '3307:3306'
 
@@ -74,6 +79,8 @@ services:
             - '2181:2181'
         networks:
             - ticketing-net
+        extra_hosts:
+            - host.docker.internal:host-gateway
 
     kafka:
         container_name: kafka
@@ -97,12 +104,14 @@ services:
             - /var/run/docker.sock:/var/run/docker.sock
         networks:
             - ticketing-net
+        extra_hosts:
+            - host.docker.internal:host-gateway
         depends_on:
             - zookeeper
 
 networks:
     ticketing-net:
-        driver: bridge
+        external: true
 
 volumes:
     mariadb-data:

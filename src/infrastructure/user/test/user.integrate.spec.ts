@@ -15,6 +15,9 @@ import { GenerateTokenUseCase } from 'src/application/user/usecase/generate-toke
 import { GenerateTokenRequestDto } from 'src/application/user/dtos/generate-token.dto'
 import { v4 as uuidv4 } from 'uuid'
 import { RedisService } from 'src/infrastructure/db/redis/redis-service'
+import { CheckWaitingUseCase } from 'src/application/user/usecase/check-waiting.usecase'
+import { CheckWaitingRequestDto } from 'src/application/user/dtos/check-waiting.dto'
+import { WaitingSchedulerUseCase } from 'src/application/user/usecase/waiting-scheduler.usecase'
 
 describe('Integration Tests for User Use Cases', () => {
     let app: INestApplication
@@ -23,6 +26,8 @@ describe('Integration Tests for User Use Cases', () => {
     let createUserUseCase: CreateUserUseCase
     let readUserPointUseCase: ReadUserPointUseCase
     let generateTokenUseCase: GenerateTokenUseCase
+    let checkWaitingUseCase: CheckWaitingUseCase
+    let waitingSchedulerUseCase: WaitingSchedulerUseCase
     let redisService: RedisService
 
     beforeEach(async () => {
@@ -39,6 +44,8 @@ describe('Integration Tests for User Use Cases', () => {
         createUserUseCase = moduleFixture.get(CreateUserUseCase)
         readUserPointUseCase = moduleFixture.get(ReadUserPointUseCase)
         generateTokenUseCase = moduleFixture.get(GenerateTokenUseCase)
+        checkWaitingUseCase = moduleFixture.get(CheckWaitingUseCase)
+        waitingSchedulerUseCase = moduleFixture.get(WaitingSchedulerUseCase)
 
         await redisService.clearAllData()
     })
@@ -148,27 +155,14 @@ describe('Integration Tests for User Use Cases', () => {
             const requestDtoOne = new GenerateTokenRequestDto(requestUserId)
             const resultOne = await generateTokenUseCase.execute(requestDtoOne)
 
-            expect(resultOne.waitingNumber).toBe(0)
-
-            for (let i = 0; i < parseInt(process.env.MAX_CONNECTIONS, 10); i++) {
-                const uuid = uuidv4()
-                const userId = await getUserID(uuid)
-                const requestDto = new GenerateTokenRequestDto(userId)
-                await generateTokenUseCase.execute(requestDto)
-            }
-
-            const userId = await getUserID('tester')
-            const requestDto = new GenerateTokenRequestDto(userId)
-            const result = await generateTokenUseCase.execute(requestDto)
-
-            expect(result.waitingNumber).toBeGreaterThanOrEqual(1)
+            expect(resultOne.waitingNumber).toBe(1)
         })
 
         it(
-            'should manage user tokens correctly under maximum load',
+            'should manage user tokens correctly load',
             async () => {
                 const maxConnect = parseInt(process.env.MAX_CONNECTIONS, 10)
-                const userNames = Array.from({ length: 2 * maxConnect }, () => uuidv4()) // Generate double the MAX_CONNECT user IDs
+                const userNames = Array.from({ length: maxConnect }, () => uuidv4()) // Generate double the MAX_CONNECT user IDs
 
                 const userIds = []
                 for (let i = 0; i < userNames.length; ++i) {
@@ -185,15 +179,10 @@ describe('Integration Tests for User Use Cases', () => {
 
                 const results = await Promise.allSettled(tokenPromises)
 
-                let validTokenCount = 0
                 let waitingCount = 0
                 const countResults = results.map(response => {
                     if (response.status === 'fulfilled') {
-                        if (response.value.token) {
-                            validTokenCount++
-                        } else {
-                            waitingCount++
-                        }
+                        waitingCount++
                     } else {
                         return Promise.resolve(null) // 응답이 실패했거나 조건을 만족하지 못하는 경우, null 반환
                     }
@@ -201,8 +190,31 @@ describe('Integration Tests for User Use Cases', () => {
 
                 await Promise.allSettled(countResults)
 
-                expect(validTokenCount).toBeLessThanOrEqual(userIds.length)
-                expect(waitingCount).toBeGreaterThanOrEqual(1)
+                expect(waitingCount).toBe(maxConnect)
+
+                await waitingSchedulerUseCase.handleWaitingUser()
+
+                const checkWaitingPromises = userIds.map(userId => {
+                    const requestDto = new CheckWaitingRequestDto(userId)
+                    return checkWaitingUseCase.execute(requestDto)
+                })
+
+                const checkResults = await Promise.allSettled(checkWaitingPromises)
+
+                let validCount = 0
+                const validCountResults = checkResults.map(response => {
+                    if (response.status === 'fulfilled') {
+                        if (response.value.token) {
+                            validCount++
+                        }
+                    } else {
+                        return Promise.resolve(null) // 응답이 실패했거나 조건을 만족하지 못하는 경우, null 반환
+                    }
+                })
+
+                await Promise.allSettled(validCountResults)
+
+                expect(validCount).toBe(maxConnect)
             },
             6000 * 1000,
         )
