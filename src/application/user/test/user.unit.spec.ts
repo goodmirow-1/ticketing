@@ -95,7 +95,7 @@ describe('유저 서비스 유닛 테스트', () => {
         it('checkWaitingUseCase response is valid token', async () => {
             const uuid = uuidv4()
 
-            const requestDto = new CheckWaitingRequestDto(uuid)
+            const requestDto = new CheckWaitingRequestDto(uuid, 0)
 
             mockWaitingReaderRedisRepo.getValidTokenByUserId.mockResolvedValue('token')
 
@@ -109,7 +109,7 @@ describe('유저 서비스 유닛 테스트', () => {
         it('checkWaitingUseCase response is waiting', async () => {
             const uuid = uuidv4()
 
-            const requestDto = new CheckWaitingRequestDto(uuid)
+            const requestDto = new CheckWaitingRequestDto(uuid, 1)
 
             mockWaitingReaderRedisRepo.getValidTokenByUserId.mockResolvedValue(null)
             mockWaitingReaderRedisRepo.getWaitingNumber.mockResolvedValue(1)
@@ -124,7 +124,7 @@ describe('유저 서비스 유닛 테스트', () => {
         it('checkWaitingUseCase response is not waiting', async () => {
             const uuid = uuidv4()
 
-            const requestDto = new CheckWaitingRequestDto(uuid)
+            const requestDto = new CheckWaitingRequestDto(uuid, -1)
 
             mockWaitingReaderRedisRepo.getValidTokenByUserId.mockResolvedValue(null)
             mockWaitingReaderRedisRepo.getWaitingNumber.mockResolvedValue(-1)

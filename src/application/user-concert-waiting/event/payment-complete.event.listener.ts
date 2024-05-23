@@ -1,18 +1,19 @@
 import { Injectable } from '@nestjs/common'
-import { KafkaService } from '../../../infrastructure/db/kafka/kafka.service'
 import { OnEventSafe } from 'src/domain/common/on-event-safe.decorator'
-import { PaymentCompleteSecondEvent } from './payment-complete-second.event'
+import { PaymentCompleteEvent } from './payment-complete.event'
+import { KafkaService } from 'src/infrastructure/db/kafka/kafka.service'
 
 @Injectable()
-export class PaymentCompleteEventSecondListener {
+export class PaymentCompleteEventListener {
     constructor(private readonly kafkaService: KafkaService) {}
 
-    @OnEventSafe('payment.completed.second')
-    async handleReservationCreated(event: PaymentCompleteSecondEvent) {
+    @OnEventSafe('payment.completed')
+    async handleEvent(event: PaymentCompleteEvent) {
         const payload = {
             eventId: event.eventId,
             publishing: event.publishing,
-            paymentId: event.pointHistory.id,
+            userId: event.user.id,
+            reservationId: event.reservation.id,
         }
         await this.kafkaService.sendMessage('payment-completed', payload)
     }

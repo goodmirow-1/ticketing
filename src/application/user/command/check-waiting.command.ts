@@ -7,10 +7,11 @@ export class CheckWaitingCommand implements ICommand<CheckWaitingResponseDto> {
     constructor(
         private readonly usecase: CheckWaitingUseCase,
         private readonly userId: string,
+        private readonly waitingCount: number,
     ) {}
 
     execute(): Promise<CheckWaitingResponseDto> {
-        const requestDto = new CheckWaitingRequestDto(this.userId)
+        const requestDto = new CheckWaitingRequestDto(this.userId, this.waitingCount)
 
         return this.usecase.execute(requestDto)
     }

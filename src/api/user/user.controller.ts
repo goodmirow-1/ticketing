@@ -20,6 +20,7 @@ import { GenerateTokenCommand } from 'src/application/user/command/generate-toke
 import type { CheckWaitingResponseDto } from 'src/application/user/dtos/check-waiting.dto'
 import { CheckWaitingUseCase } from 'src/application/user/usecase/check-waiting.usecase'
 import { CheckWaitingCommand } from 'src/application/user/command/check-waiting.command'
+import { CheckWaitingDto } from './dtos/check-waiting.request.dto'
 
 @ApiTags('유저 API')
 @Controller('user')
@@ -40,17 +41,6 @@ export class UserController {
     @ApiResponse({ status: 200, description: 'Returns a new token or waiting number for the user.' })
     async generateToken(@Param('userId') userId: string, @Res() response: Response) {
         const command: ICommand<GenerateTokenResponseDto> = new GenerateTokenCommand(this.generateTokenUseCase, userId)
-        ResponseManager.from(response, await command.execute())
-    }
-
-    @Get(':userId/check/waiting')
-    @ApiOperation({
-        summary: '대기 확인',
-    })
-    @ApiParam({ name: 'userId', required: true, description: 'User ID', example: '' })
-    @ApiResponse({ status: 200, description: 'Returns a new token or waiting number for the user.' })
-    async checkWaiting(@Param('userId') userId: string, @Res() response: Response) {
-        const command: ICommand<CheckWaitingResponseDto> = new CheckWaitingCommand(this.checkWaitingUseCase, userId)
         ResponseManager.from(response, await command.execute())
     }
 
@@ -82,6 +72,18 @@ export class UserController {
     @ApiBody({ schema: { type: 'object', properties: { name: { type: 'string', example: 'John Doe' } } } })
     async createUser(@Body() createUserDto: CreateUserDto, @Res() response: Response) {
         const command: ICommand<CreateUserResponseDto> = new CreateUserCommand(this.createUserUseCase, createUserDto.name)
+        ResponseManager.from(response, await command.execute())
+    }
+
+    @Post(':userId/check/waiting')
+    @ApiOperation({
+        summary: '대기 확인',
+    })
+    @ApiParam({ name: 'userId', required: true, description: 'User ID', example: '' })
+    @ApiBody({ schema: { type: 'object', properties: { waitingNumber: { type: 'number', example: 1 } } } })
+    @ApiResponse({ status: 200, description: 'Returns a new token or waiting number for the user.' })
+    async checkWaiting(@Param('userId') userId: string, @Body() checkWaitingDto: CheckWaitingDto, @Res() response: Response) {
+        const command: ICommand<CheckWaitingResponseDto> = new CheckWaitingCommand(this.checkWaitingUseCase, userId, checkWaitingDto.waitingNumber)
         ResponseManager.from(response, await command.execute())
     }
 }

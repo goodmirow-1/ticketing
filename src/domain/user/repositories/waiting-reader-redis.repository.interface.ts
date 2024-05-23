@@ -1,7 +1,7 @@
 export const IWaitingReaderRepositoryRedisToken = Symbol('IWaitingReaderRedisRepository')
 
 export interface IWaitingReaderRedisRepository {
-    getWaitingNumber(userId: string): Promise<number>
+    getWaitingNumber(userId: string, waitingCount: number): Promise<number>
     getValidTokenByUserId(userId: string): Promise<string>
 
     acquireLock(lockKey: string, lockValue: string, ttl: number): Promise<boolean>

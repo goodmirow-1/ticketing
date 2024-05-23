@@ -25,7 +25,7 @@ export class WaitingWriterRepositoryRedis implements IWaitingWriterRedisReposito
           local user_ids = {}
 
           for i = 1, dequeue_count do
-              local user_id = redis.call("LPOP", queue_key)
+              local user_id = redis.call("RPOP", queue_key)
               if not user_id then
                   break
               end
