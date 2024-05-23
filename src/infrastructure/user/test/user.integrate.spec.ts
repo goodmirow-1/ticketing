@@ -195,7 +195,7 @@ describe('Integration Tests for User Use Cases', () => {
                 await waitingSchedulerUseCase.handleWaitingUser()
 
                 const checkWaitingPromises = userIds.map(userId => {
-                    const requestDto = new CheckWaitingRequestDto(userId)
+                    const requestDto = new CheckWaitingRequestDto(userId, 1)
                     return checkWaitingUseCase.execute(requestDto)
                 })
 

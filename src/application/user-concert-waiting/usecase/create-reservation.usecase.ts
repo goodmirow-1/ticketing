@@ -47,10 +47,10 @@ export class CreateReservationUseCase {
             // 사용 가능한 좌석수 차감
             await this.concertWriterRepository.updateConcertDateAvailableSeat(seat.concertDate.id, -1, session)
 
-            await this.dataAccessor.commitTransaction(session)
-
             //예약 성공 이벤트 발행
-            this.eventPublisher.createReservationCompletepublish(new CreateReservationCompleteEvent(reservation))
+            await this.eventPublisher.createReservationCompletepublish(new CreateReservationCompleteEvent(reservation))
+
+            await this.dataAccessor.commitTransaction(session)
         } catch (error) {
             await this.dataAccessor.rollbackTransaction(session)
             throw error

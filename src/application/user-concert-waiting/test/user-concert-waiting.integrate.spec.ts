@@ -106,11 +106,11 @@ describe('Integration Tests for User Use Cases', () => {
 
     const generateToken = async (userId: string) => {
         const requestDtoOne = new GenerateTokenRequestDto(userId)
-        await generateTokenUseCase.execute(requestDtoOne)
+        const tokenRes = await generateTokenUseCase.execute(requestDtoOne)
 
         await waitingSchedulerUseCase.handleWaitingUser()
 
-        const requestDtoTwo = new CheckWaitingRequestDto(userId)
+        const requestDtoTwo = new CheckWaitingRequestDto(userId, tokenRes.waitingNumber)
         const result = await checkWaitingUseCase.execute(requestDtoTwo)
         expect(result.waitingNumber).toBe(0)
     }

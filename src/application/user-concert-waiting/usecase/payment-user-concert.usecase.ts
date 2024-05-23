@@ -9,7 +9,7 @@ import { DataAccessor, DataAccessorToken } from 'src/infrastructure/db/data-acce
 import { IWaitingWriterRedisRepository, IWaitingWriterRepositoryRedisToken } from 'src/domain/user/repositories/waiting-writer-redis.repository.interface'
 import { EventPublisher } from '../event/event-publisher'
 import { IConcertWriterRepository, IConcertWriterRepositoryToken } from 'src/domain/concert/repositories/concert-writer.repository.interface'
-import { PaymentCompleteFirstEvent } from 'src/application/user-concert-waiting/event/payment-complete-first.event'
+import { PaymentCompleteEvent } from 'src/application/user-concert-waiting/event/payment-complete.event'
 import type { IReservation } from 'src/domain/concert/models/reservation.entity.interface'
 
 @Injectable()
@@ -51,14 +51,16 @@ export class PaymentUserConcertUseCase {
             this.concertReaderRepository.checkValidReservation(reservation, userId)
             //결제 진행(예약정보에 따른 사용자의 포인트 차감)
             await this.userWriterRepository.calculatePoint(user, -reservation.seat.price, 'payment', session)
+            //결제 내역 저장
+            await this.userWriterRepository.createPointHistory(user, -reservation.seat.price, reservation.id, session)
             //좌석 상태 변경
             await this.concertWriterRepository.updateSeatStatus(reservation.seat.id, 'held', session)
             //예약 상태 변경
             await this.concertWriterRepository.updateReservationPaymentCompleted(reservation.id, session)
+            //결제 성공 이벤트 발행
+            await this.eventPublisher.paymentCompetePublish(new PaymentCompleteEvent(user, reservation))
 
             await this.dataAccessor.commitTransaction(session)
-            //결제 성공 이벤트 발행
-            this.eventPublisher.paymentCompetePublish(new PaymentCompleteFirstEvent(user, reservation))
         } catch (error) {
             await this.dataAccessor.rollbackTransaction(session)
             throw error

@@ -1,8 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common'
-import type { GenerateTokenRequestType } from '../dtos/generate-token.dto'
-import { GenerateTokenResponseDto } from '../dtos/generate-token.dto'
 import type { IRequestDTO } from 'src/application/common/request.interface'
 import { IWaitingReaderRedisRepository, IWaitingReaderRepositoryRedisToken } from 'src/domain/user/repositories/waiting-reader-redis.repository.interface'
+import type { CheckWaitingRequestType } from '../dtos/check-waiting.dto'
+import { CheckWaitingResponseDto } from '../dtos/check-waiting.dto'
 
 @Injectable()
 export class CheckWaitingUseCase {
@@ -11,12 +11,12 @@ export class CheckWaitingUseCase {
         private readonly waitingReaderRedisRepository: IWaitingReaderRedisRepository,
     ) {}
 
-    async execute(requestDto: IRequestDTO<GenerateTokenRequestType>): Promise<GenerateTokenResponseDto> {
+    async execute(requestDto: IRequestDTO<CheckWaitingRequestType>): Promise<CheckWaitingResponseDto> {
         requestDto.validate()
 
-        const { userId } = requestDto.toUseCaseInput()
+        const { userId, waitingCount } = requestDto.toUseCaseInput()
 
-        const responseDto = new GenerateTokenResponseDto(userId, null, -1)
+        const responseDto = new CheckWaitingResponseDto(userId, null, -1)
 
         // 유효 토큰에 있는지 확인
         const validToken = await this.waitingReaderRedisRepository.getValidTokenByUserId(userId)
@@ -24,7 +24,7 @@ export class CheckWaitingUseCase {
             responseDto.token = validToken
             responseDto.waitingNumber = 0
         } else {
-            responseDto.waitingNumber = await this.waitingReaderRedisRepository.getWaitingNumber(userId)
+            responseDto.waitingNumber = await this.waitingReaderRedisRepository.getWaitingNumber(userId, waitingCount)
         }
 
         return responseDto

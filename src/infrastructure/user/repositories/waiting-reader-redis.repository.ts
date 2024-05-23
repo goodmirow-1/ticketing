@@ -6,10 +6,10 @@ import { RedisService } from 'src/infrastructure/db/redis/redis-service'
 export class WaitingReaderRepositoryRedis implements IWaitingReaderRedisRepository {
     constructor(private redisService: RedisService) {}
 
-    async getWaitingNumber(userId: string): Promise<number> {
-        const position = await this.redisService.lrange('waitingQueue', 0, -1)
+    async getWaitingNumber(userId: string, waitingCount: number): Promise<number> {
+        const position = await this.redisService.lrange('waitingQueue', 0, waitingCount)
         const index = position.indexOf(userId)
-        return index == -1 ? -1 : index + 1
+        return index == -1 ? -1 : position.length - index
     }
 
     async getValidTokenByUserId(userId: string): Promise<string> {

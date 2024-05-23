@@ -128,8 +128,21 @@ describe('AppController (e2e)', () => {
                 // 현재 배치에 대한 모든 요청을 동시에 처리
                 const tokenResponses = await Promise.allSettled(requests)
 
+                // 각 토큰 발급 응답을 처리하고, 필요한 경우 waitingNumber를 사용하여 check/waiting 요청 생성
+                const requestCheckWaiting = tokenResponses.map(response => {
+                    if (response.status === 'fulfilled' && response.value.status === HttpStatus.OK) {
+                        const waitingNumber = response.value.body.waitingNumber
+                        const userId = response.value.body.userId
+                        return request(app.getHttpServer()).post(`/user/${userId}/check/waiting`).send({ waitingNumber })
+                    } else {
+                        return Promise.resolve(null) // 응답이 실패했거나 조건을 만족하지 못하는 경우, null 반환
+                    }
+                })
+                // 현재 배치에 대한 모든 요청을 동시에 처리
+                const CheckWaitingResponses = await Promise.allSettled(requestCheckWaiting)
+
                 // 각 토큰 발급 응답을 처리하고, 필요한 경우 폴링을 시작
-                const concertAccessRequests = tokenResponses.map(response => {
+                const concertAccessRequests = CheckWaitingResponses.map(response => {
                     if (response.status === 'fulfilled' && response.value.status === HttpStatus.OK) {
                         const userId = response.value.body.userId
                         const { token, waitingNumber } = response.value.body
@@ -160,7 +173,7 @@ describe('AppController (e2e)', () => {
             await new Promise(resolve => setTimeout(resolve, 1000 * 5))
 
             try {
-                const statusResponse = await request(app.getHttpServer()).get(`/user/${param}/token/generate`)
+                const statusResponse = await request(app.getHttpServer()).post(`/user/${param}/check/waiting`).send({ waitingNumber })
                 if (statusResponse.body.waitingNumber == 0) {
                     return pollForTokenAvailability(statusResponse.body.token, statusResponse.body.waitingNumber)
                 } else {
@@ -197,15 +210,12 @@ describe('AppController (e2e)', () => {
             while (attempt < maxAttempts) {
                 attempt++
 
-                await new Promise(resolve => setTimeout(resolve, delay))
                 // 1. 콘서트 날짜 조회
                 const concertsResponse = await request(app.getHttpServer()).get('/user-concert/dates').set('Authorization', `Bearer ${token}`)
                 if (concertsResponse.status !== HttpStatus.OK) {
                     console.error('Failed to fetch concert dates or no dates available.')
                     return
                 }
-
-                await new Promise(resolve => setTimeout(resolve, delay))
 
                 // 2. 랜덤으로 콘서트 날짜 선택
                 // 콘서트 목록 중 concertDates가 있는 콘서트만 필터링
@@ -227,7 +237,6 @@ describe('AppController (e2e)', () => {
                     return
                 }
 
-                await new Promise(resolve => setTimeout(resolve, delay))
                 // 4. 사용 가능한 좌석 찾기
                 const availableSeats = seatsResponse.body.seats.filter(seat => seat.status === 'available')
                 if (availableSeats.length > 0) {
