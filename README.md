@@ -5,15 +5,20 @@ TDD 기반 콘서트 티케팅 서버 구축 프로젝트 입니다.
 # 목차
 
 - [요약](#요약)
+- [주요 기능](#주요기능)
 - [Git Branch 전략](#git-branch-전략)
 - [ERD](#erd)
+- [타임 라인](#타임라인)
+- [APIS](#apis)
+- [시퀀스 다이어그램](#시퀀스다이어그램)
+- [트러블 슈팅](#트러블슈팅)
 
-## 요약
+# 요약
 - 콘서트 예약 서비스를 구현합니다.
 - 대기열 시스템을 구축하고, 예약 서비스는 작업가능한 유저만 수행할 수 있도록 해야합니다.
 - 좌석 예약 요청시에, 결제가 이루어지지 않더라도 일정 시간동안 다른 유저가 해당 좌석에 접근할 수 없도록 합니다.
 
-## 주요 기능
+# 주요기능
  - 대기순서
  사용자가 예약 가능 날짜와 해당 날짜의 좌석을 조회할 때 대기열 토큰(대기 순서 포함)을 생성 합니다.
  대기열 토큰은 결제 완료 시 만료됩니다.
@@ -69,20 +74,36 @@ TDD 기반 콘서트 티케팅 서버 구축 프로젝트 입니다.
 
 <br />
 
-## 타임 라인
+# ERD
+
+<img width="820" alt="image" src="https://github.com/goodmirow-1/ticketing/assets/57578975/eff8f658-b15f-4f1d-9801-b28bf49e03c6">
+
+# 타임라인
 
  [마일스톤](https://github.com/goodmirow-1/ticketing/milestones)  [로드맵](https://github.com/users/goodmirow-1/projects/2/views/1)
 
-## APIS
+# APIS
 
- [스펙 및 스웨거](https://github.com/goodmirow-1/ticketing/blob/main/documents/README-API.md)
- 
+<img width="820" alt="image" src="https://github.com/goodmirow-1/ticketing/assets/57578975/ff05bc42-7549-448a-aa19-f8798e2abeeb">
 
-## 다이어그램
+# 시퀀스다이어그램
 
- [시퀀스 및 엔티티 릴레이션 링크](https://github.com/goodmirow-1/ticketing/blob/main/documents/README-DIAGRAMS.md)
+### 유저 토큰 발급
+<img width="820" alt="image" src="https://github.com/goodmirow-1/ticketing/assets/57578975/1ad4dec7-c3b3-45d0-aa4b-1a8a75f89bce">
 
-## 트러블 슈팅
+### 예약 가능 날짜 / 좌석 조회
+<img width="820" alt="image" src="https://github.com/goodmirow-1/ticketing/assets/57578975/1341b2e0-da85-4af9-8fe8-c0c1752c8105">
+
+### 좌석 예약
+<img width="820" alt="image" src="https://github.com/goodmirow-1/ticketing/assets/57578975/17d6dfd2-1db8-4f72-8aa5-203dec3fb594">
+
+### 잔액 조회 / 충전
+<img width="820" alt="image" src="https://github.com/goodmirow-1/ticketing/assets/57578975/18bc2740-0ae8-4cdf-9278-3a9611a28e91">
+
+### 결제
+<img width="820" alt="image" src="https://github.com/goodmirow-1/ticketing/assets/57578975/b2b5944a-dcae-4393-b1b4-3cedb2d941e3">
+
+# 트러블슈팅
 
  해당 내용은 시나리오 요구사항에 대한 분석 및 기능 구현시에 고민하고 해결해 나갔던 방법들에 대한 내용이며, 각 이슈당 접근,문제,해결,개선방안(선택) 순으로 나열됩니다.
 
