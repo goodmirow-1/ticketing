@@ -1,4 +1,12 @@
-# 콘서트 티케팅
+# Concert Ticketing Server
+
+TDD 기반 콘서트 티케팅 서버 구축 프로젝트 입니다.
+
+# 목차
+
+- [요약](#요약)
+- [Git Branch 전략](#git-branch-전략)
+- [ERD](#erd)
 
 ## 요약
 - 콘서트 예약 서비스를 구현합니다.
@@ -18,19 +26,48 @@
  사용자는 결제를 진행하여 좌석을 확정짓습니다.
  결제가 완료되면 대기열 토큰이 만료되고, 좌석 소유권이 사용자에게 이전됩니다.
 
+# Git branch 전략
+
+## 서버 환경 분리
+
+`dev` : 자유롭게 기능 개발을 위한 개발 환경
+
+`prod` : 실제 서비스가 운영되는 환경
+
+&#43; `staging` : 실제 운영 환경과 동일한 환경에서 QA 하기 위한 테스트 환경
+
 ## 브랜치 전략
- 각 phase(dev, cbt, prod)에 맞는 github actions workflow 에 대한 연구와 경험을 위해 Git-flow 전략을 선택했습니다.
- Git-flow에는 5가지 종류의 브랜치가 존재합니다. 항상 유지되는 메인 브랜치들(master, develop)과 일정 기간 동안만 유지되는 보조 브랜치들(feature, release, hotfix)이 있습니다.
- 
- master : 제품으로 출시될 수 있는 브랜치
- 
- develop : 개발 브랜치로 개발자들이 이 브랜치를 기준으로 각자 작업한 기능들을 Merge
- 
- feature : 단위 기능을 개발하는 브랜치로 기능 개발이 완료되면 develop 브랜치에 Merge
- 
- release : 배포를 위해 master 브랜치로 보내기 전에 먼저 QA(품질검사)를 하기위한 브랜치
- 
- hotfix : master 브랜치로 배포를 했는데 버그가 생겼을 떄 긴급 수정하는 브랜치
+
+`feature`
+
+- 기능 단위 개발 브랜치
+- develop 브랜치 기준으로 생성되는 브랜치로 기능 구현을 하기 위한 브랜치
+- 브랜치명 컨벤션 feat/{issue-number}/{구현 기능명} **(e.g. feat/issue-30/order)**
+
+**feature 브랜치 > develop 브랜치에 merge 기준**
+
+- CI 통과
+- pr 코드리뷰 완료 및 approve 2인 이상
+
+`develop`
+
+- dev 환경에 배포되는 브랜치로, feature 브랜치에서 기능 구현이 완료된 커밋들이 합쳐지는 브랜치
+- develop 브랜치에 커밋 merge 시 dev 환경의 application 배포
+
+`release`
+
+- 배포 대상인 develop 브랜치의 커밋들이 모여 운영 환경과 동일한 환경우로 배포하여 QA 하기 위한 브랜치
+- develop 브랜치에서 개발 및 테스트가 끝나고, production에 배포 되기 전 production과 동일한 환경(staging)에서 테스트하기 위한 브랜치
+
+**main 브랜치에 merge 기준**
+
+- staging 환경에서 테스트 완료
+
+`main`
+
+- release 브랜치에서 테스트가 끝난 후 운영 환경에 배포하는 브랜치
+
+<br />
 
 ## 타임 라인
 
