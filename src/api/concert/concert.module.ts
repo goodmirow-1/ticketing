@@ -11,6 +11,7 @@ import { ConcertReaderRepositoryTypeORM } from '../../infrastructure/concert/rep
 import { ConcertWriterRepositoryTypeORM } from '../../infrastructure/concert/repositories/concert-writer.repository'
 import { IConcertReaderRepositoryToken } from '../../domain/concert/repositories/concert-reader.repository.interface'
 import { IConcertWriterRepositoryToken } from '../../domain/concert/repositories/concert-writer.repository.interface'
+import { RedisService } from 'src/infrastructure/db/redis/redis-service'
 
 @Module({
     imports: [TypeOrmModule.forFeature([Concert, ConcertDate, Seat])],
@@ -19,6 +20,7 @@ import { IConcertWriterRepositoryToken } from '../../domain/concert/repositories
         CreateConcertUseCase,
         CreateConcertDateUseCase,
         CreateSeatUseCase,
+        RedisService,
         {
             provide: IConcertReaderRepositoryToken,
             useClass: ConcertReaderRepositoryTypeORM,

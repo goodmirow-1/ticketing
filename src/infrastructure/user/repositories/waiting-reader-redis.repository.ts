@@ -1,4 +1,5 @@
-import { Injectable } from '@nestjs/common'
+import { HttpStatus, Injectable } from '@nestjs/common'
+import { CustomException } from 'src/custom-exception'
 import type { IWaitingReaderRepository } from 'src/domain/user/repositories/waiting-reader.repository.interface'
 import { RedisService } from 'src/infrastructure/db/redis/redis-service'
 
@@ -26,6 +27,10 @@ export class WaitingReaderRepository implements IWaitingReaderRepository {
     }
 
     async validateUser(userId: string) {
-        return await this.redisService.validateUser(userId)
+        const isValidate = await this.redisService.get(`token:${userId}`)
+
+        if (!isValidate) {
+            throw new CustomException('Forbidden resource', HttpStatus.FORBIDDEN)
+        }
     }
 }

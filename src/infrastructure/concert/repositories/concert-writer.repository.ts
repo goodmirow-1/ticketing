@@ -7,16 +7,16 @@ import { Seat } from '../models/seat.entity'
 import { Reservation } from '../models/reservation.entity'
 import { FailedUpdateSeatStatusError } from '../../../domain/concert/exceptions/failed-update-seat-status.exception'
 import { FailedCreateReservationError } from '../../../domain/concert/exceptions/failed-create-reservation.exception'
-import { SchedulerRegistry } from '@nestjs/schedule'
 import { FailedUpdateReservationError } from '../../../domain/concert/exceptions/faild-update-reservation.exception'
 import { v4 as uuidv4 } from 'uuid'
 import { DuplicateReservationError } from 'src/domain/concert/exceptions/duplicate-reservation.exception'
+import { RedisService } from 'src/infrastructure/db/redis/redis-service'
 
 @Injectable()
 export class ConcertWriterRepositoryTypeORM implements IConcertWriterRepository {
     constructor(
         @Inject(EntityManager) private readonly entityManager: EntityManager,
-        private readonly schedulerRegistry: SchedulerRegistry,
+        private redisService: RedisService,
     ) {}
 
     /**
@@ -156,5 +156,9 @@ export class ConcertWriterRepositoryTypeORM implements IConcertWriterRepository 
         const manager = querryRunner ? querryRunner.manager : this.entityManager
 
         manager.delete(Reservation, reservationId)
+    }
+
+    async setSeatCache(key: string, value: string) {
+        return await this.redisService.set(key, value, 5000)
     }
 }

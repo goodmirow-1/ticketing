@@ -14,10 +14,14 @@ import { NotFoundReservationError } from 'src/domain/concert/exceptions/not-foun
 import { NotFoundConcertDateError } from 'src/domain/concert/exceptions/not-found-concert-date.exception'
 import { NotAuthReservationError } from 'src/domain/concert/exceptions/not-auth-reservation.exception'
 import { DuplicateReservationError } from 'src/domain/concert/exceptions/duplicate-reservation.exception'
+import { RedisService } from 'src/infrastructure/db/redis/redis-service'
 
 @Injectable()
 export class ConcertReaderRepositoryTypeORM implements IConcertReaderRepository {
-    constructor(@Inject(EntityManager) private readonly entityManager: EntityManager) {}
+    constructor(
+        @Inject(EntityManager) private readonly entityManager: EntityManager,
+        private redisService: RedisService,
+    ) {}
 
     /**
      * Checks if a concert date already exists in the database.
@@ -151,5 +155,9 @@ export class ConcertReaderRepositoryTypeORM implements IConcertReaderRepository 
         if (reservation.userId != userId) {
             throw new NotAuthReservationError()
         }
+    }
+
+    async getSeatCache(key: string) {
+        return await this.redisService.get(key)
     }
 }

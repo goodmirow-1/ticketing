@@ -19,4 +19,6 @@ export interface IConcertReaderRepository {
 
     findReservationById(reservationId: string, querryRunner?: any, lockOption?: any): Promise<IReservation>
     checkValidReservation(reservation: IReservation, userId: string)
+
+    getSeatCache(key: string)
 }

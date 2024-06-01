@@ -15,4 +15,6 @@ export interface IConcertWriterRepository {
     updateReservationPaymentCompleted(reservationId: string, querryRunner?: any)
 
     deleteReservation(reservationId: string, querryRunner?: any)
+
+    setSeatCache(key: string, value: string)
 }

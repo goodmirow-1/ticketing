@@ -1,7 +1,6 @@
-import { HttpStatus, Injectable } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import Redis from 'ioredis'
 import Redlock from 'redlock'
-import { CustomException } from 'src/custom-exception'
 
 export const RedisServiceToken = Symbol('RedisService')
 
@@ -72,11 +71,7 @@ export class RedisService {
     }
 
     async validateUser(userId: string) {
-        const isValidate = await this.redisClient.get(`token:${userId}`)
-
-        if (!isValidate) {
-            throw new CustomException('Forbidden resource', HttpStatus.FORBIDDEN)
-        }
+        return await this.redisClient.get(`token:${userId}`)
     }
 
     async clearAllData(): Promise<void> {
