@@ -8,7 +8,6 @@ export const RedisServiceToken = Symbol('RedisService')
 @Injectable()
 export class RedisService {
     private redisClient: Redis
-    private redisSubClient: Redis
     private readonly redlock: Redlock
     private readonly lockDuration = 5_000
 
@@ -22,31 +21,6 @@ export class RedisService {
         })
 
         this.redlock = new Redlock([this.redisClient])
-        this.redisSubClient = new Redis({
-            host: host,
-            port: port,
-        })
-
-        this.redisSubClient.setMaxListeners(100) // 원하는 수로 증가시킵니다.
-        this.redisSubClient.unsubscribe()
-        this.redisSubClient.removeAllListeners('message')
-    }
-
-    async onModuleDestroy() {
-        // 모든 구독 클라이언트의 리스너와 메시지 삭제
-        await this.redisSubClient.unsubscribe()
-        this.redisSubClient.removeAllListeners('message')
-    }
-
-    async clearTokensAndQueue() {
-        // 모든 'token:*' 키를 삭제
-        const keys = await this.redisClient.keys('token:*')
-        if (keys.length) {
-            await this.redisClient.del(...keys)
-        }
-
-        // 대기열 삭제
-        await this.redisClient.del('waitingQueue')
     }
 
     async get(key: string) {
