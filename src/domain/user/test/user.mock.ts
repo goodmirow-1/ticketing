@@ -6,6 +6,8 @@ export function initUserReaderMockRepo(): Record<keyof IUserReaderRepository, je
         findUserById: jest.fn(),
         findUserPointById: jest.fn(),
         checkValidPoint: jest.fn(),
+        acquireLock: jest.fn(),
+        releaseLock: jest.fn(),
     }
 }
 

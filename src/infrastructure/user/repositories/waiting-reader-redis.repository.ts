@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common'
-import type { IWaitingReaderRedisRepository } from 'src/domain/user/repositories/waiting-reader-redis.repository.interface'
+import type { IWaitingReaderRepository } from 'src/domain/user/repositories/waiting-reader.repository.interface'
 import { RedisService } from 'src/infrastructure/db/redis/redis-service'
 
 @Injectable()
-export class WaitingReaderRepositoryRedis implements IWaitingReaderRedisRepository {
+export class WaitingReaderRepository implements IWaitingReaderRepository {
     constructor(private redisService: RedisService) {}
 
     async getWaitingNumber(userId: string, waitingCount: number): Promise<number> {
@@ -17,12 +17,12 @@ export class WaitingReaderRepositoryRedis implements IWaitingReaderRedisReposito
         return token
     }
 
-    async acquireLock(lockKey: string, lockValue: string, ttl: number): Promise<boolean> {
-        return await this.redisService.acquireLock(lockKey, lockValue, ttl)
+    async acquireLock(key: string) {
+        return await this.redisService.acquireLock(key)
     }
 
-    async releaseLock(lockKey: string, lockValue: string): Promise<void> {
-        return await this.redisService.releaseLock(lockKey, lockValue)
+    async releaseLock(lock: any) {
+        return await this.redisService.releaseLock(lock)
     }
 
     async validateUser(userId: string) {

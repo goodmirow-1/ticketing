@@ -4,7 +4,7 @@ import { IConcertWriterRepository, IConcertWriterRepositoryToken } from '../../.
 import type { IRequestDTO } from 'src/application/common/request.interface'
 import type { CreateReservationRequestType } from '../dtos/create-reservation.dto'
 import { CreateReservationResponseDto } from '../dtos/create-reservation.dto'
-import { IWaitingReaderRedisRepository, IWaitingReaderRepositoryRedisToken } from 'src/domain/user/repositories/waiting-reader-redis.repository.interface'
+import { IWaitingReaderRepository, IWaitingReaderRepositoryToken } from 'src/domain/user/repositories/waiting-reader.repository.interface'
 import { DataAccessor, DataAccessorToken } from 'src/infrastructure/db/data-accesor.interface'
 import { CreateReservationCompleteEvent } from '../event/create-reservation-complete.event'
 import { EventPublisher } from '../event/event-publisher'
@@ -16,8 +16,8 @@ export class CreateReservationUseCase {
         private readonly concertReaderRepository: IConcertReaderRepository,
         @Inject(IConcertWriterRepositoryToken)
         private readonly concertWriterRepository: IConcertWriterRepository,
-        @Inject(IWaitingReaderRepositoryRedisToken)
-        private readonly waitingReaderRepository: IWaitingReaderRedisRepository,
+        @Inject(IWaitingReaderRepositoryToken)
+        private readonly waitingReaderRepository: IWaitingReaderRepository,
         @Inject(DataAccessorToken)
         private readonly dataAccessor: DataAccessor,
         private readonly eventPublisher: EventPublisher,

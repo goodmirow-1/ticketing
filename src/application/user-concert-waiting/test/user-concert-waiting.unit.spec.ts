@@ -151,6 +151,7 @@ describe('유닛 콘서트 서비스 유닛 테스트', () => {
             const userId = uuidv4()
             const reservationId = uuidv4()
 
+            mockUserReaderRepo.acquireLock.mockResolvedValue(true)
             mockConcertReaderRepo.findReservationById.mockRejectedValue(new NotFoundReservationError())
 
             const requestDto = new PaymentUserConcertRequestDto(userId, reservationId)
@@ -161,6 +162,7 @@ describe('유닛 콘서트 서비스 유닛 테스트', () => {
             const userId = uuidv4()
             const reservationId = uuidv4()
 
+            mockUserReaderRepo.acquireLock.mockResolvedValue(true)
             mockConcertReaderRepo.findReservationById.mockResolvedValue({ id: reservationId, seat: { id: '1' }, user: { id: '1', point: 100 }, amount: 101 })
             mockUserReaderRepo.findUserById.mockResolvedValue({ id: '1', name: 'test', point: 0, reservations: [] })
             mockUserWriterRepo.calculatePoint.mockRejectedValue(new InValidPointError())
@@ -173,6 +175,7 @@ describe('유닛 콘서트 서비스 유닛 테스트', () => {
             const userId = uuidv4()
             const reservationId = uuidv4()
 
+            mockUserReaderRepo.acquireLock.mockResolvedValue(true)
             mockConcertReaderRepo.findReservationById.mockResolvedValue({ id: reservationId, seat: { id: '1', price: 1 }, userId: userId })
             mockUserReaderRepo.findUserById.mockResolvedValue({ id: '1', name: 'test', point: 100, reservations: [] })
             mockUserWriterRepo.calculatePoint.mockResolvedValue(true)

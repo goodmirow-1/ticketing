@@ -1,14 +1,14 @@
 import { Inject, Injectable } from '@nestjs/common'
 import type { IRequestDTO } from 'src/application/common/request.interface'
-import { IWaitingReaderRedisRepository, IWaitingReaderRepositoryRedisToken } from 'src/domain/user/repositories/waiting-reader-redis.repository.interface'
+import { IWaitingReaderRepository, IWaitingReaderRepositoryToken } from 'src/domain/user/repositories/waiting-reader.repository.interface'
 import type { CheckWaitingRequestType } from '../dtos/check-waiting.dto'
 import { CheckWaitingResponseDto } from '../dtos/check-waiting.dto'
 
 @Injectable()
 export class CheckWaitingUseCase {
     constructor(
-        @Inject(IWaitingReaderRepositoryRedisToken)
-        private readonly waitingReaderRedisRepository: IWaitingReaderRedisRepository,
+        @Inject(IWaitingReaderRepositoryToken)
+        private readonly waitingReaderRedisRepository: IWaitingReaderRepository,
     ) {}
 
     async execute(requestDto: IRequestDTO<CheckWaitingRequestType>): Promise<CheckWaitingResponseDto> {

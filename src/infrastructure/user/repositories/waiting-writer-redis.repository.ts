@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common'
 import { generateAccessToken } from '../../../domain/common/jwt-token.util'
-import type { IWaitingWriterRedisRepository } from 'src/domain/user/repositories/waiting-writer-redis.repository.interface'
+import type { IWaitingWriterRepository } from 'src/domain/user/repositories/waiting-writer.repository.interface'
 import { RedisService } from 'src/infrastructure/db/redis/redis-service'
 
 @Injectable()
-export class WaitingWriterRepositoryRedis implements IWaitingWriterRedisRepository {
+export class WaitingWriterRepository implements IWaitingWriterRepository {
     constructor(private redisService: RedisService) {}
 
     // Implementation of IWaitingWriterRepository methods

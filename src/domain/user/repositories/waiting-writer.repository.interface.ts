@@ -1,6 +1,6 @@
-export const IWaitingWriterRepositoryRedisToken = Symbol('IWaitingWriterRedisRepository')
+export const IWaitingWriterRepositoryToken = Symbol('IWaitingWriterRepository')
 
-export interface IWaitingWriterRedisRepository {
+export interface IWaitingWriterRepository {
     enqueueWaitingUser(userId: string)
     dequeueWaitingUser(): Promise<string>
     dequeueWaitingUserIdList(dequeueCount: number): Promise<string[]>

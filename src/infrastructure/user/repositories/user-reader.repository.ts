@@ -4,10 +4,14 @@ import { EntityManager } from 'typeorm'
 import { User } from '../models/user.entity'
 import { NotFoundUserError } from '../../../domain/user/exceptions/not-found-user.exception'
 import { InValidPointError } from 'src/domain/user/exceptions/invalid-point.exception'
+import { RedisService } from 'src/infrastructure/db/redis/redis-service'
 
 @Injectable()
 export class UserReaderRepositoryTypeORM implements IUserReaderRepository {
-    constructor(@Inject(EntityManager) private readonly entityManager: EntityManager) {}
+    constructor(
+        @Inject(EntityManager) private readonly entityManager: EntityManager,
+        private redisService: RedisService,
+    ) {}
 
     /**
      * Validates that a user's point value is non-negative.
@@ -51,5 +55,13 @@ export class UserReaderRepositoryTypeORM implements IUserReaderRepository {
                 where: { id },
             })
             .then(user => user.point)
+    }
+
+    async acquireLock(key: string) {
+        return await this.redisService.acquireLock(key)
+    }
+
+    async releaseLock(lock: any) {
+        return await this.redisService.releaseLock(lock)
     }
 }

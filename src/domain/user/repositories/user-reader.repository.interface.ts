@@ -7,4 +7,7 @@ export interface IUserReaderRepository {
     findUserPointById(id: string): Promise<number>
 
     checkValidPoint(point: number): void
+
+    acquireLock(key: string)
+    releaseLock(lock: any)
 }

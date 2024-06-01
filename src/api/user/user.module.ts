@@ -14,10 +14,10 @@ import { IUserWriterRepositoryToken } from '../../domain/user/repositories/user-
 import { DataAccessorToken } from '../../infrastructure/db/data-accesor.interface'
 import { GenerateTokenUseCase } from 'src/application/user/usecase/generate-token.usecase'
 import { RedisService } from 'src/infrastructure/db/redis/redis-service'
-import { IWaitingReaderRepositoryRedisToken } from 'src/domain/user/repositories/waiting-reader-redis.repository.interface'
-import { WaitingReaderRepositoryRedis } from 'src/infrastructure/user/repositories/waiting-reader-redis.repository'
-import { IWaitingWriterRepositoryRedisToken } from 'src/domain/user/repositories/waiting-writer-redis.repository.interface'
-import { WaitingWriterRepositoryRedis } from 'src/infrastructure/user/repositories/waiting-writer-redis.repository'
+import { IWaitingReaderRepositoryToken } from 'src/domain/user/repositories/waiting-reader.repository.interface'
+import { WaitingReaderRepository } from 'src/infrastructure/user/repositories/waiting-reader-redis.repository'
+import { IWaitingWriterRepositoryToken } from 'src/domain/user/repositories/waiting-writer.repository.interface'
+import { WaitingWriterRepository } from 'src/infrastructure/user/repositories/waiting-writer-redis.repository'
 import { WaitingSchedulerUseCase } from 'src/application/user/usecase/waiting-scheduler.usecase'
 import { CheckWaitingUseCase } from 'src/application/user/usecase/check-waiting.usecase'
 
@@ -41,12 +41,12 @@ import { CheckWaitingUseCase } from 'src/application/user/usecase/check-waiting.
             useClass: UserWriterRepositoryTypeORM,
         },
         {
-            provide: IWaitingReaderRepositoryRedisToken,
-            useClass: WaitingReaderRepositoryRedis,
+            provide: IWaitingReaderRepositoryToken,
+            useClass: WaitingReaderRepository,
         },
         {
-            provide: IWaitingWriterRepositoryRedisToken,
-            useClass: WaitingWriterRepositoryRedis,
+            provide: IWaitingWriterRepositoryToken,
+            useClass: WaitingWriterRepository,
         },
         {
             provide: DataAccessorToken,

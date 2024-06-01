@@ -15,11 +15,11 @@ import { IUserReaderRepositoryToken } from 'src/domain/user/repositories/user-re
 import { UserReaderRepositoryTypeORM } from 'src/infrastructure/user/repositories/user-reader.repository'
 import { DataAccessorToken } from 'src/infrastructure/db/data-accesor.interface'
 import { TypeORMDataAccessor } from 'src/infrastructure/db/typeorm/typeorm-data-accesor'
-import { IWaitingWriterRepositoryRedisToken } from 'src/domain/user/repositories/waiting-writer-redis.repository.interface'
-import { WaitingWriterRepositoryRedis } from 'src/infrastructure/user/repositories/waiting-writer-redis.repository'
+import { IWaitingWriterRepositoryToken } from 'src/domain/user/repositories/waiting-writer.repository.interface'
+import { WaitingWriterRepository } from 'src/infrastructure/user/repositories/waiting-writer-redis.repository'
 import { RedisService } from 'src/infrastructure/db/redis/redis-service'
-import { IWaitingReaderRepositoryRedisToken } from 'src/domain/user/repositories/waiting-reader-redis.repository.interface'
-import { WaitingReaderRepositoryRedis } from 'src/infrastructure/user/repositories/waiting-reader-redis.repository'
+import { IWaitingReaderRepositoryToken } from 'src/domain/user/repositories/waiting-reader.repository.interface'
+import { WaitingReaderRepository } from 'src/infrastructure/user/repositories/waiting-reader-redis.repository'
 import { CreateReservationUseCase } from '../../application/user-concert-waiting/usecase/create-reservation.usecase'
 import { ReadAllConcertsUseCase } from '../../application/user-concert-waiting/usecase/read-all-concerts.usecase'
 import { ReadAllSeatsByConcertDateIdUseCase } from '../../application/user-concert-waiting/usecase/read-all-seats-by-concert-date.usecase'
@@ -60,12 +60,12 @@ import { PaymentCompleteEventListener } from 'src/application/user-concert-waiti
             useClass: UserWriterRepositoryTypeORM,
         },
         {
-            provide: IWaitingReaderRepositoryRedisToken,
-            useClass: WaitingReaderRepositoryRedis,
+            provide: IWaitingReaderRepositoryToken,
+            useClass: WaitingReaderRepository,
         },
         {
-            provide: IWaitingWriterRepositoryRedisToken,
-            useClass: WaitingWriterRepositoryRedis,
+            provide: IWaitingWriterRepositoryToken,
+            useClass: WaitingWriterRepository,
         },
         {
             provide: DataAccessorToken,

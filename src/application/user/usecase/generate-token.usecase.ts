@@ -2,13 +2,13 @@ import { Inject, Injectable } from '@nestjs/common'
 import type { GenerateTokenRequestType } from '../dtos/generate-token.dto'
 import { GenerateTokenResponseDto } from '../dtos/generate-token.dto'
 import type { IRequestDTO } from 'src/application/common/request.interface'
-import { IWaitingWriterRedisRepository, IWaitingWriterRepositoryRedisToken } from 'src/domain/user/repositories/waiting-writer-redis.repository.interface'
+import { IWaitingWriterRepository, IWaitingWriterRepositoryToken } from 'src/domain/user/repositories/waiting-writer.repository.interface'
 
 @Injectable()
 export class GenerateTokenUseCase {
     constructor(
-        @Inject(IWaitingWriterRepositoryRedisToken)
-        private readonly waitingWriterRedisRepository: IWaitingWriterRedisRepository,
+        @Inject(IWaitingWriterRepositoryToken)
+        private readonly waitingWriterRedisRepository: IWaitingWriterRepository,
     ) {}
 
     async execute(requestDto: IRequestDTO<GenerateTokenRequestType>): Promise<GenerateTokenResponseDto> {

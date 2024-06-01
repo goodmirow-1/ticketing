@@ -3,15 +3,15 @@ import { IConcertReaderRepository, IConcertReaderRepositoryToken } from '../../.
 import type { ReadAllSeatsByConcertDateRequestType } from '../dtos/read-all-seats-by-concert-date.dto'
 import { ReadAllSeatsByConcertResponseDto } from '../dtos/read-all-seats-by-concert-date.dto'
 import type { IRequestDTO } from 'src/application/common/request.interface'
-import { IWaitingReaderRedisRepository, IWaitingReaderRepositoryRedisToken } from 'src/domain/user/repositories/waiting-reader-redis.repository.interface'
+import { IWaitingReaderRepository, IWaitingReaderRepositoryToken } from 'src/domain/user/repositories/waiting-reader.repository.interface'
 
 @Injectable()
 export class ReadAllSeatsByConcertDateIdUseCase {
     constructor(
         @Inject(IConcertReaderRepositoryToken)
         private readonly concertReaderRepository: IConcertReaderRepository,
-        @Inject(IWaitingReaderRepositoryRedisToken)
-        private readonly waitingReaderRepository: IWaitingReaderRedisRepository,
+        @Inject(IWaitingReaderRepositoryToken)
+        private readonly waitingReaderRepository: IWaitingReaderRepository,
     ) {}
 
     async execute(requestDto: IRequestDTO<ReadAllSeatsByConcertDateRequestType>): Promise<ReadAllSeatsByConcertResponseDto> {

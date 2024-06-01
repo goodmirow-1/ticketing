@@ -1,5 +1,6 @@
 import { HttpStatus, Injectable } from '@nestjs/common'
 import Redis from 'ioredis'
+import Redlock from 'redlock'
 import { CustomException } from 'src/custom-exception'
 
 export const RedisServiceToken = Symbol('RedisService')
@@ -7,6 +8,9 @@ export const RedisServiceToken = Symbol('RedisService')
 @Injectable()
 export class RedisService {
     private redisClient: Redis
+    private redisSubClient: Redis
+    private readonly redlock: Redlock
+    private readonly lockDuration = 5_000
 
     constructor() {
         const host = process.env.REDIS_HOST
@@ -17,7 +21,21 @@ export class RedisService {
             port: port,
         })
 
-        //this.clearTokensAndQueue()
+        this.redlock = new Redlock([this.redisClient])
+        this.redisSubClient = new Redis({
+            host: host,
+            port: port,
+        })
+
+        this.redisSubClient.setMaxListeners(100) // 원하는 수로 증가시킵니다.
+        this.redisSubClient.unsubscribe()
+        this.redisSubClient.removeAllListeners('message')
+    }
+
+    async onModuleDestroy() {
+        // 모든 구독 클라이언트의 리스너와 메시지 삭제
+        await this.redisSubClient.unsubscribe()
+        this.redisSubClient.removeAllListeners('message')
     }
 
     async clearTokensAndQueue() {
@@ -71,21 +89,12 @@ export class RedisService {
         return await this.redisClient.eval(script, numkeys, ...keysAndArgs)
     }
 
-    // Utility methods could be part of your RedisService or a separate LockService
-    async acquireLock(lockKey: string, lockValue: string, ttl: number): Promise<boolean> {
-        const result = await this.redisClient.set(lockKey, lockValue, 'PX', ttl, 'NX')
-        return result === 'OK'
+    async acquireLock(key: string) {
+        return await this.redlock.acquire([`lock:${key}`], this.lockDuration)
     }
 
-    async releaseLock(lockKey: string, lockValue: string): Promise<void> {
-        const script = `
-            if redis.call("get", KEYS[1]) == ARGV[1] then
-                return redis.call("del", KEYS[1])
-            else
-                return 0
-            end
-        `
-        await this.redisClient.eval(script, 1, lockKey, lockValue)
+    async releaseLock(lock: any) {
+        return await lock.release()
     }
 
     async validateUser(userId: string) {

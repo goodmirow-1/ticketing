@@ -1,7 +1,7 @@
-import type { IWaitingReaderRedisRepository } from '../repositories/waiting-reader-redis.repository.interface'
-import type { IWaitingWriterRedisRepository } from '../repositories/waiting-writer-redis.repository.interface'
+import type { IWaitingReaderRepository } from '../repositories/waiting-reader.repository.interface'
+import type { IWaitingWriterRepository } from '../repositories/waiting-writer.repository.interface'
 
-export function initWaitingReaderRedisMockRepo(): Record<keyof IWaitingReaderRedisRepository, jest.Mock> {
+export function initWaitingReaderRedisMockRepo(): Record<keyof IWaitingReaderRepository, jest.Mock> {
     return {
         getWaitingNumber: jest.fn(),
         getValidTokenByUserId: jest.fn(),
@@ -11,7 +11,7 @@ export function initWaitingReaderRedisMockRepo(): Record<keyof IWaitingReaderRed
     }
 }
 
-export function initWaitingWriterRedisMockRepo(): Record<keyof IWaitingWriterRedisRepository, jest.Mock> {
+export function initWaitingWriterRedisMockRepo(): Record<keyof IWaitingWriterRepository, jest.Mock> {
     return {
         enqueueWaitingUser: jest.fn(),
         dequeueWaitingUser: jest.fn(),
