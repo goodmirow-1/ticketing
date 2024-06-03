@@ -19,7 +19,7 @@ TDD 기반 콘서트 티케팅 서버 구축 프로젝트 입니다.
     -   [잔액 조회 및 충전](#잔액-조회-및-충전)
     -   [결제](#결제)
 -   [트러블 슈팅](#트러블슈팅)
-    -   [아키텍쳐 설계](#아키텍쳐-설계)
+    -   [아키텍처 개선을 통한 도메인 보호 및 유지보수성 향상](#아키텍처-개선을-통한-도메인-보호-및-유지보수성-향상)
     -   [동시성 문제와 극복](https://velog.io/@goodmirow/7%EC%A3%BC%EC%B0%A8-%EB%8F%99%EC%8B%9C%EC%84%B1-%EB%AC%B8%EC%A0%9C%EC%99%80-%EA%B7%B9%EB%B3%B5)
     -   [DB Index설정과 캐싱](https://velog.io/@goodmirow/8%EC%A3%BC%EC%B0%A8-%EC%A0%81%EC%9D%80-%EB%B6%80%ED%95%98%EB%A1%9C-%ED%8A%B8%EB%9E%98%ED%94%BD-%EC%B2%98%EB%A6%AC%ED%95%98%EA%B8%B0)
     -   [서비스 확장에 대한 고찰](https://velog.io/@goodmirow/%EC%84%9C%EB%B9%84%EC%8A%A4-%ED%99%95%EC%9E%A5%EC%97%90-%EB%8C%80%ED%95%9C-%EA%B3%A0%EC%B0%B0)
