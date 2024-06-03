@@ -128,38 +128,39 @@ TDD 기반 콘서트 티케팅 서버 구축 프로젝트 입니다.
 
 # 트러블슈팅
 
-해당 내용은 시나리오 요구사항에 대한 분석 및 기능 구현시에 고민하고 해결해 나갔던 방법들에 대한 내용이며, 각 이슈당 접근,문제,해결,개선방안(선택) 순으로 나열됩니다.
+## 아키텍처 개선을 통한 도메인 보호 및 유지보수성 향상
 
-## 아키텍쳐 설계
+### 기존 아키텍처의 문제점
 
-**접근** :
+기존의 단일 레이어드 아키텍처는 상위 계층이 하위 계층에 의존하는 단방향 흐름을 가지고 있었습니다. 이로 인해 하위 계층의 변경이 상위 계층에 영향을 주는 문제가 발생하여 유지보수가 어려웠습니다.
 
-기존에 자주 사용하던 단일 레이어드는 (Request: Presentation Layer -> Business Layer -> Persistance Layer -> Database Layer)(Response : DB -> Persistance -> Service -> Controller) 의 흐름을 가진다. 이는 상위 계층 → 하위 계층 호출의 단방향 흐름을 유지 하게 됨으로써 하위 계층의 변경이 상위 계층에 영향을 줄 수 있는 문제가 발생한다.
+### 개선된 아키텍처
 
-그래서 다음과 같은 흐름을 가지는 아키텍처를 적용해 도메인을 보호할수 있도록 한다. (controller -> Service -> Repository(interfcae) <- RepositoryImpl->ORM) 와 같이 추상 계층을 만듬으로서 (Request: Presentation -> Business) (Reponse: Database -> Business) 와 같이 business 중심의 흐름을 가질 수가 있다.
+**계층 구조:**
 
-**문제** :
+- **API (Presentation):** 외부와의 소통을 담당하며, 컨트롤러, 모듈 등을 포함합니다.
+- **Application (Business):** 도메인 서비스들을 조합하여 사용자의 요구사항(use case)을 처리하는 로직을 구현합니다.
+- **Domain (Abstract):** 핵심 비즈니스 로직을 캡슐화하며, 모델과 Repository 인터페이스를 정의합니다.
+- **Infrastructure (Persistence):** 데이터베이스와의 통신 및 데이터 처리를 담당하며, 엔티티와 Repository 구현체를 포함합니다.
 
-1.  어떤 레이어(디렉토리)들로 구상할것이며, 각각은 어떤 기능을 담당하는가
+**도메인 모델 구성:**
 
-2.  엔티티들을 도메인별로 어떻게 묶어야하며, 도메인 순수성은 어떻게 확보할 것인가
+- **Concert:** 콘서트, 콘서트 날짜, 좌석, 예약 등 콘서트 관련 엔티티를 포함합니다.
+- **User:** 사용자, 포인트 내역 등 사용자 관련 엔티티를 포함합니다.
 
-**해결** :
+**도메인 순수성 확보:**
 
-1.  어떤 레이어(디렉토리)들로 구상할것이며, 각각은 어떤 기능을 담당하는가 : Api(Presentation) / Application ( Business ) / Domain ( abstract ) / Infrastructure ( Persistence ) 로 나뉘었으며 각각의 기능과 파일은 다음과 같습니다.
+- **Application Join:** 서로 다른 도메인 간의 연관 관계는 데이터베이스 조인이 아닌 애플리케이션 레벨에서 처리하여 도메인 모델의 순수성을 유지합니다.
 
-    Api(Presentation) : 외부와 소통하는 역할을 하며 controller,module에 대한 파일을 가지고 있습니다.
+### 추가 개선 방안
 
-    Application ( Business ) : Domain단계에서 만들어낸 파편화된 service로직들을 조합하여 usecase에 대한 필요한 기능을 제공과 파일을 가지고 있습니다.
+- **Reservation 도메인 분리:** 콘서트 도메인의 책임 분리를 위해 예약 및 결제 관련 기능을 별도의 도메인으로 분리하여 관리할 수 있습니다.
 
-    Domain ( abstract ) : Infrastructure에서 필요한 model과 repository에 해당하는 interface 파일들을 가지고 있습니다.
+### 기대 효과
 
-    Infrastructure ( Persistence ) : DB와 직접 통신하며 처리하는 기능을 합니다. entity와 repository에 해당하는 파일들을 가지고 있습니다.
+이러한 아키텍처 개선을 통해 다음과 같은 효과를 기대할 수 있습니다.
 
-2.  엔티티들을 도메인별로 어떻게 묶어야하며, 도메인 순수성은 어떻게 확보할 것인가 : 먼저 엔티티들을 도메인에 크게 비슷한 계열로 묶어야 한다고 판단했습니다. 그래서 Concert / User 으로 묶었고 각 도메인별 포함 엔티티는 다음과 같습니다. Concert ( Concert, ConcertDate, Seat, Reservation ) / User ( User, PointHistory )
+- **도메인 모델의 명확성 및 응집도 향상:** 각 도메인이 핵심 비즈니스 로직에 집중하여 코드의 가독성과 유지보수성을 높입니다.
+- **유연성 및 확장성 증대:** 계층 간의 느슨한 결합으로 인해 특정 계층의 변경이 다른 계층에 미치는 영향을 최소화하여 시스템의 유연성과 확장성을 향상시킵니다.
+- **테스트 용이성 확보:** 각 계층을 독립적으로 테스트할 수 있도록 하여 테스트 효율성을 높이고 버그 발생 가능성을 줄입니다.
 
-그리고 도메인의 순수성을 확보하기 위해서 서로 다른 도메인끼리는 joinColumn이 아닌 Application join을 사용하게끔 하였습니다.
-
-**개선방안** :
-
-1.  Concert 도메인의 책임 분리를 위해 예약 좌석을 결제하는 도메인(Reservation, Payment)를 나누는 방법도 생각해 볼 수 있습니다.
