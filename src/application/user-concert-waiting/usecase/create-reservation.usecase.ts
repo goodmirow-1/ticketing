@@ -36,9 +36,7 @@ export class CreateReservationUseCase {
 
         try {
             //좌석 조회
-            const seat = await this.concertReaderRepository.findSeatById(seatId, session, {
-                mode: 'pessimistic_write',
-            })
+            const seat = await this.concertReaderRepository.findSeatById(seatId, session)
             //예약 저장
             reservation = await this.concertWriterRepository.createReservation(seat, userId, session)
 

@@ -11,51 +11,51 @@ export class KafkaService implements OnModuleInit, OnModuleDestroy {
     private consumer: Consumer
 
     constructor() {
-        // this.kafka = new Kafka({
-        //     clientId: 'concert-app',
-        //     brokers: [process.env.KAFKA_HOST + ':9092'], // Kafka 브로커 주소
-        // })
-        // this.producer = this.kafka.producer({ createPartitioner: Partitioners.LegacyPartitioner })
-        // this.consumer = this.kafka.consumer({ groupId: 'reservation-group' })
+        this.kafka = new Kafka({
+            clientId: 'concert-app',
+            brokers: [process.env.KAFKA_HOST + ':9092'], // Kafka 브로커 주소
+        })
+        this.producer = this.kafka.producer({ createPartitioner: Partitioners.LegacyPartitioner })
+        this.consumer = this.kafka.consumer({ groupId: 'reservation-group' })
     }
 
     async onModuleInit() {
-        // await this.producer.connect()
-        // await this.consumer.connect()
-        // await this.consumer.subscribe({ topic: 'reservation-created-completed', fromBeginning: true })
-        // await this.consumer.subscribe({ topic: 'payment-completed', fromBeginning: true })
-        // await this.consumer.run({
-        //     eachMessage: async ({ topic, partition, message }) => {
-        //         const payload = JSON.parse(message.value.toString())
-        //         this.logger.log(`Received message: ${JSON.stringify(payload)} from topic: ${topic}`)
-        //         switch (topic) {
-        //             case 'reservation-created-completed':
-        //                 await this.handleReservationCreated(payload, partition)
-        //                 break
-        //             case 'payment-completed':
-        //                 await this.handlePaymentCompleted(payload, partition)
-        //                 break
-        //             default:
-        //                 this.logger.warn(`No handler for topic: ${topic}`)
-        //                 break
-        //         }
-        //     },
-        // })
+        await this.producer.connect()
+        await this.consumer.connect()
+        await this.consumer.subscribe({ topic: 'reservation-created-completed', fromBeginning: true })
+        await this.consumer.subscribe({ topic: 'payment-completed', fromBeginning: true })
+        await this.consumer.run({
+            eachMessage: async ({ topic, partition, message }) => {
+                const payload = JSON.parse(message.value.toString())
+                this.logger.log(`Received message: ${JSON.stringify(payload)} from topic: ${topic}`)
+                switch (topic) {
+                    case 'reservation-created-completed':
+                        await this.handleReservationCreated(payload, partition)
+                        break
+                    case 'payment-completed':
+                        await this.handlePaymentCompleted(payload, partition)
+                        break
+                    default:
+                        this.logger.warn(`No handler for topic: ${topic}`)
+                        break
+                }
+            },
+        })
     }
 
     async sendMessage(topic: string, message: any) {
-        // try {
-        //     await this.producer.send({
-        //         topic,
-        //         messages: [{ value: JSON.stringify(message) }],
-        //     })
-        // } catch (err) {
-        //     console.log(err)
-        // }
+        try {
+            await this.producer.send({
+                topic,
+                messages: [{ value: JSON.stringify(message) }],
+            })
+        } catch (err) {
+            console.log(err)
+        }
     }
 
     async onModuleDestroy() {
-        //await this.consumer.disconnect()
+        await this.consumer.disconnect()
     }
 
     private async handleReservationCreated(payload: any, partition: number) {
